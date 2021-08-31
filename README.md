@@ -1,2 +1,2 @@
 # OpenInSAR
-Open software for Persistent Scatterer Interferoretry and more.
+Open software for Persistent Scatterer Interferometry and more.
