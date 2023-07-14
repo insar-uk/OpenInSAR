@@ -29,7 +29,7 @@ methods (Static)
                 pluginHandle = OI.Plugins.Coregistration;
             case {'Substacking'}
                 pluginHandle = OI.Plugins.Substacking;
-            otherwise
+            otherwise % Use the interpreter
                 ui.log('debug', ['Plugin ' pluginName ' not found' '\n']);
                 try
                     pluginHandle = eval(['OI.Plugins.' pluginName]);

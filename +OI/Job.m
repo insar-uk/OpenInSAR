@@ -9,6 +9,7 @@ end
 properties (SetAccess = private, GetAccess = private)
     validFields = { 'name', 'target', 'arguments'};
 end
+%#ok<*AGROW> - jobs as strings are small, so we can grow them
 
 methods 
     function obj = Job(varargin)
@@ -21,7 +22,6 @@ methods
             if ischar(varargin{1})
                 arg = varargin{1};
                 if numel(arg)<3 || ~strcmp(arg(1:3),'Job')
-                    arg
                     obj.name = arg;
                 else
                     obj = parse_from_string(obj,varargin{1});
@@ -70,32 +70,32 @@ methods
         jobStr = jobStr(5:end-1);
 
         % split the string into name, target, and arguments
-        [name,jobStr] = strtok(jobStr,',');
-        [target,jobStr] = strtok(jobStr,',');
+        [jobName,jobStr] = strtok(jobStr,',');
+        [jobTarget,jobStr] = strtok(jobStr,',');
         
         % remove the quotes
-        name = name(2:end-1);
-        target = target(2:end-1);
+        jobName = jobName(2:end-1);
+        jobTarget = jobTarget(2:end-1);
         % remove the braces
         jobStr = jobStr(3:end-1);
-        arguments = strsplit(jobStr,',');
+        jobArguments = strsplit(jobStr,',');
         
-        for i = 1:length(arguments)
-            if isempty(arguments{i})
+        for i = 1:length(jobArguments)
+            if isempty(jobArguments{i})
                 continue
             end
             % if quotes, string, else numeric
-            if arguments{i}(1) == '''' && arguments{i}(end) == ''''
-                arguments{i} = arguments{i}(2:end-1);
+            if jobArguments{i}(1) == '''' && jobArguments{i}(end) == ''''
+                jobArguments{i} = jobArguments{i}(2:end-1);
             else
-                arguments{i} = str2num(arguments{i});
+                jobArguments{i} = str2num(jobArguments{i}); %#ok<ST2NM>
             end
         end
 
         % set the properties
-        this.name = name;
-        this.target = target;
-        this.arguments = arguments;
+        this.name = jobName;
+        this.target = jobTarget;
+        this.arguments = jobArguments;
     end
 
     function this = parse_from_struct(this,jobStruct)

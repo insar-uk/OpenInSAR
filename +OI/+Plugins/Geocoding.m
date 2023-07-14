@@ -81,9 +81,6 @@ classdef Geocoding < OI.Plugins.PluginBase
             end
 
             % address of the data in the catalogue and metadata
-            % safeIndex = thisRef.segments.safe( segInd );
-            % swathIndex = thisRef.segments.swath( segInd );
-            % burstIndex = thisRef.segments.burst( segInd );
             safeIndex= stacks.stack.segments.safe( segInd );
             swathIndex =stacks.stack.segments.swath( segInd );
             burstIndex = stacks.stack.segments.burst( segInd );
@@ -95,10 +92,7 @@ classdef Geocoding < OI.Plugins.PluginBase
             [lpb,spb,nearRange,rangeSampleDistance] = ...
                 OI.Plugins.Geocoding.get_parameters( swathInfo );
 
-            % % Get some useful geometry variables
-            % [rangeSample, azLine, corners, sz, nSamps] = ...
-            %     OI.Plugins.Geocoding.get_geometry(lpb,spb);
-
+            % get the orbit
             engine.ui.log('info','Interpolating orbits\n');
             [orbit, lineTimes] = ...
                 OI.Plugins.Geocoding.get_poe_and_timings( ...
@@ -115,13 +109,8 @@ classdef Geocoding < OI.Plugins.PluginBase
                         tOrbit.vz(:) ...
                     ];
 
-
-            % [satXYZ,satV] = OI.Plugins.Geocoding.get_ephemerides( ...
-            %     cat, safeIndex, swathInfo, burstIndex );
-            % satXYZ = repmat(satXYZ,spb,1);
-            % satV = repmat(satV,spb,1);
-            
-            elevation = 'a variable, not some useless function you dumped into my namespace without asking u absolutely horrendous piece of software';
+            % define this variable because matlab pollutes the namespace
+            elevation = 'a variable not a function';
             toleranceProgression = 10.^(0:-1:-1);
             
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -88,17 +88,14 @@ methods
         if thisSafeExists
             engine.ui.log('info', 'SAFE Folder %s already exists, skipping download\n', strrep(this.outputs{1}.filepath, '\', '\\'));
         else
-            % Create a wget command
-            % to download the file
+            % Create a wget command to download the file
             % continue if the file already exists using -c
             % don't check the certificate
-
-            saferZipPath = this.outputs{1}.zippath;
-            % saferZipPath=strrep(saferZipPath,'\','\\');
+            zipPath = this.outputs{1}.zippath;
             sysCall = ...
                 sprintf(...
                 "wget -c -q -O %s --user=%s --password=%s %s --no-check-certificate", ...
-                saferZipPath, username, password, this.URL);
+                zipPath, username, password, this.URL);
             engine.ui.log('debug','Sys call: %si\n', strrep(sysCall,'\','\\'));
             system(sysCall)
         end% if

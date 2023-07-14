@@ -69,12 +69,4 @@ classdef GetDEM < OI.Plugins.PluginBase
 
     end
 
-    methods (Static = true)
-        function dem = get_srtm_dem( minLat, maxLat, minLon, maxLon )
-            % Get the DEM
-            dem = OI.Data.DEM();
-            
-            
-        end
-    end
 end
