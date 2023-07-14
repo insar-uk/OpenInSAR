@@ -1,10 +1,10 @@
 classdef Datetime < OI.Data.DataObj
 properties
-	daysSinceZero = now();
+    daysSinceZero = now();
 end
 
 methods
-	function this = Datetime( datenumOrString, format)
+    function this = Datetime( datenumOrString, format)
         % Datetime constructor.  Can be called with a string or a datenum.
         if nargin == 0
           return

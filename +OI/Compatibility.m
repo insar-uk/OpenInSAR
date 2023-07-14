@@ -74,53 +74,53 @@ methods (Static = true)
         tf = isa(s,'char') || isa(s,'string');
     end
     
-	function tf = is_string( s )
+    function tf = is_string( s )
         tf = isa(s,'char') || isa(s,'string');
-	end
+    end
 
     function txt = xml_stringify( inputStruct )
-		if OI.Compatibility.isOctave
-			txt = OI_Xml_to_text( inputStruct );
-		else
-			% convert a struct to xml
+        if OI.Compatibility.isOctave
+            txt = OI_Xml_to_text( inputStruct );
+        else
+            % convert a struct to xml
             txt = OI.Functions.struct2xml(inputStruct);
-		end
-	end
+        end
+    end
 
-	function TF = contains(X1,X2)
-		if OI.Compatibility.isOctave
-			if iscell(X1)
-				for ii=1:numel(X1)
-					X1{ii}=lower(X1{ii});
-				end
-				TF=~cellfun('isempty', strfind(X1, lower(X2))); %#ok<STRCL1>
-				return
-			end
+    function TF = contains(X1,X2)
+        if OI.Compatibility.isOctave
+            if iscell(X1)
+                for ii=1:numel(X1)
+                    X1{ii}=lower(X1{ii});
+                end
+                TF=~cellfun('isempty', strfind(X1, lower(X2))); %#ok<STRCL1>
+                return
+            end
 
-			if iscell(X2)
-				for ii=1:numel(X2)
-					if strfind(lower(X1), lower(X2{ii})) %#ok<STRIFCND>
-						TF=true;
-						return
-					end
-				end
-				TF=false;
-				return
-			end
+            if iscell(X2)
+                for ii=1:numel(X2)
+                    if strfind(lower(X1), lower(X2{ii})) %#ok<STRIFCND>
+                        TF=true;
+                        return
+                    end
+                end
+                TF=false;
+                return
+            end
 
-			if isstring(X1)||all(ischar(X1))
-				TF=strfind(X1, X2);
-				if isempty(TF) %#ok<STREMP>
-					TF=false;
-				else
-					TF = true;
-				end
-				return
-			end
-		else
-			TF = contains(X1,X2);
-		end%if isOctave
-	end%contains
+            if isstring(X1)||all(ischar(X1))
+                TF=strfind(X1, X2);
+                if isempty(TF) %#ok<STREMP>
+                    TF=false;
+                else
+                    TF = true;
+                end
+                return
+            end
+        else
+            TF = contains(X1,X2);
+        end%if isOctave
+    end%contains
 end
 
 end%classdef

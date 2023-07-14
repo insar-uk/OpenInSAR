@@ -220,18 +220,18 @@ methods
             OI.Plugins.Geocoding.get_poe_and_timings( ...
                 cat, safeIndex, swathInfo, burstIndex );
 
-		% ensure 'virtual' timings for secondary match the size of reference timings
-		if (lpbRef ~= lpb)
-			engine.ui.log('warning','Lines per burst mismatch between reference and secondary during coregistration of visit %i segment %i\n',...
-				this.visitIndex, this.referenceSegmentIndex)
-			isLongOnFirstDim = size(lineTimes,1) > size(lineTimes,2);
-			lineTimes=lineTimes(1):ati/86400:(lineTimes(1)+(lpbRef-1)*ati/86400);
-			if isLongOnFirstDim
-				lineTimes = lineTimes(:);
-			end
-				
-		end
-				
+        % ensure 'virtual' timings for secondary match the size of reference timings
+        if (lpbRef ~= lpb)
+            engine.ui.log('warning','Lines per burst mismatch between reference and secondary during coregistration of visit %i segment %i\n',...
+                this.visitIndex, this.referenceSegmentIndex)
+            isLongOnFirstDim = size(lineTimes,1) > size(lineTimes,2);
+            lineTimes=lineTimes(1):ati/86400:(lineTimes(1)+(lpbRef-1)*ati/86400);
+            if isLongOnFirstDim
+                lineTimes = lineTimes(:);
+            end
+                
+        end
+                
         if ~haveFoundOffsets % if we already have offsets we can skip this
             % we need one more input...
             geocodingData = OI.Data.LatLonEleForImage().configure( ...

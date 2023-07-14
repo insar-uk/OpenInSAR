@@ -47,7 +47,7 @@ properties (Constant = true)
                         "*int32";
                         "*single";
                         "*double";
-                        "*uint32";	]
+                        "*uint32";    ]
     % Map the tiff type code to its byte count via index
     bytesPerItem = [1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8, 4];
     % Number of vals per type

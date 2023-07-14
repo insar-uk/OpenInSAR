@@ -7,17 +7,17 @@ properties
 end
 
 methods
-	function command = input( this, prompt )
+    function command = input( this, prompt )
         if this.get_debug_level() > 3
             dbs = dbstack;
             % print callee and line number
             this.log( 4, sprintf('%s: %d\n', dbs(2).name, dbs(2).line));
         end
         % Read a command from the user. Same as input() in Oct/Mat.
-		command = this.m_input.str([prompt newline]);
-	end
+        command = this.m_input.str([prompt newline]);
+    end
 
-	function log( this, debugLevel, message, varargin)
+    function log( this, debugLevel, message, varargin)
         % Log a message to the output stream. Similar to fprintf() in Oct/Mat.
         switch nargin
             case 2
@@ -29,8 +29,8 @@ methods
             % otherwise
             %     error('Invalid number of arguments.');
         end
-		
-	end
+        
+    end
 
     function set_debug_level(this, debugLevel)
         % Set the debug level of the output stream.

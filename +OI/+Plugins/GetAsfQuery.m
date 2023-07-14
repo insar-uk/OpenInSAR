@@ -35,19 +35,19 @@ methods
         query = OI.Query( this.url , params );
         this.queryUrl = query.format_url_gently();
 
-	this.outputs{1} = this.outputs{1}.resolve_filename( engine );
-	fn = [this.outputs{1}.filepath '.json'];
+    this.outputs{1} = this.outputs{1}.resolve_filename( engine );
+    fn = [this.outputs{1}.filepath '.json'];
 
         if OI.OperatingSystem.isUnix
-	        req = sprintf( ...
+            req = sprintf( ...
                 "wget -c -q --no-check-certificate -O %s %s", ...
                 fn, ...
                 strrep(this.queryUrl,'&','\&'));
-	    else
+        else
             req = ['curl -s -L "' this.queryUrl '"'];
         end
 
-	engine.ui.log( 'info', 'Making ASF query. This may take a minute.')
+    engine.ui.log( 'info', 'Making ASF query. This may take a minute.')
         if ~strcmpi(this.mode,'TEST')
             [status, reply] = system(req);
             if OI.OperatingSystem.isUnix
