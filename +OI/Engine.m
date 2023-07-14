@@ -242,9 +242,6 @@ methods
         % Find the specific filename for this object, if this isnt
         % possible then add necessary jobs to the queue 
         [dataObj, outstandingJobs] = dataObj.identify(this);
-
-
-
         
         % if theres jobs, lets add them to the queue and return
         if numel(outstandingJobs) > 0
@@ -289,8 +286,6 @@ methods
                 end
             end
         end
-
-
      
         % Add any outstanding jobs to the queue
         for jobInd = 1:length(outstandingJobs)
