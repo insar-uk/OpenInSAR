@@ -6,7 +6,7 @@ This software will undergo extensive refactoring and development over the course
 This current version was developed through a PhD project at Imperial College London. The accompanying thesis can be found [here but it is not yet finalised](https://spiral.imperial.ac.uk/).
 
 ### Get started
-[Running an analysis in Matlab/Octave](https://github.com/insar-uk/OpenInSAR/doc/quickstart_guides/Matlab_and_Octave.md)
+[Running an analysis in Matlab/Octave](https://github.com/insar-uk/OpenInSAR/blob/SA_Thesis/doc/quickstart_guides/Matlab_and_Octave.md)
 
 
 ### Requirements
@@ -22,10 +22,10 @@ Many of the interactive elements of OpenInSAR require Python, and have been test
 - Python 3.11
 - PyQt5 5.15.4
 
-Please see the [Python quickstart guide](https://github.com/insar-uk/OpenInSAR/doc/quickstart_guides/Python_interactive.md)
+Please see the [Python quickstart guide](https://github.com/insar-uk/OpenInSAR/blob/SA_Thesis/doc/quickstart_guides/Python_interactive.md)
 
 ### Software
-Details of the software can be found in the [design directory](https://github.com/insar-uk/OpenInSAR/doc/design/). An interactive dashboard has been developed to provide an overview of the software and will by available soon.
+Details of the software can be found in the [design directory](hhttps://github.com/insar-uk/OpenInSAR/blob/SA_Thesis/doc/design/). An interactive dashboard has been developed to provide an overview of the software and will by available soon.
 
 
 ### Testing
