@@ -53,7 +53,7 @@ methods
         % Check if there are any tracks specified
         tracksToKeep = project.TRACKS; % if empty, keep all
         if ~isnumeric(tracksToKeep)
-            tracksToKeep = str2num( tracksToKeep );
+            tracksToKeep = str2num( tracksToKeep ); %#ok<ST2NM>
         end
         trackQualifier = true(size(dateQualifier));
         if ~isempty(tracksToKeep)
@@ -62,7 +62,7 @@ methods
                 splitName = strsplit(inputScenes(ii).name,'_');
                 ron = OI.Data.Sentinel1Safe.aon_to_ron( ...
                     splitName{1},... %S1A, S1B
-                    str2num(splitName{7})); % 012345 abs orb num
+                    str2num(splitName{7})); %#ok<ST2NM>  %AON 
                 if ~any(tracksToKeep==ron)
                     trackQualifier(ii)=false;
                 end

@@ -26,7 +26,7 @@ methods
         cat = engine.load( OI.Data.Catalogue() );
         projObj = engine.load( OI.Data.ProjectDefinition() );
         if isempty(cat) || isempty(projObj)
-            'empty cat'
+            engine.ui.log('debug','No catalogue or project definition loaded\n')
             return
         end
         aoi = projObj.AOI.to_area();

@@ -83,7 +83,7 @@ classdef Query
                 end
                 [this.status, response] = system(req); 
             else % use wget
-                req = ['wget -qO-'];
+                req = 'wget -qO-';
                 % add username and password if they exist
                 if ~isempty(this.username)
                     req = [req ' --http-user=' this.username ' --http-password=' this.password];

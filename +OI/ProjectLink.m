@@ -35,7 +35,7 @@ methods
         this.check_project_file_exists();
     end % ProjectLink
 
-    function this = set_new_project(this, pathToProjectFile)
+    function this = set_new_project(this, ~)
         % this.projectPath = pathToProjectFile;
         % this = this.resolve_relative_path(this);
         % this.check_project_file_exists();
@@ -154,9 +154,9 @@ methods ( Access = private )
             ], this.projectLink);
     end % get_help_text
 
-    function OK = write(this)
-        % pass - NOT YET IMPLEMENTED
-    end
+    % function OK = write(this)
+    %     % pass - NOT YET IMPLEMENTED
+    % end
 end % methods ( Access = private )
 
 end % classdef

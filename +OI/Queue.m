@@ -33,7 +33,7 @@ methods
         end
     end
 
-    function tf = is_empty( this );
+    function tf = is_empty( this )
 		tf = isempty(this.jobArray);
 	end
 
@@ -161,7 +161,7 @@ methods
         end
     end
 
-    function this = populate(this, schema)
+    function this = populate(this, ~)
         warning('Not yet implemented')
         % switch schema
         %     case 'PSI'

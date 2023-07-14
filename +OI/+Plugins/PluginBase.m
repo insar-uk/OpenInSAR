@@ -1,4 +1,6 @@
 classdef PluginBase
+% PluginBase is the base class for all plugins, defining some common methods
+% properties and helper functions which will be used to manage the plugins.
 
 properties
     isReady = false;
@@ -7,11 +9,17 @@ properties
     isOverwriting = false;
 end
 
+properties (Abstract = true)
+    id
+    inputs
+    outputs
+end
+
 methods
-    function this = PluginBase(  engine  )
+    function this = PluginBase(  ~  )
     end
 
-    function this = configure(this, engine, argCell)
+    function this = configure(this, ~, argCell)
         % set any key/value argument in varargin that matches a
         % property of this class
         for ii = 1:2:numel(argCell)
@@ -22,7 +30,7 @@ methods
     end
 
 
-    function [this, data] = run( this, engine, varargin )
+    function [this, data] = run( this, ~, varargin )
         % This is the main function that should be overloaded by the plugin
         % varargin used to pass args from job
         data = [];

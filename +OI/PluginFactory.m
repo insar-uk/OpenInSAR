@@ -32,7 +32,7 @@ methods (Static)
             otherwise % Use the interpreter
                 ui.log('debug', ['Plugin ' pluginName ' not found' '\n']);
                 try
-                    pluginHandle = eval(['OI.Plugins.' pluginName]);
+                    pluginHandle = eval(['OI.Plugins.' pluginName]); %#ok<EVLDOT>
                 catch ERROR
                     ui.log('error', ['Plugin ' pluginName ' not found or interpreted' '\n']);
                     ERROR.message

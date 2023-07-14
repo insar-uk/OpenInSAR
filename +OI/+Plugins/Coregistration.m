@@ -208,7 +208,7 @@ methods
         % get parameters from metadata
         [lpb,spb,nearRange,rangeSampleDistance] = ...
             OI.Plugins.Geocoding.get_parameters( swathInfo );
-        sz=[lpb,spb];
+
         [meshRange, meshAz] = ...
             OI.Plugins.Geocoding.get_geometry(lpb,spb);
         ati = swathInfo.azimuthTimeInterval;
@@ -224,7 +224,7 @@ methods
 		if (lpbRef ~= lpb)
 			engine.ui.log('warning','Lines per burst mismatch between reference and secondary during coregistration of visit %i segment %i\n',...
 				this.visitIndex, this.referenceSegmentIndex)
-			isLongOnFirstDim = size(lineTimes,1) > size(lineTimes,2)
+			isLongOnFirstDim = size(lineTimes,1) > size(lineTimes,2);
 			lineTimes=lineTimes(1):ati/86400:(lineTimes(1)+(lpbRef-1)*ati/86400);
 			if isLongOnFirstDim
 				lineTimes = lineTimes(:);

@@ -1,47 +1,48 @@
 classdef Stacking < OI.Plugins.PluginBase
-    %STACKING Summary of this class goes here
-    %   Detailed explanation goes here
-    
-    properties
-        inputs = {OI.Data.Catalogue(), OI.Data.PreprocessedFiles()}
-        outputs = {OI.Data.Stacks()}
-        id = 'Stacking'
-    end
-    
-    methods
-        function this = run( this, engine, varargin )
-            
-            cat = engine.load( OI.Data.Catalogue() );
-            preprocessingInfo = engine.load( OI.Data.PreprocessedFiles() );
-            % check inputs are available
-            if  isempty(cat) || isempty(preprocessingInfo)
-                return
-            end
+%STACKING Summary of this class goes here
+%   Detailed explanation goes here
+
+properties
+    inputs = {OI.Data.Catalogue(), OI.Data.PreprocessedFiles()}
+    outputs = {OI.Data.Stacks()}
+    id = 'Stacking'
+end
+
+methods
+    function this = run( this, engine, varargin )
+        
+        cat = engine.load( OI.Data.Catalogue() );
+        preprocessingInfo = engine.load( OI.Data.PreprocessedFiles() );
+        % check inputs are available
+        if  isempty(cat) || isempty(preprocessingInfo)
+            return
+        end
 
 
-            % group the available data according to the unique visits
-            [visitsForEachTrack, visitDatenums] = this.get_visits( cat );
-            
-            % pull the coverage values from each safe into an array
-            safeCoverages = ...
-                arrayfun(@(x) x.coverage, preprocessingInfo.metadata);
+        % group the available data according to the unique visits
+        [visitsForEachTrack, visitDatenums] = this.get_visits( cat );
+        
+        % pull the coverage values from each safe into an array
+        safeCoverages = ...
+            arrayfun(@(x) x.coverage, preprocessingInfo.metadata);
 
-            % prioritise the tracks with the best coverage, these will be
-            % first in an array
-            [trackPriorityInd, trackCoverageByVisit] = ...
-                this.get_track_priority( ...
-                    cat, visitsForEachTrack, safeCoverages);
+        % prioritise the tracks with the best coverage, these will be
+        % first in an array
+        [trackPriorityInd, trackCoverageByVisit] = ...
+            this.get_track_priority( ...
+                cat, visitsForEachTrack, safeCoverages);
 
-            % force the second track to be opposing look dir if possible
-            if numel( trackPriorityInd ) > 1
-                trackPriorityInd = prioritise_opposite_look( ...
-                    trackPriorityInd, cat, visitsForEachTrack);
-            end        
+        % force the second track to be opposing look dir if possible
+        if numel( trackPriorityInd ) > 1
+            trackPriorityInd = prioritise_opposite_look( ...
+                trackPriorityInd, cat, visitsForEachTrack);
+        end        
 
-            
-            % choose the best date in the best track as reference
-            % loop thru tracks
-            for referenceTrackInd = trackPriorityInd
+        
+        % choose the best date in the best track as reference
+        % loop thru tracks
+        
+        for referenceTrackInd = trackPriorityInd
                 
             bestVisitScore = max(trackCoverageByVisit{referenceTrackInd});
             bestVisits = find( bestVisitScore == ...
@@ -179,136 +180,135 @@ classdef Stacking < OI.Plugins.PluginBase
             stack.segmentCount = segCount;
             stack.visits = theseVisits;
             stack.cat = cat;
-           
+            
             if ~isstruct( this.outputs{1}.stack ) || ... 
-               isempty( fieldnames( this.outputs{1}.stack ) ) 
+                isempty( fieldnames( this.outputs{1}.stack ) ) 
                 this.outputs{1}.stack = stack;
             else
                 this.outputs{1}.stack(referenceTrackInd) = stack;
             end
         end
-            engine.save( this.outputs{1} );
+        engine.save( this.outputs{1} );
 
+    end % function run
+
+end % methods
+
+methods (Static = true)
+
+    function [trackPriorityInd, trackCoverageByVisit] = ...
+            get_track_priority(cat, visitsForEachTrack, safeCoverages )
+        % return the track numbers in descending order of importance.
+        % so the track with the best coverage should be the first
+        % element of trackPriority.
+        % cat is OI.Data.Catalogue(); other vars should be defined in
+        % this.
+
+        trackCoverageByVisit = cell(1,numel(visitsForEachTrack));
+        trackScore = zeros(1,numel(visitsForEachTrack));
+        for trackInd = 1:numel(visitsForEachTrack)
+            visitsInThisTrack = visitsForEachTrack{trackInd};
+            % get the coverages for the safes in the visits
+            covArray = ... 
+                cellfun(@(x) sum(safeCoverages(x)), visitsInThisTrack);
+            covArray = min(1,covArray);
+            trackCoverageByVisit{trackInd} = covArray;
+            trackScore(trackInd) = sum(covArray);
         end
 
-    end
+        if numel(cat.trackNumbers) < 2
+            % 1 or empty
+            trackPriorityInd = find(cat.trackNumbers);
+            return
+        end
 
-    methods (Static = true)
+        [~,trackPriorityInd] = sort( trackScore , 'descend');
 
-        function [trackPriorityInd, trackCoverageByVisit] = ...
-                get_track_priority(cat, visitsForEachTrack, safeCoverages )
-            % return the track numbers in descending order of importance.
-            % so the track with the best coverage should be the first
-            % element of trackPriority.
-            % cat is OI.Data.Catalogue(); other vars should be defined in
-            % this.
+    end % function get_track_priority
 
-            trackCoverageByVisit = cell(1,numel(visitsForEachTrack));
-            trackScore = zeros(1,numel(visitsForEachTrack));
-            for trackInd = 1:numel(visitsForEachTrack)
-                visitsInThisTrack = visitsForEachTrack{trackInd};
-                % get the coverages for the safes in the visits
-                covArray = ... 
-                    cellfun(@(x) sum(safeCoverages(x)), visitsInThisTrack);
-                covArray = min(1,covArray);
-                trackCoverageByVisit{trackInd} = covArray;
-                trackScore(trackInd) = sum(covArray);
-            end
+    function trackPriorityInd = prioritise_opposing_look( ...
+            trackPriorityInd, cat, visitsForEachTrack)
+        
+        firstSafeInTracks = cellfun( @(x) x{1}(1), visitsForEachTrack);
+        trackDirections = cellfun(@(x) x.direction(1), ...
+            cat.safes(firstSafeInTracks));
+        nextOpposingTrack = ...
+            find(trackDirections~=trackDirections(1),1);
+        if nextOpposingTrack ~= 2
+            trackPriorityInd(nextOpposingTrack) = trackPriorityInd(2);
+            trackPriorityInd(2) = nextOpposingTrack;
+        end
+    end % function prioritise_opposing_look
 
-            if numel(cat.trackNumbers) < 2
-                % 1 or empty
-                trackPriorityInd = find(cat.trackNumbers);
-                return
-            end
-            % 
-            [~,trackPriorityInd] = sort( trackScore , 'descend');
+    function [visits, visitDatenums] = get_visits( cat)
+        % loop through tracks
+        visits = cell(1,numel(cat.trackNumbers));
+        visitDatenums = visits;
+
+        for track = cat.trackNumbers(:)'
+            trackInd = find(cat.trackNumbers == track,1);
+            theseSafeInds = cat.catalogueIndexByTrack(:,trackInd);
+            theseSafeInds = theseSafeInds(~isnan(theseSafeInds));
             
-        end
+            nSafes = numel(theseSafeInds);
+            safes = cat.safes(theseSafeInds);
 
-        function trackPriorityInd = prioritise_opposing_look( ...
-                trackPriorityInd, cat, visitsForEachTrack)
+            % loop through timings
+            % anything less than 90 min (orbit time) is
+            % contiguous.
+            datenums = cellfun(@(x) x.date.datenum(), safes); 
+            diffDatenums = abs(datenums-datenums');
+            sameVisit = diffDatenums < 90/(60*24);
             
-            firstSafeInTracks = cellfun( @(x) x{1}(1), visitsForEachTrack);
-            trackDirections = cellfun(@(x) x.direction(1), ...
-                cat.safes(firstSafeInTracks));
-            nextOpposingTrack = ...
-                find(trackDirections~=trackDirections(1),1);
-            if nextOpposingTrack ~= 2
-                trackPriorityInd(nextOpposingTrack) = trackPriorityInd(2);
-                trackPriorityInd(2) = nextOpposingTrack;
-            end
-        end
-
-        function [visits, visitDatenums] = get_visits( cat)
-            % loop through tracks
-            visits = cell(1,numel(cat.trackNumbers));
-            visitDatenums = visits;
-
-            for track = cat.trackNumbers(:)'
-                trackInd = find(cat.trackNumbers == track,1);
-                theseSafeInds = cat.catalogueIndexByTrack(:,trackInd);
-                theseSafeInds = theseSafeInds(~isnan(theseSafeInds));
-                
-                nSafes = numel(theseSafeInds);
-                safes = cat.safes(theseSafeInds);
-
-                % loop through timings
-                % anything less than 90 min (orbit time) is
-                % contiguous.
-                datenums = cellfun(@(x) x.date.datenum(), safes); 
-                diffDatenums = abs(datenums-datenums');
-                sameVisit = diffDatenums < 90/(60*24);
-                
-                visitIndex = 0;
-                
-                visited = zeros(nSafes,1);
-                for ii=1:numel(visited)
-                    if visited(ii)
-                        continue;
-                    end
-                    % else we have a new visit, increment:
-                    visitIndex = visitIndex + 1;
-                    % save the relevant safe indices
-                    visits{trackInd}{visitIndex} = ...
-                        theseSafeInds( sameVisit(ii,:) );
-                    visited( sameVisit(ii,:) ) = 1;
-                    visitDatenums{trackInd}(visitIndex) = ...
-                        mean(datenums(sameVisit(:,ii)));
+            visitIndex = 0;
+            
+            visited = zeros(nSafes,1);
+            for ii=1:numel(visited)
+                if visited(ii)
+                    continue;
                 end
+                % else we have a new visit, increment:
+                visitIndex = visitIndex + 1;
+                % save the relevant safe indices
+                visits{trackInd}{visitIndex} = ...
+                    theseSafeInds( sameVisit(ii,:) );
+                visited( sameVisit(ii,:) ) = 1;
+                visitDatenums{trackInd}(visitIndex) = ...
+                    mean(datenums(sameVisit(:,ii)));
             end
-
-
-
         end
-        function coverageScores = get_coverage_array_from_metadata( ...
-                metadataForSafe, aoi )
-            % returns a 2d array where each element is a coverage amount of
-            % the aoi.
-            % rows are swaths, columns are data segments/bursts
-            % input 1 is a metadata structure
-            % input 2 is a GeographicArea object for the AOI.
-            nSwaths = numel(metadataForSafe.swath);
-            maxBursts = max(arrayfun( @(x) numel(x.burst), ...
-                metadataForSafe.swath));
+    end % function get_visits
 
-            coverageScores = nan(nSwaths,maxBursts);
-            estimationGridSize = [250,250];
+    function coverageScores = get_coverage_array_from_metadata( ...
+            metadataForSafe, aoi )
+        % returns a 2d array where each element is a coverage amount of
+        % the aoi.
+        % rows are swaths, columns are data segments/bursts
+        % input 1 is a metadata structure
+        % input 2 is a GeographicArea object for the AOI.
+        nSwaths = numel(metadataForSafe.swath);
+        maxBursts = max(arrayfun( @(x) numel(x.burst), ...
+            metadataForSafe.swath));
 
-            swaths = arrayfun(@(x) x.index, metadataForSafe.swath );
-            g = OI.Data.GeographicArea();
-            for swathInd = swaths
-                thisSwath = metadataForSafe.swath( swathInd );
-                for burstInd = 1:numel(thisSwath.burst )
-                    g.lat = thisSwath.burst(burstInd).lat;
-                    g.lon = thisSwath.burst(burstInd).lon;
-                    coverageScores(swathInd,burstInd) = OI.Functions.coverage( ...
-                            aoi.scale(1), ...
-                            g, ...
-                            estimationGridSize ...
-                        );
-                end
+        coverageScores = nan(nSwaths,maxBursts);
+        estimationGridSize = [250,250];
+
+        swaths = arrayfun(@(x) x.index, metadataForSafe.swath );
+        g = OI.Data.GeographicArea();
+        for swathInd = swaths
+            thisSwath = metadataForSafe.swath( swathInd );
+            for burstInd = 1:numel(thisSwath.burst )
+                g.lat = thisSwath.burst(burstInd).lat;
+                g.lon = thisSwath.burst(burstInd).lon;
+                coverageScores(swathInd,burstInd) = OI.Functions.coverage( ...
+                        aoi.scale(1), ...
+                        g, ...
+                        estimationGridSize ...
+                    );
             end
-
         end
-    end
-end
+    end % function get_coverage_array_from_metadata
+
+end % methods (Static = true)
+
+end % classdef

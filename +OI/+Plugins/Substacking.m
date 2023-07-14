@@ -338,7 +338,7 @@ function this = run_first_and_last( this, engine, stacks, cat, preprocessingInfo
         lle = engine.load( geocodingData );
 
         % get block info
-        [~, blocksInAoi, blockGroups, blockMap] = ...
+        [~, blocksInAoi, blockGroups, ~] = ...
             OI.Plugins.Substacking.get_blocks_in_aoi(engine, swathInfo, lle, aoi, sz, BLOCK_SIZE);
         
         if isempty(blocksInAoi)
