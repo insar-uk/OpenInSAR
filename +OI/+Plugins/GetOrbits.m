@@ -144,7 +144,7 @@ methods
 
         % get the results
         % TODO - This isn't doing anything?? Should it be??
-        str = query.format_url_gently();
+        % str = query.format_url_gently();
         [results, query] = query.get_response();
 
         if isempty(results)

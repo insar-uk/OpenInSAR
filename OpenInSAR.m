@@ -61,7 +61,7 @@ methods
                 case '-run'
                     % Run plugin
                     plugin = PluginFactory(varargin{i+1});
-                    this.engine.add_plugin(varargin{i+1});
+                    this.engine.plugin = plugin;
 
                 otherwise
                     % Unknown argument

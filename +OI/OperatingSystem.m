@@ -28,7 +28,7 @@ end%properties
 			info.os = OI.OperatingSystem.os_str();
 			info.username =  getenv("USERNAME");
 			info.machinename = getenv("COMPUTERNAME");
-			info.processor = getenv("PROCESSOR_IDENTIFIER")
+			info.processor = getenv("PROCESSOR_IDENTIFIER");
 			[sysCallStatusCode, sysCallResponse] = system("VER");
 			if ~sysCallStatusCode
 				info.version = strtrim(sysCallResponse);
@@ -38,9 +38,9 @@ end%properties
 		end
 
 		function osStr = os_str()
-			if OI.OperatingSystem.isUnix; osStr = "unix"; end;
-			if OI.OperatingSystem.isWindows; osStr = "windows"; end;
-			if OI.OperatingSystem.isMac; osStr = "mac"; end;
+			if OI.OperatingSystem.isUnix; osStr = "unix"; end
+			if OI.OperatingSystem.isWindows; osStr = "windows"; end
+			if OI.OperatingSystem.isMac; osStr = "mac"; end
 		end
 
 		function isOct = is_octave()

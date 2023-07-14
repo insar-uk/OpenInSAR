@@ -46,7 +46,7 @@ methods
             timeStr = vertcat(OSV.UTC);
             % just days hours mins
             dayTMinHourSec = timeStr(:,5:end-7);
-            time = datenum(dayTMinHourSec, 'yyyy-mm-ddTHH:MM:SS');
+            time = datenum(dayTMinHourSec, 'yyyy-mm-ddTHH:MM:SS'); %#ok<DATNM>
             % usually 0 for osv
             secFraction = str2num(timeStr(:,end-6:end-1)); %#ok<ST2NM>
             % covert to days
@@ -64,25 +64,6 @@ methods
         end
     end%ctor
 
-    function jobs = create_array_job( this, engine )
-        jobs = {};
-        catalogue = engine.load(  OI.Data.Catalogue() );
-        if isempty(catalogue)
-            job = OI.Job('name','GetOrbits');
-            jobs{end+1} = job;
-            return
-        end%if
-
-        safes = catalogue.safes;
-        for i = 1:numel(safes)
-            date = safes{i}.date;
-            platform = safes{i}.platform;
-            job = OI.Job('name','GetOrbits');
-            job.arguments = {'datetime',date.datenum(),'platform',platform};
-            jobs{end+1} = job;
-        end%for
-    end%array_jobs
-
     function this = interpolate(this,newTimes)
         newTimes = newTimes(:);
         this.x = interp1(this.t,this.x,newTimes,'spline');
@@ -95,11 +76,31 @@ methods
     end%interpolate
 
 
-    % function jobs = create_job( this, engine )
-    %     jobs = create_array_job( this, engine );
-    % end%create_job
+end % methods
 
-    function filename = find(this, platform, date, orbitFiles)
+methods (Static = true)
+
+    function jobs = create_array_job( engine )
+        jobs = {};
+        catalogue = engine.load(  OI.Data.Catalogue() );
+        if isempty(catalogue)
+            job = OI.Job('name','GetOrbits');
+            jobs{end+1} = job;
+            return
+        end%if
+
+        safes = catalogue.safes;
+        for i = 1:numel(safes)
+            targetDate = safes{i}.date;
+            targetPlatform = safes{i}.platform;
+            job = OI.Job('name','GetOrbits');
+            job.arguments = {'datetime',targetDate.datenum(),'platform',targetPlatform};
+            jobs{end+1} = job; %#ok<AGROW>
+        end%for
+    end%array_jobs
+
+    
+    function filename = find(platform, date, orbitFiles)
         filename = '';
         % easy_debug
         if any(strcmpi(platform,{'S1A','S1B'}))
@@ -130,6 +131,6 @@ methods
         end
     end
 
-end
+end % methods (Static = true)
 
 end

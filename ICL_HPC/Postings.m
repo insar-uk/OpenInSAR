@@ -55,7 +55,7 @@ classdef Postings
                 if numel(fName)>8
                    if contains(fName,obj.suffix)
                        split = strsplit(fName,{obj.prefix,obj.suffix});
-                       wid=str2num(split{2});
+                       wid=str2num(split{2}); %#ok<ST2NM> - performance ok
                        isWorker(ii)=wid;
                    end
                 end
@@ -191,14 +191,13 @@ classdef Postings
             
             if ~exist(myPosting,'file') % if I haven't filed for a job
                 report_ready(obj,J); % write the file
-%                 pause(5);%wait for orders
                 return % Empty. Will need to wait for orders.
             end
             
             fid=fopen(myPosting,'r');
             line=fgetl(fid);
             fclose(fid);
-            line
+
             if isempty(line)||line(1)==-1
                 %we've hit an error. weird.
                 % wait a min to avoid causing drama.
