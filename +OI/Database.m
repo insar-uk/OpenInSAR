@@ -145,6 +145,13 @@ classdef Database < handle
             end
         end%find
 
+        function this = clear_database_manually(this)
+            yn = input('Do you really want to do that? [y/n]\n','s');
+            if ~isempty(yn) && lower(yn(1)) == 'y'
+                this = this.clear;
+            end
+        end
+
     end
 
     

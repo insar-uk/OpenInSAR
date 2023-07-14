@@ -1,9 +1,3 @@
 #PBS -I
 #PBS -lselect=1:ncpus=8:mem=16gb
 #PBS -lwalltime=01:00:00
-
-<<EOF
-cd ~/../ephemeral
-echo "Directory we start in is: $(pwd)\n"
-echo "the time is: $(date)"
-EOF
