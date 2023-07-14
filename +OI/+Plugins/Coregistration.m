@@ -59,11 +59,6 @@ methods
                 result2.SEGMENT_INDEX = result.SEGMENT_INDEX;
                 result2.REFERENCE_SEGMENT_INDEX = num2str(refSegInd);
                 result2.VISIT_INDEX = num2str(visitInd);
-                % result2 = OI.Data.CoregisteredSegment();
-                % result2.copy_parameters( result );
-                % result2.POLARIZATION = projObj.POLARIZATION(end-1:end);
-        
-            
 
                 result = result.identify( engine );
                 result2 = result2.identify( engine );
@@ -91,9 +86,8 @@ methods
         end
 
         % Check we haven't done this already
-        refSegInd = this.referenceSegmentIndex
-        segInd = stacks.stack.correspondence(refSegInd, this.visitIndex)
-
+        refSegInd = this.referenceSegmentIndex;
+        segInd = stacks.stack.correspondence(refSegInd, this.visitIndex);
 
         % Get the expected results:
         result = OI.Data.CoregOffsets().configure( ...
@@ -286,11 +280,6 @@ methods
     
             % Estimate the doppler rate
             refGroundXYZ = OI.Functions.lla2xyz( lle );
-			'spb of reference, lle, refXYZ, refXYZ just line starts?'
-			spbRef
-			size(lle)
-			size(refGroundXYZ)
-			size(refGroundXYZ(1:spbRef:end,:))
             midDem = OI.Functions.lla2xyz(mean(lle)); % mean xyz would be ...
             % below the surface of the earth, as compared to mean lle.
             linesPerDoppler =  lpbRef./ ...
@@ -372,18 +361,6 @@ methods
                 'REFERENCE_SEGMENT_INDEX', num2str(this.referenceSegmentIndex), ...
                 'VISIT_INDEX', num2str(this.visitIndex) ...
             );
-            % coregSegmentInfo.POLARIZATION = pol{1};
-            % coregSegmentInfo.STACK = num2str(this.trackIndex);
-            % coregSegmentInfo.SEGMENT_INDEX = num2str(segInd);
-            % coregSegmentInfo.REFERENCE_SEGMENT_INDEX = ...
-            %     num2str(this.referenceSegmentIndex);
-            % coregSegmentInfo.VISIT_INDEX = num2str(this.visitIndex);
-
-
-            % coregRampInfo = OI.Data.CoregisteredRamp();
-            % coregRampInfo.STACK = this.trackIndex;
-            % coregRampInfo.SEGMENT_INDEX = segInd;    
-            
 
             % find correct strip and its filepath
             for stripInd = 1:numel(safe.strips)
@@ -485,10 +462,6 @@ methods (Static = true)
             tOrbit.vz(:) ...
         ];
     % get err
-	'satxyz satv demxyz:'
-	size(satXYZ)
-	size(satV)
-	size(demXYZ)
     dopplerErr = OI.Functions.doppler_eq(satXYZ, satV, demXYZ);
 
     % update time

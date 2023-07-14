@@ -36,7 +36,7 @@ methods (Static = true)
         formatStr = err.message;
         for ii=1:numel(err.stack)
             formatStr = [formatStr, ' | ', ...
-                err.stack(ii).file ':' err.stack(ii).name ':' num2str(err.stack(ii).line) ];
+                err.stack(ii).file ':' err.stack(ii).name ':' num2str(err.stack(ii).line) ]; %#ok<AGROW>
         end
     end
 

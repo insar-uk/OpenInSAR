@@ -8,6 +8,8 @@ classdef Query
         status
     end
 
+    %#ok<*AGROW> - Queries are not expected to be large
+
     methods 
         function this = Query( url, inputStruct )
             % check inputs
@@ -79,8 +81,7 @@ classdef Query
                 if ~isempty(this.username)
                     req = [req ' --user ' this.username ':' this.password];
                 end
-                req
-                [this.status, response] = system(req); %#ok<ASGLU>
+                [this.status, response] = system(req); 
             else % use wget
                 req = ['wget -qO-'];
                 % add username and password if they exist
@@ -88,26 +89,9 @@ classdef Query
                     req = [req ' --http-user=' this.username ' --http-password=' this.password];
                 end
                 req = [req ' "' str '"'];
-                req
-                [this.status, response] = system(req); %#ok<ASGLU>
+                [this.status, response] = system(req);
             end
-            
 
-
-            % req
-            % status
-            % response
-            % % set mozilla user agent
-            % ua = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:10.0.2) Gecko/20100101 Firefox/10.0.2';
-
-            % % set the username and password
-            % if ~isempty(this.username)
-            %     options = weboptions('Username', this.username, 'Password', this.password,'UserAgent', ua);
-            %     response = webread(str, options);
-            % else 
-            %     options = weboptions('UserAgent', ua);
-            % end
-            % response = webread(str);
         end
     end
 

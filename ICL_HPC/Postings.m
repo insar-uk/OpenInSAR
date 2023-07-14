@@ -217,9 +217,7 @@ classdef Postings
             end
             
             if contains(line,'JOB=')
-%                 obj.jobline=strrep(line,'JOB=','');
                 obj.jobline=line;
-%                 report_recieved(obj,J)
                 return;
             end
         end

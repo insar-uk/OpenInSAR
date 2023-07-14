@@ -155,7 +155,7 @@ methods ( Access = private )
     end % get_help_text
 
     function OK = write(this)
-        
+        % pass - NOT YET IMPLEMENTED
     end
 end % methods ( Access = private )
 

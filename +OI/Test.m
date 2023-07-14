@@ -25,7 +25,10 @@ classdef Test
         SUFFIX = '_tests'; % string
         DIRECTORY = fullfile('..','test'); % string
     end
-
+%#ok<*AGROW> - Test arrays are pretty small, so preallocation is not necessary
+%#ok<*TNOW1> - now() is better compatibility w/ Octave
+%#ok<*FXSET> - Since when was changing a loop index a bad thing?s
+%#ok<*FXSET>
     methods
         function this = Test( varargin )
 
@@ -36,15 +39,15 @@ classdef Test
             for currentTest = this.testList
                 idx = numel(this.results) + 1;
                 this.lastTestStartTime = now();
-                currentTest = currentTest{1};
+                currentTest = currentTest{1}; 
                 % find the corresponding test
                 try
                     testHandle = this.find_test(currentTest);
-                    testObj = testHandle();
+                    testObj = testHandle(); %#ok<NASGU> - we're just testing initialization
                     % run the test
                     currentResults = this.run_test(testHandle);
                     % append results to this.results
-                    this.results = {this.results{:}, currentResults{:}};
+                    this.results = [this.results(:)', currentResults(:)'];% Check this works with Octave rather than {this.results{:}, currentResults{:}};
                 catch errorObj
                     errMsg = sprintf('Error : %s not found or could not complete its tests ', currentTest);
                     this.results{end+1} = OI.TestResult(currentTest, 'error', errMsg, errorObj);
@@ -56,8 +59,6 @@ classdef Test
                 this.timings(idx) = (now()-this.lastTestStartTime) * 24 * 60 * 60;
                 this.timings(idx+1:numel(this.results)) = nan;
             end
-            
-            
 
             % Print summary
             if this.isSummarising
@@ -113,20 +114,7 @@ classdef Test
     end
 
     methods (Access = private)
-        function testHandle = find_test( this, testName )
-            % testName: string
-            % testHandle: function handle
-            % ensure string
-            assert(ischar(testName), 'testName must be a string');
-            % make sure suffix matches
-            needsSuffix =  numel(testName)<numel(OI.Test.SUFFIX) || ...
-                ~strcmpi(testName(end-numel(OI.Test.SUFFIX)+1:end), OI.Test.SUFFIX);
-            if needsSuffix 
-                testName = [testName, OI.Test.SUFFIX];
-            end
-            % convert to test function handle
-            testHandle = str2func(testName);
-        end
+
 
         function results = run_test( this,  testHandle )
             % testHandle: function handle
@@ -196,6 +184,21 @@ classdef Test
 
     methods (Static = true)
 
+        function testHandle = find_test( testName )
+            % testName: string
+            % testHandle: function handle
+            % ensure string
+            assert(ischar(testName), 'testName must be a string');
+            % make sure suffix matches
+            needsSuffix =  numel(testName)<numel(OI.Test.SUFFIX) || ...
+                ~strcmpi(testName(end-numel(OI.Test.SUFFIX)+1:end), OI.Test.SUFFIX);
+            if needsSuffix 
+                testName = [testName, OI.Test.SUFFIX];
+            end
+            % convert to test function handle
+            testHandle = str2func(testName);
+        end
+
         function add_test_dir()
             % add test directory to path
             parentDir = fileparts(fileparts(mfilename('fullpath')));
@@ -218,7 +221,7 @@ classdef Test
                 if testList(ii).isdir || numel(testList(ii).name) < 2
                     continue
                 else 
-                    if testList(ii).name(end-1:end) == '.m'
+                    if strcmpi(testList(ii).name(end-1:end),'.m')
                         testList(ii).name = testList(ii).name(1:end-2);
                     end
                 end
@@ -238,7 +241,6 @@ classdef Test
         
         % check a given file has "_tests.m" at end indicating its a test file
         function tf = valid_test_name( str )
-            tf = false;
             %check number of chars
             expected = OI.Test.SUFFIX;
             nExpect = numel(expected);

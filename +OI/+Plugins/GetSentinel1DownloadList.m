@@ -8,7 +8,6 @@ end% properties
 
 methods
 
-
     function this = run(this, engine, varargin)
         this.inputs{1} = this.inputs{1}.identify( engine );
         [asfResults, jobs] = this.inputs{1}.load(engine);
@@ -24,7 +23,7 @@ methods
         for i = 1:length(resultStruct)
             downloadUrl = resultStruct(i).downloadUrl;
             % add line to text file
-            parsedText = [parsedText downloadUrl '\n'];
+            parsedText = [parsedText downloadUrl '\n'];  %#ok<AGROW> - this is a small file, so it's ok
         end% for
         engine.save( this.outputs{1}, parsedText );
     end% run
@@ -33,7 +32,7 @@ end% methods
 
 end % classdef
 
-
+% response example:
 % [
 %   [
 %     {

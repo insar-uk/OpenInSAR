@@ -42,9 +42,6 @@ methods
             OI.Data.Datetime(x.name(18:25),'yyyymmdd').datenum(), ...
             inputScenes);
 
-        % dbstop in easy_debug at 1
-        % easy_debug
-
         % Get the date order, earliest first
         [dateNumbers, dateOrder] = sort( dateNumbers );
         inputScenes = inputScenes( dateOrder );

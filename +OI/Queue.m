@@ -5,8 +5,6 @@ properties (SetAccess = private, GetAccess = public)
 end
 
 methods 
-    function this = Queue()
-    end
 
     function this = add_job(this, jobObj, idx)
 		if ~isa(jobObj, 'OI.Job')
@@ -164,17 +162,18 @@ methods
     end
 
     function this = populate(this, schema)
-        switch schema
-            case 'PSI'
+        warning('Not yet implemented')
+        % switch schema
+        %     case 'PSI'
                 
-        end
+        % end
 
-        if ~iscell(jobArray)
-            error('Invalid input type');
-        end
-        for k = 1:length(jobArray)
-            this.add_job(jobArray{k});
-        end
+        % if ~iscell(tJobArray)
+        %     error('Invalid input type');
+        % end
+        % for k = 1:length(tJobArray)
+        %     this.add_job(tJobArray{k});
+        % end
     end
 
     function overview(this)
@@ -188,7 +187,6 @@ methods
                 names.(jn) = 1;
             end
         end
-        names
     end
 
     function clear(this)

@@ -49,21 +49,18 @@ methods
 
 	engine.ui.log( 'info', 'Making ASF query. This may take a minute.')
         if ~strcmpi(this.mode,'TEST')
-            [status, response] = system(req); %#ok<ASGLU>
-            status
-            response
-
-	        if OI.OperatingSystem.isUnix
-		        response = fileread(fn);
+            [status, reply] = system(req);
+            if OI.OperatingSystem.isUnix
+                reply = fileread(fn);
             end
             if status ~= 0
                 engine.ui.log( 'error', 'ASF query failed.')
                 return
             end
-            engine.save( this.outputs{1}, response );
+            engine.save( this.outputs{1}, reply );
         else
-            response = './test/res/test_asf_json.json'; %#ok<NASGU>
-            engine.save( this.outputs{1}, response );
+            reply = './test/res/test_asf_json.json';
+            engine.save( this.outputs{1}, reply );
         end
         engine.ui.log( 'info', 'ASF query complete.')
 
