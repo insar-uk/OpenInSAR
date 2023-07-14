@@ -1,19 +1,19 @@
 classdef Queue < handle
 
 properties (SetAccess = private, GetAccess = public)
-	jobArray;
+    jobArray;
 end
 
 methods 
 
     function this = add_job(this, jobObj, idx)
-		if ~isa(jobObj, 'OI.Job')
+        if ~isa(jobObj, 'OI.Job')
             % if it's not a job object, try to make it one
             jobObj = OI.Job(jobObj);
             if ~isa(jobObj, 'OI.Job')
                 error('Invalid input type');
             end
-		end
+        end
         % check for duplicate
         for k = 1:length(this.jobArray)
             if this.jobArray{k}.eq(jobObj)
@@ -34,18 +34,18 @@ methods
     end
 
     function tf = is_empty( this )
-		tf = isempty(this.jobArray);
-	end
+        tf = isempty(this.jobArray);
+    end
 
     function n = length( this )
-		n = length( this.jobArray );
-	end
+        n = length( this.jobArray );
+    end
 
     function nextJob = next_job( this )
-		nextJob = [];
-		if ~this.is_empty()
-			nextJob = this.jobArray{1};
-		end
+        nextJob = [];
+        if ~this.is_empty()
+            nextJob = this.jobArray{1};
+        end
     end
 
     function this = prioritise_argument(this, key, val, inPlace)
@@ -87,7 +87,7 @@ methods
         end
     end
 
-	function this = remove_job( this, job )
+    function this = remove_job( this, job )
         % accepts either a job object or a job index
         if isa(job, 'OI.Job')
             for k = 1:length(this.jobArray)
@@ -103,7 +103,7 @@ methods
         else
             error('Invalid input type');
         end
-	end
+    end
 
     function this = promote_job(this, idx)
         if ~isnumeric(idx)

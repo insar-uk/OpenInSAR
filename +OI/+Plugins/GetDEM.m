@@ -12,10 +12,10 @@ classdef GetDEM < OI.Plugins.PluginBase
             
 
             stacks = engine.load( OI.Data.Stacks() );
-			if isempty( stacks )
-				return
-			end
-				
+            if isempty( stacks )
+                return
+            end
+                
             maxLat = -90;
             minLat = 90;
             maxLon = -180;

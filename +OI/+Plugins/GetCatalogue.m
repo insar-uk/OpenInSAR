@@ -107,11 +107,11 @@ methods
                 catalogue = catalogue.add_safe(safe);
             end
         end% for
-		
-		% error here if no data
-		if ~numel(catalogue.safes) > 3
-			error('No data catlogued?')
-		end 
+        
+        % error here if no data
+        if ~numel(catalogue.safes) > 3
+            error('No data catlogued?')
+        end 
         % Get info about the scenes in each orbital track
         catalogue = catalogue.get_track_info();
         engine.database.add(rejectedScenes);

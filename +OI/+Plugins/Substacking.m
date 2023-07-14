@@ -342,7 +342,7 @@ function this = run_first_and_last( this, engine, stacks, cat, preprocessingInfo
             OI.Plugins.Substacking.get_blocks_in_aoi(engine, swathInfo, lle, aoi, sz, BLOCK_SIZE);
         
         if isempty(blocksInAoi)
-			engine.ui.log('debug','No blocks in AOI for track %i segment %i',trackInd, refSegInd);
+            engine.ui.log('debug','No blocks in AOI for track %i segment %i',trackInd, refSegInd);
             continue
         end
         for groupInd = 1:blockGroups(end) % if empty, nothing added

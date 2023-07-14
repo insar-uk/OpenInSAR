@@ -53,8 +53,8 @@ methods
             job = OI.Job(job);
         end
         this.currentJob = job.to_string();
-		% convert the named job to a plugin
-		pluginHandle = OI.PluginFactory.get_plugin_handle( job.name );
+        % convert the named job to a plugin
+        pluginHandle = OI.PluginFactory.get_plugin_handle( job.name );
         if isempty(pluginHandle)
             error('Could not resolve plugin %s', job.name)
         end

@@ -16,9 +16,9 @@ classdef XmlWrite
 
     methods
         function this = XmlWrite( structToWrite, filepathToSave )
-			if nargin==0
-				return;
-			end
+            if nargin==0
+                return;
+            end
 
             this.contentBuffer = numel(this.contents);
             if OI.Compatibility.is_stringy( structToWrite )
@@ -26,7 +26,7 @@ classdef XmlWrite
 %                 str = char(structToWrite);
 %                 this.contents(1:numel(str)) = str;
             else
-				this.contents = OI.Compatibility.xml_stringify( structToWrite );
+                this.contents = OI.Compatibility.xml_stringify( structToWrite );
                 % this = this.stringify( structToWrite, 0 );
             end
             % if a filepath is given, write to it.
@@ -75,7 +75,7 @@ classdef XmlWrite
             %why is strcat so slow and overengineered? Is there a c
             %alternative?
             % For now just do the cpp approach and reserve space by doubling the
-			% char array when space runs out.
+            % char array when space runs out.
             if isempty(str); return; end
             range = this.contentLength+1:this.contentLength+numel(str);
             if range(end)>this.contentBuffer
