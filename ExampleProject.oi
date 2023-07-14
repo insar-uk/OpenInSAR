@@ -1,0 +1,24 @@
+# ExampleProject.oi
+# Any line without a semicolon will be ignored
+# The key on the LHS of the equals sign is the variable name
+# the value on the RHS is the value that variable will be set to
+# extreme spaces will be removed
+# Anything enclosed in $ will be replaced with the value of the variable
+# found in the OpenInSAR internal database.
+# You can specify this when calling OpenInSAR with flag -v
+# some values have defaults:
+#   $HERE$ = the directory where the project file is located
+#   $REPO_ROOT$ = the directory where the OpenInSAR scripts are located
+
+PROJECT_NAME = Example_OpenInSAR_Project; # Name of the project
+PROCESSING_SCHEME = PSI; # Processing scheme to use
+
+INPUT_DATA_LIST = $HERE$/$PROJECT_NAME$/input_data.txt; # File containing a list of data to process
+INPUT_DATA_DIR = $HERE$/$PROJECT_NAME$/input; # Directory where the data will be downloaded to or loaded from
+OUTPUT_DATA_DIR = $HERE$/$PROJECT_NAME$/work; # Directory where the output will be written to
+
+AOI = [51.8, -2.9, 51.3, -3.9]; # Rectangular, NESW, WGS84 lat/lon
+START_DATE = 20180101; # Start date of the data to search
+END_DATE = 20190101; # End date of the data to search
+
+TRACKS = 30
