@@ -32,60 +32,79 @@ methods
             segmentMetadata = this.get_segment_metadata(cat, ...
                 preprocessingInfo, referenceSegments);
 
-            % Data from the valid rectangle will now be mapped into an
-            % overall mosaic for the whole stack. We start by simply
-            % finding the corresponding location in a mosaic
+            % Find the maximum size of the mosaic
+            cursor = [0,0];
+            lastSegmentAddress = segmentMetadata.address;
+            for segmentInd = 1:nSegments
+                segmentAddress = segmentMetadata(segmentInd).address;
+                burstChanged = segmentAddress(3) ~= lastSegmentAddress(3);
+                swathChanged = segmentAddress(2) ~= lastSegmentAddress(2);
+                safeChanged = segmentAddress(1) ~= lastSegmentAddress(1);
+
+                thisBottomLeft = cursor;
+                thisTopRight = cursor + segmentMetadata(segmentInd).timing.size;
 
 
-            % Offset of the valid data in segments, overlapping in a
-            % mosaic:
-            [segSize, segOff] = deal(zeros(nSegments,2));
-            refValidSampOffsets = segmentMetadata(1).validSamples;
+                cursor = max(cursor, segmentMetadata(segmentInd).validSamples.lastRangeSample);
+            end
            
 
-            getOffset = @(a,b) this.offsets_from_timing(...
-                segmentMetadata(a).timing, ...
-                segmentMetadata(b).timing);
+            % getOffset = @(a,b) this.offsets_from_timing(...
+            %     segmentMetadata(a).timing, ...
+            %     segmentMetadata(b).timing);
 
-            for segmentInd = 1:nSegments
-                bulkOffset = round(getOffset(segmentInd,1));
-                validSamples = segmentMetadata(segmentInd).validSamples;
-                validOffset = [...
-                    validSamples.firstAzimuthLine - ...
-                    refValidSampOffsets.firstAzimuthLine, ...
-                    validSamples.firstRangeSample - ...
-                    refValidSampOffsets.firstRangeSample ...
-                    ];
-                segSize(segmentInd,:) = validSamples.size;
-                segOff(segmentInd,:) = bulkOffset + validOffset;
-            end
-            segOff=segOff-min(segOff);
-            segStarts = segOff + 1;
-            segEnds = segStarts + segSize - 1;
-            overlaps = segEnds(1:end-1,:)-segStarts(2:end,:);
-
-
-            % % TEST
-            % mosaic=zeros(max(segOff)+validSampOffsets.size);
-            % for ii=1:nSegments
-            %     img=load(['localimg' num2str(ii)]).img';
-            %     img = min(max(log(abs(img)),3.5),5.5);
-            %     vs = segmentMetadata(ii).validSamples;
-            %     sz = vs.size;
-            %     mosaic((1:sz(1)) + segOff(ii,1), (1:sz(2)) + segOff(ii,2)) = ...
-            %         img(vs.firstAzimuthLine:vs.lastAzimuthLine, ...
-            %         vs.firstRangeSample:vs.lastRangeSample);
-            %     imagesc(mosaic)
-            %     drawnow()
+            % for segmentInd = 1:nSegments
+            %     bulkOffset = round(getOffset(segmentInd,1));
+            %     validSamples = segmentMetadata(segmentInd).validSamples;
+            %     validOffset = [...
+            %         validSamples.firstAzimuthLine - ...
+            %         refValidSampOffsets.firstAzimuthLine, ...
+            %         validSamples.firstRangeSample - ...
+            %         refValidSampOffsets.firstRangeSample ...
+            %         ];
+            %     segSize(segmentInd,:) = validSamples.size;
+            %     segOff(segmentInd,:) = bulkOffset + validOffset;
             % end
+            % segOff=segOff-min(segOff);
+            % segStarts = segOff + 1;
+            % segEnds = segStarts + segSize - 1;
+
+            % % Find the overlaps between segments
+            % getOverlaps = @(a,b) this.rectangular_overlaps( ...
+            %     segmentMetadata(a).timing, ...
+            %     segmentMetadata(b).timing);
+            % for segA = 1:nSegments
+            %     for segB = 1:nSegments
+            %         oL = getOverlaps(segA,segB);
+            %         if oL
+            %             continue
+            %         end
+            %     end
+            % end
+            % overlaps = segEnds(1:end-1,:)-segStarts(2:end,:);
+
+
+            % % % TEST
+            % % mosaic=zeros(max(segOff)+validSampOffsets.size);
+            % % for ii=1:nSegments
+            % %     img=load(['localimg' num2str(ii)]).img';
+            % %     img = min(max(log(abs(img)),3.5),5.5);
+            % %     vs = segmentMetadata(ii).validSamples;
+            % %     sz = vs.size;
+            % %     mosaic((1:sz(1)) + segOff(ii,1), (1:sz(2)) + segOff(ii,2)) = ...
+            % %         img(vs.firstAzimuthLine:vs.lastAzimuthLine, ...
+            % %         vs.firstRangeSample:vs.lastRangeSample);
+            % %     imagesc(mosaic)
+            % %     drawnow()
+            % % end
             
-            stackStitchInfo = struct(...
-                'segments', segmentMetadata, ...
-                'reference', referenceVisit, ...
-                'stitchStarts', segStarts, ...
-                'stitchEnds', segEnds, ...
-                'overlaps', overlaps ...
-                ); 
+            % stackStitchInfo = struct(...
+            %     'segments', segmentMetadata, ...
+            %     'reference', referenceVisit, ...
+            %     'stitchStarts', segStarts, ...
+            %     'stitchEnds', segEnds, ...
+            %     'overlaps', overlaps ...
+            %     ); 
             % Assign to structs
             this.output{1}.stack(stackInd) = stackStitchInfo;
         end
@@ -94,6 +113,21 @@ methods
 end % methods
 
 methods (Static = true)
+
+    function overlap = rectangular_overlap( coordsA, coordsB )
+        overlap = [];
+        hasOverlap = (x1 <= x4 && x3 <= x2 && y1 <= y4 && y3 <= y2);
+        if hasOverlap
+            overlap.top_right = [max(x1, x3), max(y1, y3)]
+            overlap.bottom_left = [min(x2, x4), min(y2, y4)]
+            % check for positive area
+            if overlap.top_right(1) < overlap.bottom_left(1) || ...
+                    overlap.top_right(2) < overlap.bottom_left(2)
+                overlap = [];
+            end
+        end
+    end
+
 
     function segmentMetadata = get_segment_metadata(cat, preprocessingInfo, referenceSegments)
         nSegments = numel(referenceSegments.burst);

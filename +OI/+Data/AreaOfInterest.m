@@ -13,7 +13,7 @@ methods
 
         if nargin == 0, return; end
 
-        if OI.Compatibility.is_string( strOrDoubleArray );
+        if OI.Compatibility.is_string( strOrDoubleArray )
             % replace all non numeric with space
             str = regexprep( strOrDoubleArray, '[^0-9\.\-]', ' ' );
             % split on space

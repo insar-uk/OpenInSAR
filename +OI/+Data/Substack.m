@@ -12,7 +12,7 @@ properties
 end%properties
 
 methods
-    function this = Substack( engine )
+    function this = Substack( ~ )
         this.hasFile = true;
         this.filepath = '$WORK$/substacks/$id$';
         % this.fileextension = 'tiff'; % TODO, get Tiff working!

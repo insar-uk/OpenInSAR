@@ -16,7 +16,7 @@ if ~isstruct(structObj)
 end
 
 fnames = fieldnames(structObj);
-nStruct = numel(structObj);
+% nStruct = numel(structObj);
 
 % if its not scalar, then we need to create a new element for each
 % element in the structure array
@@ -80,7 +80,8 @@ if 1==1
                     for ii=1:numel(val)
                         newElem = docNode.createElement(fnames{fInd});
                         docElem.appendChild(newElem);
-                        newElem = OI.Functions.struct_into_xml_obj(docNode, newElem, structObj.(fnames{fInd})(ii));
+                        error('element unused here - debug')
+                        % newElem = OI.Functions.struct_into_xml_obj(docNode, newElem, structObj.(fnames{fInd})(ii));
                     end
                 else
                     newElem = docNode.createElement(fnames{fInd});
@@ -99,3 +100,4 @@ if 1==1
         end
     end
 end
+%#ok<*AGROW> - Limited performance hit

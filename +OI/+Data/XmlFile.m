@@ -34,6 +34,8 @@ properties
     elementOpeners
 end
 
+%#ok<*ST2NM> - Octave compatibility
+%#ok<*HISTC> - Octave compatibility
 methods
     function this = XmlFile( inputArgument )
         this.hasFile = 1;
@@ -100,7 +102,7 @@ methods
         closerCharOffsets = charOffsets(this.elementClosers);
         closerCharLevel = this.rawXmlLevel(closerCharOffsets);
         elementsWithContent = find(~this.eleIsEmpty.mask());
-        r= this.rawXml;
+
         for ii = elementsWithContent
             %if eleIsEmpty(ii), continue; end
             myStart = this.eleHeaderStarts(ii);
@@ -388,11 +390,11 @@ methods
         nCloses =   sum(isMarkupCloser) + ...
                     sum(isMarkupOpener & isMarkupEmptyElement);
         if  nOpens ~= nCloses
-            msg = sprintf(['There appears to be %i open tags versus ' ...
-                            '%i close tags. This may not be valid xml.\n'], ...
-                            nOpens, nCloses ...
-                            );
-            warning(msg)
+            warning([ ...
+                'There appears to be %i open tags versus ' ...
+                '%i close tags. This may not be valid xml.\n'], ...
+                nOpens, nCloses ...
+                );
         end
 
         this.eleHeaderStarts = lArrow(isMarkupOpener);
@@ -491,16 +493,17 @@ methods
         dd(this.elementOpeners) = 1;
         dd(this.elementClosers+closerLength+2) = ...
             dd(this.elementClosers+closerLength+2) -1;
-        emptyEle = this.elementOpeners(this.eleIsEmpty.mask);
 
-        emptyLength = this.get_tag_length( ...
-                t, ...
-                emptyEle, ...
-                emptyEle+this.maxTagLength+2 ...
-        );
+        % emptyEle = this.elementOpeners(this.eleIsEmpty.mask);
+
+        % emptyLength = this.get_tag_length( ...
+        %         t, ...
+        %         emptyEle, ...
+        %         emptyEle+this.maxTagLength+2 ...
+        % );
+        % hasSpace = (t(emptyEle + emptyLength + 1));
 
         % empty might be <aTag /> or <aTag/> so we need
-%         hasSpace = (t(emptyEle + emptyLength + 1));
         endOfEmptyEle = this.eleHeaderEnds( this.eleIsEmpty.mask )+2;
         dd( endOfEmptyEle ) = dd( endOfEmptyEle ) -1;
         d= cumsum(dd);
@@ -624,11 +627,6 @@ methods (Static = true)
     end
 
     function branches = build_branches(ss,eleStruct,branches,occ)
-        
-        parents = arrayfun(@(x) x.parent_,eleStruct.ele);
-        tagStr = arrayfun(@(x) x.tag_,eleStruct.ele,'UniformOutput',0);
-        sibs = arrayfun(@(x) x.sibling_,eleStruct.ele);
-        burstI = cellfun(@(x) strcmpi(x,'burst'),tagStr);
 
         for eleInd = 1:numel(ss)
             thisEle = ss( eleInd );
@@ -770,14 +768,14 @@ methods (Static = true)
                         if thisOne == 1
                             root.(elementStructArray(k).tag_) = [];
                         else
-                            '??'
+                            warning('debug this 1')
                         end
                     elseif contains(attr,'array')
                         if thisOne == 1
                             root.(elementStructArray(k).tag_) = ...
-                                str2num(elementStructArray(k).value_);
+                                str2num(elementStructArray(k).value_); 
                         else
-                            '???{}?'
+                            warning('debug this 2')
                             root.(elementStructArray(k).tag_){thisOne} = ...
                                 str2num(elementStructArray(k).value_);
                         end
@@ -794,8 +792,7 @@ methods (Static = true)
                     if ~isempty(elementStructArray(k).tag_)
                         root.(elementStructArray(k).tag_) = elementStructArray(k).value_;
                     else
-                        'Hopefully unreachable?'
-                        warning('debug this')
+                        warning('debug this 3')
                         root.value_ = elementStructArray(k).value_;
                     end
                 end

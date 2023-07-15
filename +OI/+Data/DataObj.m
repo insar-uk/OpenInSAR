@@ -81,7 +81,7 @@ methods
     function obj = DataObj()
     end
 
-    function tf = needs_load( this )
+    function tf = needs_load( ~ )
         % overload this to provide logic which determines if a data object
         % needs additional files to be loaded in order to be fully defined.
         tf = true;
@@ -168,7 +168,7 @@ methods
                 % dont add the extension if its already there...
                 if ~strcmp(obj.fileextension, obj.filepath(end-length(obj.fileextension)+1:end))
                     if obj.fileextension(1) == '.'
-                        obj.fileextension = obj.fileextension(2:end)
+                        obj.fileextension = obj.fileextension(2:end);
                     end
                     filepath = [filepath '.' obj.fileextension];
                 end
@@ -399,42 +399,46 @@ methods (Static)
 
     function dataObj = object_from_name( vName )
         % get the class name
-        class_name = vName;
+        className = vName;
 
         % anything following a hyphen is a parameter not the class name
         hyphen = find(vName=='-');
         if ~isempty(hyphen)
-            class_name = vName(1:hyphen-1);
+            className = vName(1:hyphen-1);
         end
 
         % remove file extension
-        dot = find(class_name=='.',1,'last');
+        dot = find(className=='.',1,'last');
         if ~isempty(dot)
-            class_name = class_name(1:dot-1);
+            className = className(1:dot-1);
         end
 
         % remove any path
-        slashes = sum( uint8(class_name) == [uint8('/'); uint8('\')] );
+        slashes = sum( uint8(className) == [uint8('/'); uint8('\')] );
         slash = find(slashes,1,'last');
         if ~isempty(slash)
-            class_name = class_name(slash+1:end);
+            className = className(slash+1:end);
         end
 
 
         try
             % get the constructor
-            constructor = str2func(class_name);
+            constructor = str2func(className);
             % construct the object
             dataObj = constructor();
+        catch
+            warning('Could not find constructor for %s',className)
         end
         try
             % try with OI.Data.
-            constructor = str2func(['OI.Data.' class_name]);
+            constructor = str2func(['OI.Data.' className]);
             dataObj = constructor();
+        catch
+            warning('Could not find constructor for OI.Data.%s',className)
         end
         if ~exist('dataObj','var')
             dataObj = [];
-            warning('Could not find class %s', class_name)
+            warning('Could not find class %s', className)
         end
     end
 

@@ -4,6 +4,7 @@ properties
     root = OI.Data.XmlNode( 'root', '', {}, 1, 0, 0, 0, 1);
     % OI.Data.XmlNode( tag, value, attributes, index, parentIndex, firstChildIndex, nextSiblingIndex, depth)
 end
+%#ok<*AGROW>
 
 methods
     function this = struct2xml( structObj )

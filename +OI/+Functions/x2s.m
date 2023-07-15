@@ -1,4 +1,4 @@
-function root = x2s (elementStructArray, childrenCellArray, index);
+function root = x2s (elementStructArray, childrenCellArray, index)
     % let client code handle converting from XmlNode to data
     if (nargin < 3)
         index = 1;
@@ -13,7 +13,7 @@ function root = x2s (elementStructArray, childrenCellArray, index);
     tags = arrayfun(@(x) x.tag_, childEles, 'UniformOutput', false);
     % identify any duplicate tags and get a logical mask
     [uniqueTags, ~, tagInds] = unique(tags);
-    tagIndsThatAreDupes = find(histc(tagInds, 1:numel(uniqueTags)) > 1);
+    tagIndsThatAreDupes = find(histc(tagInds, 1:numel(uniqueTags)) > 1); 
     % Dupe matrix:
     % rows are the tags, columns are the individual duplicates
     % a 1 in the matrix means that the tag is a duplicate corresponding
@@ -48,3 +48,4 @@ function root = x2s (elementStructArray, childrenCellArray, index);
                 OI.Functions.x2s(elementStructArray, childrenCellArray, k);
         end
     end
+%#ok<*HISTC> - Octave compatibility

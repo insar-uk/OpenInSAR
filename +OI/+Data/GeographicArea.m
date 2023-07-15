@@ -6,7 +6,7 @@ properties
     lat
     lon
 end
-
+%#ok<*ST2NM> - Octave compatibility
 methods
     function obj = GeographicArea()
     end
@@ -31,8 +31,7 @@ methods
 
         % get the name
         if isempty(this.name)
-            [~, name, ~] = fileparts(filename);
-            this.name = name;
+            [~, this.name, ~] = fileparts(filename);
         end
         
         % if filename is empty just call it name.kml
@@ -83,7 +82,6 @@ methods
 
 
         % Create a KML file.
-        filename
         fid = fopen(filename, 'w');
         fprintf(fid, '%s', kmlStr);
         fclose(fid);
@@ -92,8 +90,8 @@ methods
     function [this, rotation, newOrder] = make_counter_clockwise(this)
         % make sure the lat/lon points are in counter clockwise order
         % with the first point being the lower left corner
-        rotation = 0;
-        origOrder = [1:numel(this.lat)]';
+
+        origOrder = (1:numel(this.lat))';
         newOrder = origOrder;
         % find the center of the polygon
         lat_center = mean(this.lat);
@@ -157,7 +155,7 @@ methods
             OI.Functions.obj2struct(this));
         % As we're saving the KML alongside the image, we can use relative
         % image path which is more portable for e.g. network paths.
-        [imgDir, imgName, imgExt] = fileparts(imgPath);
+        [imgDir, imgName, imgExt] = fileparts(imgPath); %#ok<ASGLU> maybe need
         imgPath = [imgName, imgExt];
         kml.write( filepath, imgPath );
 
@@ -349,7 +347,7 @@ methods (Static)
         obj = OI.Data.GeographicArea();
         % parse GML coordinates into a polygon of lat/lon points
         % example: gml = '48.0 -123.0 48.0 -122.0 49.0 -122.0 49.0 -123.0 48.0 -123.0'
-        coords = str2num(gml); % #ok<ST2NM>
+        coords = str2num(gml); 
         obj.lat = coords(1:2:end);
         obj.lon = coords(2:2:end);
     end

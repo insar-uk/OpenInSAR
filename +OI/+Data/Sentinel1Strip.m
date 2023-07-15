@@ -17,7 +17,7 @@ properties
 
     orbit
 end % properties
-
+%#ok<*STREMP> - Octave compatibility
 methods
     %./measurement/s1a-iw2-slc-vh-20230318t175815-20230318t175841-047702-05baed-002.tiff"
     function this = Sentinel1Strip()

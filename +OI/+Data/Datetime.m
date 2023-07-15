@@ -1,8 +1,10 @@
 classdef Datetime < OI.Data.DataObj
 properties
-    daysSinceZero = now();
+    daysSinceZero = now(); 
 end
-
+%#ok<*DATNM> - Octave compatibility
+%#ok<*TNOW1> - Octave compatibility
+%#ok<*DATST> - Octave compatibility
 methods
     function this = Datetime( datenumOrString, format)
         % Datetime constructor.  Can be called with a string or a datenum.
@@ -16,7 +18,7 @@ methods
                 % Sentinel SAFE:
                 case 15 % yyyymmddThhMMss
                     fmt = 'yyyymmddTHHMMSS';
-                    this.daysSinceZero = datenum(datenumOrString,fmt);
+                    this.daysSinceZero = datenum(datenumOrString,fmt); 
                 % Sentinel Orbits:
                 case 16 % yyyymmddThhMMssZ
                     fmt = 'yyyymmddTHHMMSSZ';

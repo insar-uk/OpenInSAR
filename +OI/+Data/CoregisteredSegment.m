@@ -12,7 +12,7 @@ properties
 end%properties
 
 methods
-    function this = CoregisteredSegment( engine )
+    function this = CoregisteredSegment( ~ )
         this.hasFile = true;
         this.filepath = '$WORK$/coregistration/$id$';
         % this.fileextension = 'tiff'; % TODO, get Tiff working!

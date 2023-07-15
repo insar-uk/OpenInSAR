@@ -46,3 +46,4 @@ function absPath = abspath( inputPath )
     % Append any nonexistent folders/files argued
     absPath = [absPath filesep appendage];
 end
+%#ok<*AGROW> - Limited performance hit

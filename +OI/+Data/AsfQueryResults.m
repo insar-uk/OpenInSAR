@@ -7,7 +7,7 @@ properties
 end%properties
 
 methods
-    function this = AsfQueryResults( engine )
+    function this = AsfQueryResults( ~ )
         this.hasFile = true;
         this.filepath = fullfile( this.filepath, 'AsfQueryResults');
         this.fileextension = 'json';
