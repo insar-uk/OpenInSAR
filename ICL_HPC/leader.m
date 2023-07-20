@@ -3,7 +3,7 @@ if ~exist('J','var')
 end
 disp(J)
 
-addpath('prototype')
+addpath('ICL_HPC')
 
 projectPath = OI.ProjectLink().projectPath;
 

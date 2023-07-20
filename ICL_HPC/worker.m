@@ -24,7 +24,7 @@ end
 
 disp(J)
 
-addpath('prototype')
+addpath('ICL_HPC')
 
 % project file:
 % resolve the real path to the project file
