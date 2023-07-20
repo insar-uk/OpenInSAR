@@ -80,9 +80,6 @@ classdef XmlWrite
             range = this.contentLength+1:this.contentLength+numel(str);
             if range(end)>this.contentBuffer
                 this.contentBuffer = this.contentBuffer * 2;
-                blankSize = this.contentBuffer - this.contentLength;
-                b = blanks(blankSize);
- %              this.contents( this.contentLength+1:this.contentBuffer ) = b;
                 this.contents( this.contentBuffer ) = ' ';
             end
             this.contents(this.contentLength+1:this.contentLength+numel(str)) = str;

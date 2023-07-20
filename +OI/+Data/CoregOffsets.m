@@ -18,7 +18,7 @@ properties
 end%properties
 
 methods
-    function this = CoregOffsets( engine )
+    function this = CoregOffsets( ~ )
         this.hasFile = true;
         this.filepath = '$WORK$/coregistration/$id$';
         % this.fileextension = 'tiff'; % TODO, get Tiff working!

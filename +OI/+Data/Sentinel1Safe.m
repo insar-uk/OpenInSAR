@@ -192,8 +192,7 @@ methods (Static)
             case 'SH'
                 pol = 'HH';
             otherwise
-                polCode
-                error('Unknown polarization')
+                error('Unknown polarization %s', polCode)
         end% switch
     end% decode_polarisation
 

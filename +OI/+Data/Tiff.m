@@ -14,6 +14,8 @@ properties (Constant = true)
                     "float" ];
 end
 
+%#ok<*AGROW> - Limited performance hit
+
 methods (Static =  true)
     function [data, header] = read( filepath )
         fId = fopen( filepath , 'r' );
@@ -233,7 +235,7 @@ methods (Static =  true)
         % add the complex flag if necessary
         if ~isreal(data)
             sampleFormat = sampleFormat * 2;
-            isComplex = true;
+            % isComplex = true;
         end
 
         % determine the number of bits per sample
@@ -308,7 +310,7 @@ methods (Static =  true)
                 bytesForHeader + ...
                 bytesForIfds;
             % write the IFD
-            bytes = tIfd.write_ifd( fId , []);
+            tIfd.write_ifd( fId , []);
         end
         % write the header
         % header.write_header(fId);
@@ -319,58 +321,6 @@ methods (Static =  true)
         fclose(fId);
         status = 0;
     end % write
-    %     % populate each IFD in the header
-    %     for bandInd = 1:nBands
-    %         tIfd = OI.Data.TiffIfd();
-    %         % populate the IFD
-    %         tIfd.SampleFormat = sampleFormat;
-    %         tIfd.ImageWidth = size(data,1); % tiffs are transposed
-    %         tIfd.ImageLength = size(data,2); % old document scanner format!
-    %         tIfd.BitsPerSample = 
-    %         tIfd.StripByteCounts = size(data,1)*size(data,2)*4;
-    %         tIfd.StripOffsets = 8;
-    %         tIfd.Compression = 1;
-    %         % populate the header
-    %         header.ifds(bandInd) = tIfd;
-    %     end
-
-        
-
-    %     % populate each IFD in the header
-    %     for bandInd = 1:nBands
-    %         tIfd = OI.Data.TiffIfd();
-    %         % populate the IFD
-
-
-    %         tIfd.SampleFormat
-
-    %         % populate the header
-    %         header.ifds(bandInd) = tIfd;
-    %     end
-
-    %     % % populate the header
-    %     % header.ifdCount = size(data,3);
-    %     % header.ifds = OI.Data.TiffIfd();
-    %     % for iBand=1:header.ifdCount
-    %     %     header.ifds(iBand) = OI.Data.TiffHeader.IFD();
-    %     %     header.ifds(iBand).ImageWidth = size(data,1); % tiffs are transposed
-    %     %     header.ifds(iBand).ImageLength = size(data,2); % old document scanner format!
-    %     %     header.ifds(iBand).BitsPerSample = 32;
-    %     %     header.ifds(iBand).Compression = 1;
-    %     %     header.ifds(iBand).PhotometricInterpretation = 1;
-    %     %     header.ifds(iBand).SamplesPerPixel = 1;
-    %     %     header.ifds(iBand).RowsPerStrip = size(data,1);
-    %     %     header.ifds(iBand).StripByteCounts = size(data,1).*size(data,2).*4;
-    %     %     header.ifds(iBand).StripOffsets = 8;
-    %     %     header.ifds(iBand).SampleFormat = 3;
-    %     % end
-
-    %     header = OI.Data.TiffHeader.write_to_stream( fId );
-    %     if header.ifdCount > 0
-    %         data = OI.Data.Tiff.read_image_data_from_stream(fId, header);
-    %     end
-    %     fclose( fId );
-    % end % =
 
 
 

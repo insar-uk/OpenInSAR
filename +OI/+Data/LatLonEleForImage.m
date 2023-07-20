@@ -9,7 +9,7 @@ properties
 end%properties
 
 methods
-    function this = LatLonEleForImage( engine )
+    function this = LatLonEleForImage( ~ )
         this.hasFile = true;
         this.filepath = '$WORK$/geocoding/$id$';
         % this.fileextension = 'tiff'; % TODO, get Tiff working!

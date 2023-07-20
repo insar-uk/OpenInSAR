@@ -4,7 +4,7 @@ function tilepaths = get_srtm_tiles(minLat, maxLat, minLon, maxLon, directory, u
     NASA_URL = 'https://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL1.003/2000.02.11/'; 
 
     if nargin < 5
-        directory = fullfile(pwd,'srtm1');;
+        directory = fullfile(pwd,'srtm1');
     end
     % make sure the directory exists
     if ~exist(directory,'dir')
@@ -90,7 +90,7 @@ function tilepaths = get_srtm_tiles(minLat, maxLat, minLon, maxLon, directory, u
         end % if needsDownload
 
         if needsUnzip(n)
-            inputPath = [tilepaths{n}, '.zip']
+            inputPath = [tilepaths{n}, '.zip'];
             if OI.OperatingSystem.isUnix
                 unzipCommand = sprintf('unzip -DD -o %s -d %s', ...
                     inputPath, ...
@@ -115,5 +115,7 @@ function tilepaths = get_srtm_tiles(minLat, maxLat, minLon, maxLon, directory, u
         end % if needsUnzip
     end % for each tile
 end
+
+%#ok<*TNOW1> - Octave compatibility
 
 

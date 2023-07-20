@@ -32,7 +32,8 @@ properties
     
     unknownTags
 end % properties
-    
+%#ok<*BDSCI> - Looks scalar to me.
+%#ok<*ST2NM> - Octave compatibility
 properties (Constant = true)
     % Map the tiff type code to its Octave type specifier
     typeSpecifier = [   "*uint8";
@@ -74,7 +75,7 @@ methods
         
         tagBytes = count.*this.bytesPerItem(type);
         nextTagOffset = ftell(fid) + 4;
-        if tagBytes>4
+        if tagBytes>4 
             % read the 4 byte offset for data
             thisDataOffset = fread(fid,1,"*uint32");
             fseek(fid,thisDataOffset,'bof');
@@ -132,7 +133,7 @@ methods
             case 33922
                 this.ModelTiepointTag = value;
             case 34665
-                this.ExifIFDPointer = value;
+                % this.ExifIFDPointer = value;
             case 34735
                 this.GeoKeyDirectoryTag = value;
             case 34736
@@ -144,7 +145,7 @@ methods
         end
     end % set_tag
     
-    function bytes = write_ifd(this, bytes)
+    function bytes = write_ifd(this, ~)
 % An Image File Directory (IFD) consists of a 2-byte count of the number of direc-
 % tory entries (i.e., the number of fields), followed by a sequence of 12-byte field
 % entries, followed by a 4-byte offset of the next IFD (or 0 if none). (Do not forget to
@@ -179,7 +180,7 @@ methods
             tagType = this.get_type(tagValue);
             tagCount = length(tagValue);
             tagBytes = tagCount.*this.bytesPerItem(tagType);
-            if tagBytes>4
+            if tagBytes>4 
                 % write the 4 byte offset for data
                 bytes = [bytes, typecast(uint32(length(bytes)+4),'uint8')];
 
@@ -189,14 +190,19 @@ methods
         else
             % write the 4 byte offset for data
             bytes = [bytes, typecast(uint32(length(bytes)+4),endian)];
-            bytes = [bytes, typecast(tagValue,this.typeSpecifier(tagType),endian)];
+            % bytes = [bytes, typecast(tagValue,this.typeSpecifier(tagType),endian)];
         end
         bytes = [bytes, typecast(uint16(tagCode),endian)];
         bytes = [bytes, typecast(uint16(tagType),endian)];
         bytes = [bytes, typecast(uint32(tagCount),endian)];
     end % write_tag
 
-    function tagType = get_type(this, tagValue)
+
+end % methods
+
+methods (Static = true)
+
+    function tagType = get_type(tagValue)
         if isinteger(tagValue)
             if tagValue>=0
                 if tagValue<=255
@@ -224,5 +230,5 @@ methods
         end
     end % get_type
 
-end % methods
+end
 end % classdef

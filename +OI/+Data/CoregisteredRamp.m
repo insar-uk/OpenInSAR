@@ -8,7 +8,7 @@ properties
 end%properties
 
 methods
-    function this = CoregisteredRamp( engine )
+    function this = CoregisteredRamp( ~ )
         this.hasFile = true;
         this.filepath = '$WORK$/coregistration/$id$';
         % this.fileextension = 'tiff'; % TODO, get Tiff working!

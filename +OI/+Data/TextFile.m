@@ -10,20 +10,21 @@ function obj = TextFile(filename)
     obj.hasFile = true;
 end % constructor
 
-function OK = write(obj, content)
+function [OK, bytes] = write(obj, content)
     OK = false;
     if ~ischar(content)
         error('OI:Data:TextFile:write', 'Content must be a string');
-        return
     end
     fp = obj.filepath;
     if ~isempty(obj.fileextension)
         fp = [fp, '.', obj.fileextension];
     end
     fid = fopen(fp, 'w');
-    bytes = fprintf(fid, '%s', content)
+    bytes = fprintf(fid, '%s', content);
     fclose(fid);
-    OK = true;
+    if bytes > 0
+        OK = true;
+    end
 end % write
 
 end % methods

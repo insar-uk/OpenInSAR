@@ -64,7 +64,7 @@ function obj = struct2obj(s)
                 % try and get the value of the matlab_type_ attribute
                 split = strsplit(attributes,'=');
                 % find if any of the split strings contain matlab_type_
-                idx = find(~cellfun(@isempty,strfind(split,'matlab_type_')));
+                idx = find(~cellfun(@isempty,strfind(split,'matlab_type_'))); 
                 if ~isempty(idx)
                     % get the value of the matlab_type_ attribute
                     typeOfThis = split{idx+1};
@@ -101,3 +101,4 @@ function obj = struct2obj(s)
     end
 
 end
+%#ok<*STRCLFH> - Octave compatibility
