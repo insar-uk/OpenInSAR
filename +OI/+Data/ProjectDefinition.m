@@ -87,7 +87,7 @@ properties
     pathVars = {'HERE','ROOT','WORK','INPUT_DATA_DIR','OUTPUT_DATA_DIR','ORBITS_DIR'}
 
 
-    SECRETS_FILEPATH = '$HERE$/secrets.txt'
+    SECRETS_FILEPATH = '$HERE$/../secrets.txt'
 end
 
 methods 

@@ -3,6 +3,11 @@ if ~exist('J','var')
 end
 disp(J)
 
+[~,startDirectory,~]=fileparts(pwd)
+
+if strcmpi(startDirectory,'ICL_HPC')
+    cd('..')
+end
 addpath('ICL_HPC')
 
 projectPath = OI.ProjectLink().projectPath;

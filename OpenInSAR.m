@@ -28,6 +28,10 @@ methods
             % Handle command line arguments
             this = this.parse_args(varargin{:});
         end
+
+        % Run any neccessary first-time setup
+        this.setup();
+
         if this.configuration.isActive
             % Run main
             this = this.main();
@@ -93,6 +97,66 @@ methods
         this.ui.log('info', 'Starting OpenInSAR main\n');
     end
 
+    function this = setup(this, varargin)
+        % Run any neccessary first-time setup
+        this.ui.log('info', 'Running setup\n');
+        [~,currentDir] = fileparts(pwd);
+        % Check if we are in the correct directory
+        if ~strcmp(currentDir, 'OpenInSAR')
+            this.ui.log('error', 'Please call OpenInSAR from the OpenInSAR directory\n');
+        end
+        % Check if there is an xml file linking us to the current project
+        if exist('CurrentProject.xml', 'file')
+            this.engine.ui.log('debug', 'Found CurrentProject.xml\n');
+            this.engine.ui.log('info', 'Reloading current project from CurrentProject.xml\n');
+            % Load the project
+            this.load_current_project();
+        else
+            this.engine.ui.log('info', 'Running first time setup. (No CurrentProject.xml found)\n');
+            % Create a new project
+            this.create_project();
+        end
+    end
+
+    function this = load_current_project(this, varargin)
+        % Get the listed project path
+        currentProjectPath = OI.ProjectLink().projectPath;
+        this.ui.log('info', 'Loading current project at %s\n', currentProjectPath);
+        if exist(currentProjectPath, 'file')
+            % Load the project
+            this.engine.load_project(currentProjectPath);
+        else
+            % Throw an error and try to create a new project
+            this.ui.log('error', 'Could not find project at %s\n', currentProjectPath);
+            error('Could not find project at %s\n Please check CurrentProject.xml\n', currentProjectPath);
+        end
+    end
+
+    function this = create_project(this, varargin)
+        % Create a new project
+        this.ui.log('info', 'Creating a new project\n');
+        % For now we will just copy the template examples
+        newProjectPath = fullfile(fileparts(pwd), 'OIProject.oi');
+        copyfile('+OI/Examples/CurrentProject_template.xml', 'CurrentProject.xml');
+        % Don't overwrite an existing project
+        if exist(newProjectPath, 'file')
+            warning('A project already exists at %s\nThis was not overwritten.', newProjectPath)
+        else
+            this.engine.ui.log('info', 'Creating a new project at %s\n', newProjectPath')
+            copyfile('+OI/Examples/ExampleProject_template.oi', newProjectPath);
+        end
+
+        % Throw an error to stop execution
+        warning( [ ...
+        'A new project has been created at \n\t%s\n\n' ...
+        'You will now need to manually edit this file to define your project\n', ...
+        'If you wish to move this project file, please also edit CurrentProject.xml\n', ...
+        'CurrentProject.xml should contain the path to the current project file\n', ...
+        ], ...
+        newProjectPath);
+        error('Please read instructions above before continuing\n')
+        
+    end
 end
 
 end

@@ -1,3 +1,7 @@
+# User-defined project files
+CurrentProject.xml
+ExampleProject.oi
+
 # Prompt.m
 # prototype/secrets.txt
 # test/res/OpenInSAR_Test_Run/*
@@ -25,4 +29,4 @@
 # *.sh.o*
 # # IDE stuff
 # .vscode/*
-# .vscode
+# .vscodes

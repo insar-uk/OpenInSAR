@@ -10,7 +10,7 @@
 #   $HERE$ = the directory where the project file is located
 #   $REPO_ROOT$ = the directory where the OpenInSAR scripts are located
 
-PROJECT_NAME = Example_OpenInSAR_Project; # Name of the project
+PROJECT_NAME = OpenInSAR_Project; # Name of the project
 PROCESSING_SCHEME = PSI; # Processing scheme to use
 
 INPUT_DATA_LIST = $HERE$/$PROJECT_NAME$/input_data.txt; # File containing a list of data to process

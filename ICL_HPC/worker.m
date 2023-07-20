@@ -24,6 +24,9 @@ end
 
 disp(J)
 
+if strcmpi(startDirectory,'ICL_HPC')
+    cd('..')
+end
 addpath('ICL_HPC')
 
 % project file:
