@@ -79,15 +79,16 @@ properties
     MASK_SEA = 1;
     
     HERE
+    HOME
     ROOT
     WORK
     INPUT_DATA_DIR
     OUTPUT_DATA_DIR
     ORBITS_DIR = '$WORK$/Orbits/'
-    pathVars = {'HERE','ROOT','WORK','INPUT_DATA_DIR','OUTPUT_DATA_DIR','ORBITS_DIR'}
+    pathVars = {'HERE','HOME','ROOT','WORK','INPUT_DATA_DIR','OUTPUT_DATA_DIR','ORBITS_DIR'}
 
 
-    SECRETS_FILEPATH = '$HERE$/../secrets.txt'
+    SECRETS_FILEPATH = '$HERE$/secrets.txt'
 end
 
 methods 
@@ -116,6 +117,8 @@ methods
                     continue;
                 case 'WORK'
                     continue;
+                case 'HOME'
+                    continue;
                 case 'HERE'
                     continue;
                 case 'hasFile'
@@ -131,6 +134,24 @@ methods
         end
     end%to_string
 
+    function this = get_special_paths(this)
+        
+        % get 'ROOT':
+        %   the root directory of the OpenInSAR script
+        this.ROOT = fileparts(fileparts(fileparts( mfilename( 'fullpath' ) )));
+
+        % get 'HERE': 
+        %   the directory of the project definition file
+        hereFolder = fileparts( this.filepath );
+        if isempty(hereFolder)
+            hereFolder = pwd;
+        end
+        this.HERE = fullfile( hereFolder );
+
+        % get 'HOME':
+        this.HOME = OI.OperatingSystem.get_usr_dir();
+    end
+
 end% methods
 
 methods (Static)
@@ -139,14 +160,8 @@ methods (Static)
         this = OI.Data.ProjectDefinition();
         this.filepath = filename;
 
-        % get the root directory of the OpenInSAR script
-        this.ROOT = fileparts(fileparts(fileparts( mfilename( 'fullpath' ) )));
-        % get the directory of the project definition file
-        hereFolder = fileparts(filename);
-        if isempty(hereFolder)
-            hereFolder = pwd;
-        end
-        this.HERE = fullfile( hereFolder );
+        % get special paths like ROOT, HERE, HOME
+        this = this.get_special_paths();
 
         % read in file
         fId = fopen( filename, 'r' );

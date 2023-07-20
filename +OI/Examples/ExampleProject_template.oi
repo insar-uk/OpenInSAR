@@ -17,6 +17,8 @@ INPUT_DATA_LIST = $HERE$/$PROJECT_NAME$/input_data.txt; # File containing a list
 INPUT_DATA_DIR = $HERE$/$PROJECT_NAME$/input; # Directory where the data will be downloaded to or loaded from
 OUTPUT_DATA_DIR = $HERE$/$PROJECT_NAME$/work; # Directory where the output will be written to
 
+SECRETS_FILEPATH = $HOME$/secrets.txt
+
 AOI = [51.8, -2.9, 51.3, -3.9]; # Rectangular, NESW, WGS84 lat/lon
 START_DATE = 20180101; # Start date of the data to search
 END_DATE = 20190101; # End date of the data to search
