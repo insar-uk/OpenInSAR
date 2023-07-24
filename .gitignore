@@ -2,6 +2,10 @@
 CurrentProject.xml
 ExampleProject.oi
 
+# PBS files
+*.sh.e*
+*.sh.o*
+
 # Prompt.m
 # prototype/secrets.txt
 # test/res/OpenInSAR_Test_Run/*

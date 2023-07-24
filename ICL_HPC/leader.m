@@ -3,7 +3,7 @@ if ~exist('J','var')
 end
 disp(J)
 
-[~,startDirectory,~]=fileparts(pwd)
+[~,startDirectory,~]=fileparts(pwd);
 
 if strcmpi(startDirectory,'ICL_HPC')
     cd('..')

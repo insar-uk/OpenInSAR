@@ -66,7 +66,7 @@ classdef DataObj
 %#ok<*PROPLC>
 properties
 
-    filepath = '$workingDirectory$/general/';
+    filepath = '$workingDirectory$/';
     fileextension = 'mat';
     % generator = '';
     hasFile = false; % If the DataObj is very large we save it to a file

@@ -24,6 +24,8 @@ end
 
 disp(J)
 
+[~,startDirectory] = fileparts(pwd);
+
 if strcmpi(startDirectory,'ICL_HPC')
     cd('..')
 end
