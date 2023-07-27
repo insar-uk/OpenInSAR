@@ -9,6 +9,8 @@ ExampleProject.oi
 # Matlab backups
 *.asv
 
+temp/
+
 # Prompt.m
 # prototype/secrets.txt
 # test/res/OpenInSAR_Test_Run/*
@@ -37,3 +39,4 @@ ExampleProject.oi
 # # IDE stuff
 # .vscode/*
 # .vscodes
+xint

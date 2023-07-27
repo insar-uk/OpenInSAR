@@ -35,6 +35,7 @@ methods
         blockMap = engine.load( OI.Data.BlockMap() );
         cat = engine.load( OI.Data.Catalogue() );
         stacks = engine.load( OI.Data.Stacks() );
+        projObj = engine.load( OI.Data.ProjectDefinition() );
         if isempty(blockMap) || isempty(cat) || isempty(stacks)
             return
         end
@@ -82,13 +83,17 @@ methods
 
         % Save the block
         engine.save( blockObj, blockData );
+        this.isFinished = true;
+
+        % Save a preview of the block
+        OI.Plugins.Blocking.preview_block(projObj, blockInfo, blockData, this.POLARISATION);
 
     end % run
 
     function this = get_polarisations(this, engine)
         projObj = engine.load( OI.Data.ProjectDefinition() );
         % what polarisations do we need?
-        requestedPol = {'VV','VH','HV','HH'};
+        requestedPol = {'VV', 'VH', 'HV', 'HH'};
         if ~isempty(projObj.POLARIZATION)
             keepPol = zeros(size(requestedPol));
             ii=0;
@@ -187,7 +192,7 @@ methods (Static = true)
 
         % preview directory
         previewDir = fullfile(projObj.WORK,'preview','block');
-        blockName = sprintf('Stack_%i_block_%i',blockInfo.stackIndex,blockInfo.index);
+        blockName = sprintf('Stack_%i_%s_block_%i',blockInfo.stackIndex,POL,blockInfo.index);
 
         previewKmlPath = fullfile( previewDir, [blockName '.kml']);
         previewKmlPath = OI.Functions.abspath( previewKmlPath );
