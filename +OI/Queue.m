@@ -187,6 +187,8 @@ methods
                 names.(jn) = 1;
             end
         end
+        fprintf(1,'Queue overview as of %s:\n',datestr(now())); %#ok<TNOW1,DATST>
+        disp(names)
     end
 
     function clear(this)

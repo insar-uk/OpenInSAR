@@ -1,4 +1,4 @@
-classdef ReferencePSI < OI.Plugins.PluginBase
+classdef ReferencePsi < OI.Plugins.PluginBase
     properties
         inputs = {OI.Data.Sentinel1SafeDownload(), ...
             OI.Data.Catalogue(), ...
@@ -6,9 +6,9 @@ classdef ReferencePSI < OI.Plugins.PluginBase
             OI.Data.PreprocessedFiles(), ...
             OI.Data.GeocodingSummary(), ...
             OI.Data.CoregistrationSummary(), ...
-            OI.Data.SubstackingSummary() };
+            OI.Data.BlockingSummary() };
             outputs = {OI.Data.PsiSummary()}
-        id = 'ReferencePSI'
+        id = 'ReferencePsi'
     end
 
     methods

@@ -6,6 +6,9 @@ ExampleProject.oi
 *.sh.e*
 *.sh.o*
 
+# Matlab backups
+*.asv
+
 # Prompt.m
 # prototype/secrets.txt
 # test/res/OpenInSAR_Test_Run/*

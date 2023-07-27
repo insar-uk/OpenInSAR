@@ -121,14 +121,17 @@ methods
     function this = load_current_project(this, varargin)
         % Get the listed project path
         currentProjectPath = OI.ProjectLink().projectPath;
-        this.ui.log('info', 'Loading current project at %s\n', currentProjectPath);
+        this.ui.log('info', 'Loading current project at %s\n', ...
+            strrep(currentProjectPath,'\','\\'))
         if exist(currentProjectPath, 'file')
             % Load the project
             this.engine.load_project(currentProjectPath);
         else
             % Throw an error and try to create a new project
-            this.ui.log('error', 'Could not find project at %s\n', currentProjectPath);
-            error('Could not find project at %s\n Please check CurrentProject.xml\n', currentProjectPath);
+            this.ui.log('error', 'Could not find project at %s\n', ...
+                strrep(currentProjectPath,'\','\\'));
+            error(['Could not find project at %s\n', ...
+                'Please check CurrentProject.xml\n'], currentProjectPath);
         end
     end
 

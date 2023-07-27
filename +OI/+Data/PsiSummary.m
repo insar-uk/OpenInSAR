@@ -1,8 +1,8 @@
 classdef PsiSummary < OI.Data.DataObj
 
 properties
-    id = 'PSI_Summary';
-    generator = 'ReferencePSI';
+    id = 'PsiSummary';
+    generator = 'ReferencePsi';
 end%properties
 
 methods

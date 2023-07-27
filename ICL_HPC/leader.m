@@ -26,13 +26,7 @@ oi.engine.postings.report_ready(0)
 nextWorker = 0;
 assignment = {};
 
-thingToDoList = { OI.Data.Sentinel1SafeDownload(), ... %1
-    OI.Data.Catalogue(), ... %0
-    OI.Data.OrbitSummary() , ... %0
-    OI.Data.PreprocessedFiles(), ... %0
-    OI.Data.GeocodingSummary(), ... %1
-    OI.Data.CoregistrationSummary(), ... %1
-    OI.Data.SubstackingSummary() }; %1
+thingToDoList = { OI.Data.PsiSummary() }; %1
 
 for thingToDo = thingToDoList
     oi.ui.log('info','Jobs remaining in queue:\n');

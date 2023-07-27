@@ -12,6 +12,9 @@ methods
         this.postings = Postings( projObj );
     end
 
+end
+
+methods (Access = protected)
     function run_plugin( this, job )
         % run the plugin
         fprintf(1, 'Running plugin is array: %d\n', this.plugin.isArray);

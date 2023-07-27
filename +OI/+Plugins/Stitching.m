@@ -50,38 +50,151 @@ methods
             segmentStarts = segmentOffsets + 1;
             segmentEnds = segmentOffsets + segmentSizes;
 
-
-
-
-            % Crop the data. Start by cropping to the valid data extent.
-            segmentCropping = zeros(nSegments,4); % bottom, top, left, right
-            % start az, end az, start rg, end rg
-            for i = 1:nSegments
-                segmentCropping(i,:) = [ ...
-                    segmentMetadata(i).validSamples.firstAzimuthLine, ...
-                    segmentMetadata(i).validSamples.lastAzimuthLine, ...
-                    segmentMetadata(i).validSamples.firstRangeSample, ...
-                    segmentMetadata(i).validSamples.lastRangeSample ...
-                    ];
+            % Just to be explicit ...
+            for i = 1:nSegments 
+                % Temp struct to hold the position information
+                s = segmentMetadata(i);
+                p = struct();
+                p.startAzimuth = segmentStarts(i,1);
+                p.endAzimuth = segmentEnds(i,1);
+                p.startRange = segmentStarts(i,2);
+                p.endRange = segmentEnds(i,2);
+                p.validStartAzimuth = ...
+                    p.startAzimuth + s.validSamples.firstAzimuthLine;
+                p.validEndAzimuth = ...
+                    p.endAzimuth + s.validSamples.azimuthEndOffset;
+                p.validStartRange = ...
+                    p.startRange + s.validSamples.firstRangeSample;
+                p.validEndRange = ...
+                    p.endRange + s.validSamples.rangeEndOffset;
+                % Set the initial crop extent to the valid data extrent
+                p.cropStartAzimuth = p.validStartAzimuth;
+                p.cropEndAzimuth = p.validEndAzimuth;
+                p.cropStartRange = p.validStartRange;
+                p.cropEndRange = p.validEndRange;
+                % Assign to the segment metadata
+                segmentMetadata(i).position = p;
             end
 
             % Find the overlaps between segments
-            overlap = cell(nSegments,nSegments);
+            overlaps = cell(nSegments,nSegments);
+            overlapPairs = zeros(nSegments * nSegments,2);
             for i = 1:nSegments
-                for j = 1:nSegments
-                    overlap{i,j} = this.rectangular_overlap( ...
+                for j = i+1:nSegments
+                    overlaps{i,j} = this.rectangular_overlap( ...
                         segmentStarts(i,:), segmentEnds(i,:), ...
                         segmentStarts(j,:), segmentEnds(j,:) );
+                    isOverlap = ( numel(overlaps{i,j}) > 0 );
+                    overlapPairs((i-1)*nSegments + j,:) = [i,j] .* isOverlap;
                 end
             end
 
+            % Remove empty overlaps
+            overlapPairs = overlapPairs( sum(overlapPairs,2) > 0, : );
+
+            % Use the overlaps to adjust the crop extents
+            for o = 1:size(overlapPairs,1)
+                pair = overlapPairs(o,:);
+                i = pair(1); j = pair(2);
+                % Get the overlap
+                overlap = overlaps{i,j};
+                % Adjust the crop extents, crop the azimuth of the first segment back to half of the overlap
+                azCentre = floor(mean(overlap([1,3])));
+                rgCentre = floor(mean(overlap([2,4])));
+
+                % check if segment i is above segment j
+                iIsCloserToBottom = segmentStarts(i,1) < segmentStarts(j,1);
+                iIsCloserToRight = segmentStarts(i,2) < segmentStarts(j,2);
+                
+                % Get existing crop extents
+                iPosition = segmentMetadata(i).position;
+                jPosition = segmentMetadata(j).position;
+                iPosCropAz = iPosition;
+                jPosCropAz = jPosition;
+                iPosCropRg = iPosition;
+                jPosCropRg = jPosition;
+
+                % Determine the new extent if we crop in azimuth
+                if iIsCloserToBottom
+                    iPosCropAz.cropEndAzimuth = azCentre;
+                    jPosCropAz.cropStartAzimuth = azCentre + 1;
+                else
+                    iPosCropAz.cropStartAzimuth = azCentre + 1;
+                    jPosCropAz.cropEndAzimuth = azCentre;
+                end
+
+                % Determine the new extent if we crop in range
+                if iIsCloserToRight
+                    iPosCropRg.cropEndRange = rgCentre;
+                    jPosCropRg.cropStartRange = rgCentre + 1;
+                else
+                    iPosCropRg.cropStartRange = rgCentre + 1;
+                    jPosCropRg.cropEndRange = rgCentre;
+                end
+
+                % Determine the area after cropping in azimuth
+                iAreaAz = (iPosCropAz.cropEndAzimuth - iPosCropAz.cropStartAzimuth) * ...
+                    (iPosCropAz.cropEndRange - iPosCropAz.cropStartRange);
+                jAreaAz = (jPosCropAz.cropEndAzimuth - jPosCropAz.cropStartAzimuth) * ...
+                    (jPosCropAz.cropEndRange - jPosCropAz.cropStartRange);
+                % Determine the area after cropping in range
+                iAreaRg = (iPosCropRg.cropEndAzimuth - iPosCropRg.cropStartAzimuth) * ...
+                    (iPosCropRg.cropEndRange - iPosCropRg.cropStartRange);
+                jAreaRg = (jPosCropRg.cropEndAzimuth - jPosCropRg.cropStartAzimuth) * ...
+                    (jPosCropRg.cropEndRange - jPosCropRg.cropStartRange);
+
+                % Determine which crop direction (azimuth or range) to use
+                azCropBetter = iAreaAz + jAreaAz > iAreaRg + jAreaRg;
+                if azCropBetter
+                    segmentMetadata(i).position = iPosCropAz;
+                    segmentMetadata(j).position = jPosCropAz;
+                else
+                    segmentMetadata(i).position = iPosCropRg;
+                    segmentMetadata(j).position = jPosCropRg;
+                end
+            end % overlap loop
+
+            % Find the min az/rg and record the position in mosaic
+            minAz = 9e9; minRg = 9e9;
+            for i=1:nSegments
+                minAz = min(minAz,segmentMetadata(i).position.cropStartAzimuth);
+                minRg = min(minRg,segmentMetadata(i).position.cropStartRange);
+            end
+            for i=1:nSegments
+                segmentMetadata(i).position.azOutputStart = ...
+                    segmentMetadata(i).position.cropStartAzimuth - minAz + 1;
+                segmentMetadata(i).position.rgOutputStart = ...
+                    segmentMetadata(i).position.cropStartRange - minRg + 1;
+            end
 
 
+            % Provide info on how to read in the cropped data
+            for i=1:nSegments
 
+                segmentMetadata(i).position.firstCroppedAzimuthLine = ...
+                    segmentMetadata(i).position.cropStartAzimuth - ...
+                    segmentMetadata(i).position.startAzimuth + 1;
+                segmentMetadata(i).position.lastCroppedAzimuthLine = ...
+                    segmentMetadata(i).position.cropEndAzimuth - ...
+                    segmentMetadata(i).position.startAzimuth + 1;
 
+                segmentMetadata(i).position.firstCroppedRangeSample = ...
+                    segmentMetadata(i).position.cropStartRange - ...
+                    segmentMetadata(i).position.startRange + 1;
+                segmentMetadata(i).position.lastCroppedRangeSample = ...
+                    segmentMetadata(i).position.cropEndRange - ...
+                    segmentMetadata(i).position.startRange + 1;
+                
+            end % data startpoints loop 
             % Assign to structs
-            this.output{1}.stack(stackInd) = stackStitchInfo;
+            if stackInd == 1
+                this.outputs{1}.stack.segments = segmentMetadata;
+            else
+                this.outputs{1}.stack(stackInd).segments = segmentMetadata;
+            end
         end
+
+        engine.save( this.outputs{1} );
 
     end
 end % methods
@@ -151,6 +264,9 @@ methods (Static = true)
             'samplesPerBurst', swathMetadata.samplesPerBurst, ...
             'rangeSamplingRate', swathMetadata.rangeSamplingRate, ...
             'azimuthTimeInterval', swathMetadata.azimuthTimeInterval, ...
+            'azSpacing', swathMetadata.azSpacing, ...
+            'rgSpacing', swathMetadata.rgSpacing, ...
+            'incidenceAngle', swathMetadata.incidenceAngle, ...
             'slantRangeTime', swathMetadata.slantRangeTime, ...
             'startTime', ...
                 swathMetadata.burst(address(3)).startTime * daysToSecs ...
@@ -187,6 +303,7 @@ methods (Static = true)
 
         % Define the top-level output struct
         segmentMetadata = struct( ...
+            'indexInStack', segmentInd, ...
             'address', address, ...
             'timing', timing, ...
             'validSamples', validSamples ... % 'absolutePosition', struct() 
@@ -213,7 +330,7 @@ methods (Static = true)
 
     end
 
-    function visualise_stitching( segmentStarts, segmentSizes, overlap )
+    function visualise_stitching( segmentStarts, segmentSizes, overlaps )
         % Visualise the stitching information
         nSegments = size(segmentStarts,1);
         % assign a unique color to each segment
@@ -233,9 +350,9 @@ methods (Static = true)
         figure(2); clf; hold on
         for i = 1:nSegments
             for j = i+1:nSegments
-                if ~isempty(overlap{i,j})
+                if ~isempty(overlaps{i,j})
                     % convert the overlap cell [bottomLeftX, bottomLeftY, topRightX, topRightY] into rectangle format [x y w h]
-                    overlapXYWH = [overlap{i,j}(1:2), overlap{i,j}(3:4) - overlap{i,j}(1:2)];
+                    overlapXYWH = [overlaps{i,j}(1:2), overlaps{i,j}(3:4) - overlaps{i,j}(1:2)];
                     rectangle('Position', overlapXYWH, ...
                         'EdgeColor', colors(i,:), 'LineWidth', 2);
                 end
@@ -243,6 +360,20 @@ methods (Static = true)
         end
         title('Segment overlaps'); xlim(xlims); ylim(ylims); grid minor;
         
+    end
+
+    function visualise_cropping(segmentMetadata)
+        % Visualise the cropping information
+        figure(404); clf; hold on
+        nSegments = numel(segmentMetadata);
+        colors = hsv(nSegments);
+        for ri = 1:nSegments
+            p = segmentMetadata(ri).position;
+            rectangle('Position', [p.cropStartRange, p.cropStartAzimuth, ...
+                p.cropEndRange - p.cropStartRange, ...
+                p.cropEndAzimuth - p.cropStartAzimuth], ...
+                'EdgeColor', colors(ri,:), 'LineWidth', 2);
+        end
     end
 
 end % methods (Static = true)
