@@ -21,8 +21,9 @@ methods
 
         % load the list of files to download
         dlList = engine.load( OI.Data.Sentinel1DownloadList() );
+        dlSummary = engine.load( OI.Data.Sentinel1DownloadSummary() );
 
-        if isempty(dlList)
+        if isempty(dlList) || isempty(dlSummary)
             return % no list of files to download provided
         end
 

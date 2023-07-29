@@ -151,7 +151,7 @@ methods
                 engine.ui.log('error', '%s will be deleted\n', strrep(this.outputs{1}.filepath, '\', '\\'));
                 % I will try deleting the existing file...
                 delete(this.outputs{1}.zippath);
-                delete(strrep(this.outputs{1}.zippath,'.zip','.SAFE'));
+                rmdir(this.outputs{1}.filepath,'s'); % s flag for non-empty dir
             end
             this.isFinished = false;
             return;
@@ -162,6 +162,10 @@ methods
         % debug, can remove
         this.currentObj = this.outputs{1};
         this.isFinished = true;
+        %% !! TODO
+        % Database is seeing output from this plugin even when it fails (unzip error)
+        % Need to ensure the failure is properly communicated in order to
+        % expediate requeuing
 
         
     end% run
