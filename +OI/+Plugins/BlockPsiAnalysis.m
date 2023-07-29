@@ -1,7 +1,7 @@
 classdef BlockPsiAnalysis < OI.Plugins.PluginBase
     
 properties
-    inputs = {OI.Data.Blocking()}
+    inputs = {OI.Data.BlockingSummary()}
     outputs = {OI.Data.BlockPsiSummary()}
     id = 'BlockPsiAnalysis'
     STACK = []
@@ -12,17 +12,32 @@ methods
     function this = BlockPsiAnalysis( varargin )
         this.isArray = true;
         this.isFinished = false;
+        % if strcmpi(getenv('USERNAME'),'stewl')
+            % this.STACK=1;
+            % this.BLOCK=32;
+            % this.run();
+        % end
     end    
 
 
     function this = run(this, engine, varargin)
 
-        blockMap = oi.engine.load( OI.Data.BlockMap() );
-        projObj = oi.engine.load( OI.Data.ProjectDefinition() );
-        if isempty(blockMap) || isempty(projObj)
+        blockMap = engine.load( OI.Data.BlockMap() );
+        projObj = engine.load( OI.Data.ProjectDefinition() );
+        stacks = engine.load( OI.Data.Stacks() );
+        if isempty(blockMap) || isempty(projObj) 
             % No block map
             return
         end
+        
+
+        % % Set some stuff for debugging
+        % if strcmpi(getenv('USERNAME'),'stewl')
+        %     % For testing
+        %     this.STACK = 1;
+        %     this.BLOCK = 32;
+        %     blockData = load('P:\\stack_1_polarisation_VV_block_32.mat').data_;
+        % end
 
         if isempty(this.BLOCK)
             % Queue up all blocks
@@ -30,11 +45,9 @@ methods
             return
         end
 
-        blockData = oi.engine.load( OI.Data.Block().configure('STACK',num2str(this.STACK),'POLARISATION','VV','BLOCK', num2str(this.BLOCK) ) );
-        if isempty(blockData)
-            % No data for this block
-            return
-        end
+        stack = stacks.stack( this.STACK );
+        thisSegment = blockMap.stacks(this.STACK).blocks( this.BLOCK ).segmentIndex;
+        thisReferenceVisit = stack.reference.segments.visit( thisSegment );
 
         % Create the block object template
         blockObj = OI.Data.Block().configure( ...
@@ -43,57 +56,149 @@ methods
             'BLOCK', num2str( this.BLOCK ) ...
             ).identify( engine );
 
-        error('TODO write ampstab func')
-        amplitudeStability = OI.Functions.block_amplitude_stability(blockData);
-        
+                
+        % if ~strcmpi(getenv('USERNAME'),'stewl')
+        blockData = engine.load( blockObj );
+    % end
+
+        if isempty(blockData)
+            % No data for this block
+            return
+        end
+        sz = size(blockData);
+
+
+       
         % Create data objects
-        error('TODO specify these objects')
-        error('Make sure there is a copy method for each of these')
-        ampStabObj = OI.Data.BlockAmplitudeStability().copy( blockObj );
-        coherenceObj = OI.Data.BlockCoherence().copy( blockObj );
-        velocityObject = OI.Data.BlockVelocity().copy( blockObj );
-        heightErrorObject = OI.Data.BlockHeightError().copy( blockObj );
+        ampStabObj = OI.Data.BlockResult( blockObj, 'AmplitudeStability' );
+        coherenceObj = OI.Data.BlockResult( blockObj, 'Coherence');
+        velocityObject = OI.Data.BlockResult( blockObj, 'Velocity' );
+        heightErrorObject = OI.Data.BlockResult( blockObj, 'HeightError' );
         
+
+        % Get the time series and baselines
+        baselinesObjectTemplate = OI.Data.BlockBaseline().configure( ...
+            'STACK', num2str(this.STACK), ...
+            'BLOCK', num2str(this.BLOCK) ...
+            ).identify( engine );
+        baselinesObject = engine.load( baselinesObjectTemplate );
+        timeSeries = baselinesObject.timeSeries(:)';
+        kFactors = baselinesObject.k(:)';
+
+        % Get PSC
+        amplitudeStability = OI.Functions.amplitude_stability( abs(blockData) );
+        pscMask = amplitudeStability(:)>3;
         % Save the amplitude stability
         engine.save( ampStabObj, amplitudeStability );
 
-        error('TODO get time series and baseline')
-        % Get the time series and baselines
-        timeSeries = OI.Functions.block_time_series(blockData);
-        baselines = OI.Functions.block_baselines(blockData);
+        %% Do the inversion
+        qToPhase = @(q) exp(1i.*q.*kFactors);
+        vToPhase = @(v) exp(1i.*v.*timeSeries);
+        normz = @(x) x./abs(x);
+        mask0s = @(x) OI.Functions.mask0s(x);
+        mean_coherence = @(phase2d) mean(abs(sum(normz(phase2d),2)))./size(phase2d,2);
+        data2d = reshape(blockData,[],sz(3));
+        avfilt = @(I,x,y) imfilter((I),fspecial('average',[x,y]));
 
-        % Do the inversion
-        error('TODO check inversion func')
-        [C, v, q] = OI.Functions.invert_block(blockData, timeSeries, baselines);
+        % APS
+        pscCm = data2d(pscMask,:)'*data2d(pscMask,:);
+        [eVec, eVal] = eig(pscCm);
+        [~, bestPairIndex] = max(diag(eVal));
+        aps = eVec(:,bestPairIndex).';
 
+        % height error
+        data_residual = data2d.*aps;
+        [Cq, q, qi] = OI.Functions.invert_height(data_residual,kFactors);
+        
+        % velocity
+        data_residual = normz(data2d.*aps.*qToPhase(q));
+        [Cv,v] = OI.Functions.invert_velocity(data_residual,timeSeries);
 
-        warning('TODO Resize these here?')
+        % q, v, and aps now form our initial model
+        % lets improve each in turn
+        psMask = Cv>.75;
+
+        % APS
+        psResidual = data_residual(psMask,:).*conj(aps);
+        psCm = psResidual'*psResidual;
+        [eVec, eVal] = eig(psCm);
+        [~, bestPairIndex] = max(diag(eVal));
+        aps = eVec(:,bestPairIndex).';
+        data_residual = data2d.*aps.*qToPhase(q).*vToPhase(v);
+
+        % Height
+        data_residual = data_residual.*qToPhase(-q);
+        [Cq, q, qi] = OI.Functions.invert_height(data_residual,kFactors);
+        data_residual = data_residual.*qToPhase(q);
+
+        % Velocity
+        data_residual = data_residual.*vToPhase(-v);
+        [Cv,v] = OI.Functions.invert_velocity(data_residual,timeSeries);
+        data_residual = data_residual.*vToPhase(v);
+
+        fprintf(1,'Mean coherence after constant aps analysis: %.3f\n',mean_coherence(data_residual))
+        
+        % Lets improve the aps by spatial filtering
+        for iteration = 1:3
+            for visitInd = sz(3):-1:1
+                apsBlock(:,:,visitInd) = avfilt(reshape( ...
+                    data_residual(:,thisReferenceVisit) ...
+                    .* conj(data_residual(:,visitInd)), ...
+                    sz(1:2) ) ... % reshape size
+                    ,50,200); % filter size
+            end
+            aps2d = reshape(normz(apsBlock),[],sz(3));
+            data_residual = data_residual.*aps2d;
+    
+             % Height
+            data_residual = data_residual.*qToPhase(-q);
+            [Cq, q, qi] = OI.Functions.invert_height(data_residual,kFactors); %#ok<*ASGLU>
+            data_residual = data_residual.*qToPhase(q);
+    
+            % Velocity
+            data_residual = data_residual.*vToPhase(-v);
+            [Cv,v] = OI.Functions.invert_velocity(data_residual,timeSeries);
+            data_residual = data_residual.*vToPhase(v);
+            fprintf(1,'Mean coherence after iter %i: %.3f\n',iteration,mean_coherence(data_residual))
+        end
+
+        
         % Save the PSI outputs
+        C = reshape(Cv,sz(1:2));
+        v = reshape(v,sz(1:2));
+        q = reshape(q,sz(1:2));
         engine.save( coherenceObj, C );
         engine.save( velocityObject, v );
         engine.save( heightErrorObject, q );
 
         % Save a preview of the v, C and q
-        error('TODO implement modified block preview')
-        this.preview_block(blockMap, blockInfo, v, 'velocity')
-        this.preview_block(blockMap, blockInfo, C, 'coherence')
-        this.preview_block(blockMap, blockInfo, q, 'height_error')
+        blockInfo = blockMap.stacks(this.STACK).blocks(this.BLOCK);
+        OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, C, 'Coherence')
+        OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, v .* mask0s(C>.5), 'Velocity')
+        OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, q .* mask0s(C>.5), 'HeightError')
+
+        % Get block lat/;pm
+        blockGeocode = OI.Data.BlockGeocodedCoordinates().configure( ...
+            'STACK', num2str(this.STACK), ...
+            'BLOCK', num2str(this.BLOCK) ...
+        );
+        bg = engine.load(blockGeocode);
 
         % Create a shapefile of the block
-        warning('TODO Name this elsewhere?')
         blockName = sprintf('Stack_%i_block_%i',this.STACK,this.BLOCK);
-        blockFilePath = fullfile( projObj.WORK, 'shapefiles', [blockName '.shp'] );
-        error('TODO implement save shapefile')
-        blockObj.save_shapefile( { ...
-            'Name', blockName, ...
-            'timeSeries', timeSeries, ...
-            'baselines', baselines, ...
-            'fileName', blockFilePath, ...
-            'Coherence', C, ...
-            'Velocity', v, ...
-            'HeightError', q, ...
-            'AmplitudeStability', amplitudeStability ...
-            } );
+        blockFilePath = fullfile( projObj.WORK, 'shapefiles', this.id, blockName);
+        
+
+        cohMask = C>.5;
+        OI.Functions.ps_shapefile( ...
+            blockFilePath, ...
+            bg.lat(cohMask), ...
+            bg.lon(cohMask), ...
+            [], ... % displacements 2d Array
+            {}, ... % datestr(timeSeries(1),'YYYYMMDD')
+            q(cohMask), ...
+            v(cohMask), ...
+            C(cohMask));
 
         this.isFinished = true;
 
@@ -102,26 +207,44 @@ methods
     function this = queue_jobs(this, engine, blockMap)
         allDone = true;
         % Queue up all blocks
-        for stackIndex = 1:blockMap.numStacks
+        for stackIndex = 1:numel(blockMap.stacks)
             stackBlocks = blockMap.stacks( stackIndex );
-            for blockIndex = 1:stackBlocks.usefulBlockIndices
+            for blockIndex = stackBlocks.usefulBlockIndices(:)'
+                
+                % Create the block object template
+                blockObj = OI.Data.Block().configure( ...
+                    'STACK',num2str( stackIndex ), ...
+                    'BLOCK', num2str( blockIndex ) ...
+                    );
+                coherenceObj = OI.Data.BlockResult(blockObj, 'Coherence').identify( engine );
 
                 % Check if the block is already done
-                error('TODO implement / specifiy output object')
-                priorObj = engine.database.find( outputObj );
+                priorObj = engine.database.find( coherenceObj );
                 if ~isempty(priorObj)
                     % Already done
                     continue
                 end
 
                 allDone = false;
-                block = stackBlocks.blocks( blockIndex );
                 engine.requeue_job( ...
-                    'BLOCK', block.index, ...
-                    'STACK', block.stackIndex);
+                    'BLOCK', blockIndex, ...
+                    'STACK', stackIndex);
             end
         end
+
+        if allDone
+            engine.save( this.outputs{1} )
+        end
+        
     end % queue_jobs
+
+    function datetimes = get_time_series(engine, stackInd, segInd)
+        cat = engine.load( OI.Data.Catalogue() );
+        stacks = engine.load( OI.Data.Stacks() );
+        segmentInds = stacks.stack( stackInd ).correspondence( segInd,:);
+        safeInds = stacks.stack.segments.safe(segmentInds);
+        datetimes = arrayfun(@(x) x.date.datenum, [cat.safes{safeInds}]);
+    end
 
 end % methods
 
@@ -131,6 +254,22 @@ methods (Static = true)
         % get the block extent
         sz = blockInfo.size;
         dataToPreview = reshape(dataToPreview, sz(1), sz(2), []);
+
+        
+        switch dataCategory
+            case 'Coherence'
+                imageColormap = gray(256);
+            % case 'Velocity'
+            %     jet = imageColormap;
+            % case 'HeightError'
+            %     jet = imageColormap;
+            otherwise
+                imageColormap = jet(256);
+                imageColormap(1,:) = [0 0 0];
+        end
+
+        dataToPreview = OI.Functions.grayscale_to_rgb(dataToPreview, imageColormap);
+
       
         blockExtent = OI.Data.GeographicArea().configure( ...
             'lat', blockInfo.latCorners, ...
@@ -152,6 +291,21 @@ methods (Static = true)
         blockExtent.save_kml_with_image( ...
             previewKmlPath, fliplr(dataToPreview), cLims);
     end
+
+    function I = grayscale_to_rgb( grayImage, cmap )
+        minValue = double(min(grayImage(:)));
+        maxValue = double(max(grayImage(:)));
+        normalized_array = (your_2d_array - minValue) / (maxValue - minValue);
+        
+        % Get the colormap and rescale it to match the grayscale image limits
+        cmapIndex = round(1 + (size(cmap, 1) - 1) * normalized_array);
+        cmapIndex = max(cmapIndex, 1);
+        cmapIndex = min(cmapIndex, size(cmap, 1));
+        
+        % Convert the grayscale image to an RGB image using the colormap
+        I = ind2rgb(cmapIndex, cmap);
+    end
+
 end % methods (Static = true)
 
 end % classdef

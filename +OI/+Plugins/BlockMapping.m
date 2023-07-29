@@ -140,6 +140,22 @@ methods
                         blocks(ii).lonCorners = latLonEle(cornerInds,2);
                         blocks(ii).eleCorners = latLonEle(cornerInds,3);
 
+                        % Pull out the extire block of lat lon ele
+                        inds = sub2ind( segmentSz, azGrid(:), rgGrid(:) );
+                        blockLat = latLonEle(inds,1);
+                        blockLon = latLonEle(inds,2);
+                        blockEle = latLonEle(inds,3);
+                        
+                        % Create an object to save these geocoded coordinates
+                        blockGeocode = OI.Data.BlockGeocodedCoordinates().configure( ...
+                            'lat', blockLat, ...    
+                            'lon', blockLon, ...
+                            'ele', blockEle, ...
+                            'STACK', num2str(stackInd), ...
+                            'BLOCK', num2str(blockCount) ...
+                        );
+                        engine.save( blockGeocode );
+
                         aoiArea = projObj.AOI.to_area();
                         blockArea = OI.Data.GeographicArea();
                         blockArea.lat = latLonEle(cornerInds,1);

@@ -117,6 +117,15 @@ while true
         end
     end
 
+    % Check if jobstr is 'reset'
+    if strcmpi(jobstr,'reset')
+        disp('resetting')
+        clearvars -except J
+        restoredefaultpath
+        worker
+        return
+    end
+
     % clear any info asside from JOB
     jobCell=strsplit(jobstr,'JOB=');
     jobstr = jobCell{end};
@@ -136,6 +145,14 @@ while true
                 oi.engine.ui.log( OI.Compatibility.CompatibleError(ERR) )
                 errStruct = OI.Functions.obj2struct(ERR);
                 disp(OI.Functions.struct2xml(errStruct).to_string())
+
+                % write the error to a file
+                ds = strrep(strrep(datestr(now),':',''),' ','_');
+                fid = fopen(fullfile(postings.postingPath,['error' num2str(J) ds '.txt']),'w');
+                fwrite(fid, OI.Functions.struct2xml(errStruct).to_string());
+                fclose(fid);
+
+                % report the error
                 postings.report_error(J, ...
                     OI.Functions.struct2xml(errStruct).to_string())
                 clearvars -except J
@@ -144,7 +161,6 @@ while true
             catch ERR2
                 warning('cant handle error at all, restarting')
                 disp(ERR2)
-                oi.engine.queue.clear
                 clearvars -except J
                 restoredefaultpath
                 worker
@@ -161,6 +177,18 @@ while true
                 postings.report_done(J, answer);
             end
         end
+
+        postings = postings.check_jobs(J);
+        jobstr = postings.jobline;
+        % Check if jobstr is 'reset'
+        if strcmpi(jobstr,'reset')
+            disp('resetting')
+            clearvars -except J
+            restoredefaultpath
+            worker
+            return
+        end
+        
     end
     answer = '';
     % if ~isempty(oi.engine.plugin.outputs)

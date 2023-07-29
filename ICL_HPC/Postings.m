@@ -72,7 +72,7 @@ classdef Postings
                     disp(['Worker ' num2str(J) ' is ready.'])
                     return
                 end
-                disp([ num2str(ii) 'Worker ' num2str(J)  ' not ready '])
+                disp([ num2str(ii) ' _ Worker ' num2str(J)  ' not ready '])
             end
             J=0;
         end
@@ -218,6 +218,18 @@ classdef Postings
             if contains(line,'JOB=')
                 obj.jobline=line;
                 return;
+            end
+        end
+
+        function obj=force_reset(obj,J)
+            fid=fopen(obj.get_posting_filepath(J),'w');
+            fwrite(fid,'reset');
+            fclose(fid);
+        end
+
+        function obj = force_reset_all(obj)
+            for ii = 1:numel(obj.workers)
+                obj = obj.force_reset(ii);
             end
         end
 

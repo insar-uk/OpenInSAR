@@ -8,7 +8,7 @@ end%properties
 methods
     function this = PsiSummary( ~ )
         this.hasFile = true;
-        this.filepath = '$WORK$/$id$.mat';
+        this.filepath = '$WORK$/$id$';
     end%ctor
 end%methods
 

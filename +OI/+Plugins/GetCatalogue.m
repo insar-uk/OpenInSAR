@@ -19,6 +19,13 @@ methods
         % get the project
         project = engine.load(OI.Data.ProjectDefinition());
 
+        % load the list of files to download
+        dlList = engine.load( OI.Data.Sentinel1DownloadList() );
+
+        if isempty(dlList)
+            return % no list of files to download provided
+        end
+
         % get the input data directory
         inputDir = project.INPUT_DATA_DIR;
 

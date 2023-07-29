@@ -1,7 +1,4 @@
-if ~exist('J','var')
-    J = 0;
-end
-disp(J)
+J=0;
 
 [~,startDirectory,~]=fileparts(pwd);
 
@@ -12,7 +9,7 @@ addpath('ICL_HPC')
 
 projectPath = OI.ProjectLink().projectPath;
 
-oi = OpenInSAR('-log','trace','-project', projectPath);
+oi = OpenInSAR('-log','info','-project', projectPath);
     
 % load the project object
 projObj = oi.engine.load( OI.Data.ProjectDefinition() );
@@ -39,6 +36,8 @@ for thingToDo = thingToDoList
     while true
 
         while nextWorker == 0
+            oi.engine.queue.overview();
+            
             oi.engine.postings = oi.engine.postings.find_workers();
             % assignment{ numel(oi.engine.postings.workers) } = '';
 

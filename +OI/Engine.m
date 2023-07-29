@@ -295,6 +295,11 @@ methods
                 % but only if its a oi data obj
                 if isa(data,'OI.Data.DataObj')
                     this.ui.log('debug', 'Adding %s to database after load from disk\n', dataObj.id');
+                    % edge case where the file is an OI data object
+                    if isa(data,'OI.Data.DataObj')
+                        data.id = dataObj.id;
+                        data.filepath = dataObj.filepath;
+                    end
                     this.database.add(data);
                 else % otherwise add the dataObj as a record
                     this.database.add(dataObj);
