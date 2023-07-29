@@ -8,8 +8,8 @@ properties
 end
 %#ok<*ST2NM> - Octave compatibility
 methods
-    function obj = GeographicArea()
-    end
+    % function obj = GeographicArea()
+    % end
 
     function [minLat,maxLat,minLon,maxLon] = limits(this)
         minLat = min(this.lat);

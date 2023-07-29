@@ -75,6 +75,22 @@ methods
         this.t = newTimes;
     end%interpolate
 
+    function xyzArray = xyz(this, index)
+        if nargin == 1
+            xyzArray = [this.x, this.y, this.z];
+        else
+            xyzArray = [this.x(index), this.y(index), this.z(index)];
+        end
+    end%xyz
+
+    function vArray = v(this, index)
+        if nargin == 1
+            vArray = [this.vx, this.vy, this.vz];
+        else
+            vArray = [this.vx(index), this.vy(index), this.vz(index)];
+        end
+    end%v
+
 
 end % methods
 

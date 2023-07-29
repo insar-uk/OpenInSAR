@@ -3,7 +3,8 @@
 if [ -z "$runPath" ]; then
     # exit
     echo "No runPath specified"
-	runPath=~/../ephemeral/OpenInSAR_internal
+	runPath=~/OpenInSAR/
+    echo "Setting runPath to $runPath"
 fi
 
 # Distinguish worker using array index
@@ -30,7 +31,7 @@ echo "Num workers: $nJ"
 # start matlab
 echo "the time is: $(date), starting Matlab"
 pwd
-matlab -nodesktop -nosplash -noFigureWindows -r "disp('Matlab is in:'); pwd; J=$J; nJ=$nJ; worker;"
+matlab -nodesktop -nosplash -noFigureWindows -r "disp('Matlab is in:'); pwd; J=$J; nJ=$nJ; addpath('ICL_HPC'); worker;"
 cd ..
 echo "Matlab finished execution at: $(date)\n"
 echo "End of shell script."

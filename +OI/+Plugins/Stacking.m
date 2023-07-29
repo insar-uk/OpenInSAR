@@ -154,7 +154,7 @@ methods
                                 [burstLat(1) burstLon(1)] )).^2,2).^.5;
 
                             [minDist, refSegInd] = min(distance);
-                            disp(distance'./1e3)
+                            % disp(distance'./1e3)
                             if minDist > 5e3 % anything more than this is
                                 % another segment
                                 continue

@@ -52,8 +52,9 @@ methods ( Access = private )
 
         % Define the mapping of user/OS combinations to file paths
         userPaths = containers.Map();
-        userPaths('stewl_windows') = '\\rds.imperial.ac.uk\rds\user\saa116\ephemeral\test_2023_06_21.oi';
-        userPaths('saa116_unix') = '../test_2023_06_21.oi';
+        % userPaths('stewl_windows') = '\\rds.imperial.ac.uk\rds\user\saa116\ephemeral\test_2023_06_21.oi';
+        % userPaths('saa116_unix') = '../test_2023_06_21.oi';
+
         userPaths('11915_windows') = '\\rds.imperial.ac.uk\rds\user\ws121\ephemeral\test_2023_06_21.oi';
         userPaths('ws121_unix') = '../test_2023_06_21.oi';
 
@@ -69,8 +70,14 @@ methods ( Access = private )
         % Construct the key based on the user and OS
         key = [user, '_', OS];
 
-        % Get the file path based on the key
-        this.projectPath = userPaths(key);
+        % check if the key exists in the map
+        if isKey(userPaths, key)
+            % Get the file path based on the key
+            this.projectPath = userPaths(key);
+            return
+        end
+        % If not, carry on as if nothing happened
+
 
     end
 

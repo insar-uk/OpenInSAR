@@ -48,12 +48,13 @@ methods
             for ii=1:numel(jobs)
                 jobs{ii}.target = '1';
                 engine.queue.add_job(jobs{ii});
-                
             end
             % if no more, set as finished
             if numel(jobs) == 0
                 % set the status to complete
                 this.isFinished = true;
+                summary = OI.Data.Sentinel1DownloadSummary();
+                engine.save( summary );
             else
                 this.isFinished = false;
             end

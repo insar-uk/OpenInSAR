@@ -48,7 +48,8 @@ classdef Database < handle
                     this.add( strtrim(kv{2}), strtrim(kv{1}) );
                 end
             else
-                error('I expected to find a ''secrets'' file containing login data for various services at this location:\n%s\n ...but it was not found',secretsFilepath);
+                projObj.SECRETS_FILEPATH
+                error('I expected to find a ''secrets'' file containing login data for various services at this location:\n %s \n ...but it was not found',projObj.SECRETS_FILEPATH);
             end
 
             % preview the aoi

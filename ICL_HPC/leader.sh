@@ -4,7 +4,8 @@ runPath=$1;
 if [ -z "$runPath" ]; then
     # exit
     echo "No runPath specified. You should run this from the OpenInSAR repository root."
-	runPath=$(pwd)
+	runPath=~/OpenInSAR/
+    echo "Setting runPath to $runPath"
 fi
 
 # Distinguish worker using array index
@@ -31,7 +32,7 @@ echo "Num workers: $nJ"
 # start matlab
 echo "the time is: $(date), starting Matlab"
 
-matlab -nodesktop -nosplash -noFigureWindows -r "J=$J; nJ=$nJ; leader;"
+matlab -nodesktop -nosplash -noFigureWindows -r "J=$J; nJ=$nJ; addpath('ICL_HPC'); leader;"
 cd ..
 echo "Matlab finished execution at: $(date)\n"
 echo "End of shell script."

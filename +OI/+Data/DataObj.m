@@ -66,7 +66,7 @@ classdef DataObj
 %#ok<*PROPLC>
 properties
 
-    filepath = '$workingDirectory$/general/';
+    filepath = '$workingDirectory$/';
     fileextension = 'mat';
     % generator = '';
     hasFile = false; % If the DataObj is very large we save it to a file
@@ -178,7 +178,7 @@ methods
             % filepath
             if ~exist(filepath, 'file')
                 if isLogging
-                    engine.ui.log('info', 'File %s does not exist, creating job to produce it\n', filepath);
+                    engine.ui.log('info', 'File %s does not exist, creating job to produce it\n', strrep(filepath,'\','\\'));
                 end
                 if any(filepath=='$')
                     if nargin < 2
@@ -186,7 +186,7 @@ methods
                     end
                 end
                 if nargin < 2
-                    error('File %s does not appear to exist, and no oi.engine was supplied to create a job.\n', filepath);
+                    error('File %s does not appear to exist, and no oi.engine was supplied to create a job.\n', strrep(filepath,'\','\\'));
                 end
                 jobs = obj.create_job( engine );
                 return
@@ -310,6 +310,12 @@ methods
             vName = var(2:end-1); % remove the $ signs
             if any(strcmp(props, vName))
                 value = this.(vName);
+                if ~OI.Compatibility.is_string(value)
+                    warning('Value for %s is not a string', vName')
+                    disp(this)
+                    value = num2str(value);
+                end
+
                 if ~isempty(value)
                     str = strrep(str, var, value);
                 end

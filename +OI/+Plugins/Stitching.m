@@ -32,100 +32,199 @@ methods
             segmentMetadata = this.get_segment_metadata(cat, ...
                 preprocessingInfo, referenceSegments);
 
-            % Find the maximum size of the mosaic
-            cursor = [0,0];
-            lastSegmentAddress = segmentMetadata.address;
-            for segmentInd = 1:nSegments
-                segmentAddress = segmentMetadata(segmentInd).address;
-                burstChanged = segmentAddress(3) ~= lastSegmentAddress(3);
-                swathChanged = segmentAddress(2) ~= lastSegmentAddress(2);
-                safeChanged = segmentAddress(1) ~= lastSegmentAddress(1);
-
-                thisBottomLeft = cursor;
-                thisTopRight = cursor + segmentMetadata(segmentInd).timing.size;
-
-
-                cursor = max(cursor, segmentMetadata(segmentInd).validSamples.lastRangeSample);
+            % Use the slowtime/fasttime of the segment to determine its offset wrt the first segment.
+            segmentOffsets = zeros(nSegments,2);
+            for i = 2:nSegments
+                segmentOffsets(i,:) = this.offsets_from_timing( ...
+                    segmentMetadata(i), segmentMetadata(1));
             end
-           
+            % Set the bottom left of the scene as the reference
+            segmentOffsets = round(segmentOffsets - min(segmentOffsets));
 
-            % getOffset = @(a,b) this.offsets_from_timing(...
-            %     segmentMetadata(a).timing, ...
-            %     segmentMetadata(b).timing);
+            % Get the start and end positions of the segments
+            segmentSizes = zeros(nSegments,2);
+            for i = 1:nSegments 
+                segmentSizes(i,:) = [ segmentMetadata(i).timing.linesPerBurst, ...
+                    segmentMetadata(i).timing.samplesPerBurst ];
+            end
+            segmentStarts = segmentOffsets + 1;
+            segmentEnds = segmentOffsets + segmentSizes;
 
-            % for segmentInd = 1:nSegments
-            %     bulkOffset = round(getOffset(segmentInd,1));
-            %     validSamples = segmentMetadata(segmentInd).validSamples;
-            %     validOffset = [...
-            %         validSamples.firstAzimuthLine - ...
-            %         refValidSampOffsets.firstAzimuthLine, ...
-            %         validSamples.firstRangeSample - ...
-            %         refValidSampOffsets.firstRangeSample ...
-            %         ];
-            %     segSize(segmentInd,:) = validSamples.size;
-            %     segOff(segmentInd,:) = bulkOffset + validOffset;
-            % end
-            % segOff=segOff-min(segOff);
-            % segStarts = segOff + 1;
-            % segEnds = segStarts + segSize - 1;
+            % Just to be explicit ...
+            for i = 1:nSegments 
+                % Temp struct to hold the position information
+                s = segmentMetadata(i);
+                p = struct();
+                p.startAzimuth = segmentStarts(i,1);
+                p.endAzimuth = segmentEnds(i,1);
+                p.startRange = segmentStarts(i,2);
+                p.endRange = segmentEnds(i,2);
+                p.validStartAzimuth = ...
+                    p.startAzimuth + s.validSamples.firstAzimuthLine;
+                p.validEndAzimuth = ...
+                    p.endAzimuth + s.validSamples.azimuthEndOffset;
+                p.validStartRange = ...
+                    p.startRange + s.validSamples.firstRangeSample;
+                p.validEndRange = ...
+                    p.endRange + s.validSamples.rangeEndOffset;
+                % Set the initial crop extent to the valid data extrent
+                p.cropStartAzimuth = p.validStartAzimuth;
+                p.cropEndAzimuth = p.validEndAzimuth;
+                p.cropStartRange = p.validStartRange;
+                p.cropEndRange = p.validEndRange;
+                % Assign to the segment metadata
+                segmentMetadata(i).position = p;
+            end
 
-            % % Find the overlaps between segments
-            % getOverlaps = @(a,b) this.rectangular_overlaps( ...
-            %     segmentMetadata(a).timing, ...
-            %     segmentMetadata(b).timing);
-            % for segA = 1:nSegments
-            %     for segB = 1:nSegments
-            %         oL = getOverlaps(segA,segB);
-            %         if oL
-            %             continue
-            %         end
-            %     end
-            % end
-            % overlaps = segEnds(1:end-1,:)-segStarts(2:end,:);
+            % Find the overlaps between segments
+            overlaps = cell(nSegments,nSegments);
+            overlapPairs = zeros(nSegments * nSegments,2);
+            for i = 1:nSegments
+                for j = i+1:nSegments
+                    overlaps{i,j} = this.rectangular_overlap( ...
+                        segmentStarts(i,:), segmentEnds(i,:), ...
+                        segmentStarts(j,:), segmentEnds(j,:) );
+                    isOverlap = ( numel(overlaps{i,j}) > 0 );
+                    overlapPairs((i-1)*nSegments + j,:) = [i,j] .* isOverlap;
+                end
+            end
+
+            % Remove empty overlaps
+            overlapPairs = overlapPairs( sum(overlapPairs,2) > 0, : );
+
+            % Use the overlaps to adjust the crop extents
+            for o = 1:size(overlapPairs,1)
+                pair = overlapPairs(o,:);
+                i = pair(1); j = pair(2);
+                % Get the overlap
+                overlap = overlaps{i,j};
+                % Adjust the crop extents, crop the azimuth of the first segment back to half of the overlap
+                azCentre = floor(mean(overlap([1,3])));
+                rgCentre = floor(mean(overlap([2,4])));
+
+                % check if segment i is above segment j
+                iIsCloserToBottom = segmentStarts(i,1) < segmentStarts(j,1);
+                iIsCloserToRight = segmentStarts(i,2) < segmentStarts(j,2);
+                
+                % Get existing crop extents
+                iPosition = segmentMetadata(i).position;
+                jPosition = segmentMetadata(j).position;
+                iPosCropAz = iPosition;
+                jPosCropAz = jPosition;
+                iPosCropRg = iPosition;
+                jPosCropRg = jPosition;
+
+                % Determine the new extent if we crop in azimuth
+                if iIsCloserToBottom
+                    iPosCropAz.cropEndAzimuth = azCentre;
+                    jPosCropAz.cropStartAzimuth = azCentre + 1;
+                else
+                    iPosCropAz.cropStartAzimuth = azCentre + 1;
+                    jPosCropAz.cropEndAzimuth = azCentre;
+                end
+
+                % Determine the new extent if we crop in range
+                if iIsCloserToRight
+                    iPosCropRg.cropEndRange = rgCentre;
+                    jPosCropRg.cropStartRange = rgCentre + 1;
+                else
+                    iPosCropRg.cropStartRange = rgCentre + 1;
+                    jPosCropRg.cropEndRange = rgCentre;
+                end
+
+                % Determine the area after cropping in azimuth
+                iAreaAz = (iPosCropAz.cropEndAzimuth - iPosCropAz.cropStartAzimuth) * ...
+                    (iPosCropAz.cropEndRange - iPosCropAz.cropStartRange);
+                jAreaAz = (jPosCropAz.cropEndAzimuth - jPosCropAz.cropStartAzimuth) * ...
+                    (jPosCropAz.cropEndRange - jPosCropAz.cropStartRange);
+                % Determine the area after cropping in range
+                iAreaRg = (iPosCropRg.cropEndAzimuth - iPosCropRg.cropStartAzimuth) * ...
+                    (iPosCropRg.cropEndRange - iPosCropRg.cropStartRange);
+                jAreaRg = (jPosCropRg.cropEndAzimuth - jPosCropRg.cropStartAzimuth) * ...
+                    (jPosCropRg.cropEndRange - jPosCropRg.cropStartRange);
+
+                % Determine which crop direction (azimuth or range) to use
+                azCropBetter = iAreaAz + jAreaAz > iAreaRg + jAreaRg;
+                if azCropBetter
+                    segmentMetadata(i).position = iPosCropAz;
+                    segmentMetadata(j).position = jPosCropAz;
+                else
+                    segmentMetadata(i).position = iPosCropRg;
+                    segmentMetadata(j).position = jPosCropRg;
+                end
+            end % overlap loop
+
+            % Find the min az/rg and record the position in mosaic
+            minAz = 9e9; minRg = 9e9;
+            for i=1:nSegments
+                minAz = min(minAz,segmentMetadata(i).position.cropStartAzimuth);
+                minRg = min(minRg,segmentMetadata(i).position.cropStartRange);
+            end
+            for i=1:nSegments
+                segmentMetadata(i).position.azOutputStart = ...
+                    segmentMetadata(i).position.cropStartAzimuth - minAz + 1;
+                segmentMetadata(i).position.rgOutputStart = ...
+                    segmentMetadata(i).position.cropStartRange - minRg + 1;
+            end
 
 
-            % % % TEST
-            % % mosaic=zeros(max(segOff)+validSampOffsets.size);
-            % % for ii=1:nSegments
-            % %     img=load(['localimg' num2str(ii)]).img';
-            % %     img = min(max(log(abs(img)),3.5),5.5);
-            % %     vs = segmentMetadata(ii).validSamples;
-            % %     sz = vs.size;
-            % %     mosaic((1:sz(1)) + segOff(ii,1), (1:sz(2)) + segOff(ii,2)) = ...
-            % %         img(vs.firstAzimuthLine:vs.lastAzimuthLine, ...
-            % %         vs.firstRangeSample:vs.lastRangeSample);
-            % %     imagesc(mosaic)
-            % %     drawnow()
-            % % end
-            
-            % stackStitchInfo = struct(...
-            %     'segments', segmentMetadata, ...
-            %     'reference', referenceVisit, ...
-            %     'stitchStarts', segStarts, ...
-            %     'stitchEnds', segEnds, ...
-            %     'overlaps', overlaps ...
-            %     ); 
+            % Provide info on how to read in the cropped data
+            for i=1:nSegments
+
+                segmentMetadata(i).position.firstCroppedAzimuthLine = ...
+                    segmentMetadata(i).position.cropStartAzimuth - ...
+                    segmentMetadata(i).position.startAzimuth + 1;
+                segmentMetadata(i).position.lastCroppedAzimuthLine = ...
+                    segmentMetadata(i).position.cropEndAzimuth - ...
+                    segmentMetadata(i).position.startAzimuth + 1;
+
+                segmentMetadata(i).position.firstCroppedRangeSample = ...
+                    segmentMetadata(i).position.cropStartRange - ...
+                    segmentMetadata(i).position.startRange + 1;
+                segmentMetadata(i).position.lastCroppedRangeSample = ...
+                    segmentMetadata(i).position.cropEndRange - ...
+                    segmentMetadata(i).position.startRange + 1;
+                
+            end % data startpoints loop 
             % Assign to structs
-            this.output{1}.stack(stackInd) = stackStitchInfo;
+            if stackInd == 1
+                this.outputs{1}.stack.segments = segmentMetadata;
+            else
+                this.outputs{1}.stack(stackInd).segments = segmentMetadata;
+            end
         end
+
+        engine.save( this.outputs{1} );
 
     end
 end % methods
 
 methods (Static = true)
 
-    function overlap = rectangular_overlap( coordsA, coordsB )
+    function overlap = rectangular_overlap( bottomLeftA, topRightA, bottomLeftB, topRightB )
+        % Returns the overlap between two rectangles, or empty if there is no overlap.
+        % Where each input point is a 2-element vector [x,y]
+
         overlap = [];
-        hasOverlap = (x1 <= x4 && x3 <= x2 && y1 <= y4 && y3 <= y2);
-        if hasOverlap
-            overlap.top_right = [max(x1, x3), max(y1, y3)]
-            overlap.bottom_left = [min(x2, x4), min(y2, y4)]
-            % check for positive area
-            if overlap.top_right(1) < overlap.bottom_left(1) || ...
-                    overlap.top_right(2) < overlap.bottom_left(2)
-                overlap = [];
-            end
+        if bottomLeftA(1) > topRightB(1) || bottomLeftB(1) > topRightA(1)
+            return
         end
+        if bottomLeftA(2) > topRightB(2) || bottomLeftB(2) > topRightA(2)
+            return
+        end
+
+        overlap = [ ...
+            max(bottomLeftA(1), bottomLeftB(1)), ...
+            max(bottomLeftA(2), bottomLeftB(2)), ...
+            min(topRightA(1), topRightB(1)), ...
+            min(topRightA(2), topRightB(2)) ...
+            ];
+
+        % Check for negative overlap
+        if overlap(1) > overlap(3) || overlap(2) > overlap(4)
+            overlap = [];
+        end
+
     end
 
 
@@ -165,6 +264,9 @@ methods (Static = true)
             'samplesPerBurst', swathMetadata.samplesPerBurst, ...
             'rangeSamplingRate', swathMetadata.rangeSamplingRate, ...
             'azimuthTimeInterval', swathMetadata.azimuthTimeInterval, ...
+            'azSpacing', swathMetadata.azSpacing, ...
+            'rgSpacing', swathMetadata.rgSpacing, ...
+            'incidenceAngle', swathMetadata.incidenceAngle, ...
             'slantRangeTime', swathMetadata.slantRangeTime, ...
             'startTime', ...
                 swathMetadata.burst(address(3)).startTime * daysToSecs ...
@@ -201,51 +303,77 @@ methods (Static = true)
 
         % Define the top-level output struct
         segmentMetadata = struct( ...
+            'indexInStack', segmentInd, ...
             'address', address, ...
             'timing', timing, ...
             'validSamples', validSamples ... % 'absolutePosition', struct() 
             );
     end
-    % 
-    % function segmentTimingData = get_segment_timing( segmentMetadata )
-    %     nSegments = numel( segmentMetadata );
-    %     for segmentInd = nSegments:-1:1
-    %         segmentMetadata( segmentInd ) = ...
-    %             OI.Plugins.Stitching.get_one_segment_timing( segmentMetadata, segmentInd );
-    %     end % segment loop
-    % end
-    % 
-    % function segmentTimingdata = get_one_segment_timing(swathMetadata, ...
-    %         burstIndexInSwath)
-    % 
-    %         if nargin
-    % 
-    %         segmentTimingdata = struct( ...
-    %         'startTime', swathMetadata.burst(burstIndexInSwath).startTime, ...
-    %         'slantRangeTime', swathMetadata.slantRangeTime, ...
-    %         'azimuthTimeInterval', swathMetadata.azimuthTimeInterval, ...
-    %         'rangeSamplingRate', swathMetadata.rangeSamplingRate ...
-    %         );
-    % 
-    % end
+
 
     function azRgOffset = offsets_from_timing(thisSegmentMetadata, ...
             referenceSegmentMetadata )
 
         % assuming that 'this' swath is offset due to the size of the
         % data in the reference swath
-        thisSlowTime = thisSegmentMetadata.startTime;
-        thisFastTime = thisSegmentMetadata.slantRangeTime;
-        referenceSlowTime = referenceSegmentMetadata.startTime;
-        referenceFastTime = referenceSegmentMetadata.slantRangeTime;
-        azimuthTimeInterval = referenceSegmentMetadata.azimuthTimeInterval;
-        rangeSamplingRate = referenceSegmentMetadata.rangeSamplingRate;
+        thisSlowTime = thisSegmentMetadata.timing.startTime;
+        thisFastTime = thisSegmentMetadata.timing.slantRangeTime;
+        referenceSlowTime = referenceSegmentMetadata.timing.startTime;
+        referenceFastTime = referenceSegmentMetadata.timing.slantRangeTime;
+        azimuthTimeInterval = referenceSegmentMetadata.timing.azimuthTimeInterval;
+        rangeSamplingRate = referenceSegmentMetadata.timing.rangeSamplingRate;
 
         azRgOffset = [ ...
             (thisSlowTime - referenceSlowTime) / azimuthTimeInterval, ...
             (thisFastTime - referenceFastTime) * rangeSamplingRate ...
             ];
 
+    end
+
+    function visualise_stitching( segmentStarts, segmentSizes, overlaps )
+        % Visualise the stitching information
+        nSegments = size(segmentStarts,1);
+        % assign a unique color to each segment
+        colors = hsv(nSegments);
+        
+        % Plot the segment positions
+        figure(1); clf; hold on
+        for i = 1:nSegments
+            rectangle('Position', [segmentStarts(i,:), segmentSizes(i,:)], ...
+                'EdgeColor', colors(i,:), 'LineWidth', 2);
+        end
+        grid minor; title('Segment positions');
+        % get the extents of the figure
+        xlims = xlim(); ylims = ylim();
+       
+        % Plot the overlaps
+        figure(2); clf; hold on
+        for i = 1:nSegments
+            for j = i+1:nSegments
+                if ~isempty(overlaps{i,j})
+                    % convert the overlap cell [bottomLeftX, bottomLeftY, topRightX, topRightY] into rectangle format [x y w h]
+                    overlapXYWH = [overlaps{i,j}(1:2), overlaps{i,j}(3:4) - overlaps{i,j}(1:2)];
+                    rectangle('Position', overlapXYWH, ...
+                        'EdgeColor', colors(i,:), 'LineWidth', 2);
+                end
+            end 
+        end
+        title('Segment overlaps'); xlim(xlims); ylim(ylims); grid minor;
+        
+    end
+
+    function visualise_cropping(segmentMetadata)
+        % Visualise the cropping information
+        figure(404); clf; hold on
+        nSegments = numel(segmentMetadata);
+        colors = hsv(nSegments);
+        for ri = 1:nSegments
+            p = segmentMetadata(ri).position;
+            rectangle('Position', [p.cropStartRange, p.cropStartAzimuth, ...
+                p.cropEndRange - p.cropStartRange, ...
+                p.cropEndAzimuth - p.cropStartAzimuth], ...
+                'EdgeColor', colors(ri,:), 'LineWidth', 2);
+        end
     end
 
 end % methods (Static = true)

@@ -24,6 +24,7 @@ methods
         % This should be in plugin.
         % return if no list
         if isempty(projObj) || isempty( dlList )
+            jobs = {OI.Job( OI.Data.Sentinel1DownloadList().generator)};
             return;
         end
 

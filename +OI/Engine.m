@@ -105,17 +105,6 @@ methods
         end
     end
 
-    function run_plugin(this, job)
-        this.throw_error_if_no_project_loaded();
-        if isa(job,'OI.Job')
-            % run the plugin
-            this.plugin = this.plugin.run( this, job.arguments );
-        else
-            warning('You should send a job argument to the plugin')
-            this.plugin = this.plugin.run( this, job );
-        end
-    end
-
 
     function finish_job(this, job, timeJobTook)
         this.handle_job_timing(job, timeJobTook);
@@ -221,7 +210,21 @@ methods
                 nUnknownJobs = nUnknownJobs + 1;
             end
         end
-        this.ui.log('info', 'Estimated time remaining %f seconds\n', totalTime);
+
+        % Vary the message based on how long
+        reportTime = totalTime;
+        unitToReport = 'seconds';
+        timingTemplate = 'Estimated time remaining %d %s\n';
+        if reportTime > 60 * 60 % more than an hour
+            reportTime = reportTime / (60 * 60);
+            unitToReport = 'hours';
+        elseif reportTime > 60 % more than a minute
+            reportTime = reportTime / 60;
+            unitToReport = 'minutes';
+        end
+        timingMessage = sprintf(timingTemplate,reportTime,unitToReport);
+        this.ui.log('info',timingMessage);
+        
         if nUnknownJobs %> 0
             this.ui.log('info', 'Plus %i jobs without timing information available\n', nUnknownJobs);
         end
@@ -292,6 +295,11 @@ methods
                 % but only if its a oi data obj
                 if isa(data,'OI.Data.DataObj')
                     this.ui.log('debug', 'Adding %s to database after load from disk\n', dataObj.id');
+                    % edge case where the file is an OI data object
+                    if isa(data,'OI.Data.DataObj')
+                        data.id = dataObj.id;
+                        data.filepath = dataObj.filepath;
+                    end
                     this.database.add(data);
                 else % otherwise add the dataObj as a record
                     this.database.add(dataObj);
@@ -379,6 +387,21 @@ methods
         this.database.add(dataObj);
         this.ui.log('trace', 'End of save. File %s exists: %d\n', strrep(dataObj.filepath,'\','\\'), dataObj.exists());
     end
+end
+
+methods (Access = protected)
+
+    function run_plugin(this, job)
+        this.throw_error_if_no_project_loaded();
+        if isa(job,'OI.Job')
+            % run the plugin
+            this.plugin = this.plugin.run( this, job.arguments );
+        else
+            warning('You should send a job argument to the plugin')
+            this.plugin = this.plugin.run( this, job );
+        end
+    end
+
 end
 
 end

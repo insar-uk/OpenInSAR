@@ -11,7 +11,7 @@ methods
     function this = Sentinel1DownloadList( )
         this.hasFile = true;
         this.fileextension = 'txt';
-        this.filepath = [this.filepath, 'Sentinel1DownloadList'];
+        this.filepath = fullfile(this.filepath, 'Sentinel1DownloadList');
     end%ctor
 end%methods
 

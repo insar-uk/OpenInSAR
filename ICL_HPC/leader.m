@@ -1,13 +1,15 @@
-if ~exist('J','var')
-    J = 0;
-end
-disp(J)
+J=0;
 
-addpath('prototype')
+[~,startDirectory,~]=fileparts(pwd);
+
+if strcmpi(startDirectory,'ICL_HPC')
+    cd('..')
+end
+addpath('ICL_HPC')
 
 projectPath = OI.ProjectLink().projectPath;
 
-oi = OpenInSAR('-log','trace','-project', projectPath);
+oi = OpenInSAR('-log','info','-project', projectPath);
     
 % load the project object
 projObj = oi.engine.load( OI.Data.ProjectDefinition() );
@@ -21,13 +23,7 @@ oi.engine.postings.report_ready(0)
 nextWorker = 0;
 assignment = {};
 
-thingToDoList = { OI.Data.Sentinel1SafeDownload(), ... %1
-    OI.Data.Catalogue(), ... %0
-    OI.Data.OrbitSummary() , ... %0
-    OI.Data.PreprocessedFiles(), ... %0
-    OI.Data.GeocodingSummary(), ... %1
-    OI.Data.CoregistrationSummary(), ... %1
-    OI.Data.SubstackingSummary() }; %1
+thingToDoList = { OI.Data.PsiSummary() }; %1
 
 for thingToDo = thingToDoList
     oi.ui.log('info','Jobs remaining in queue:\n');
@@ -40,6 +36,8 @@ for thingToDo = thingToDoList
     while true
 
         while nextWorker == 0
+            oi.engine.queue.overview();
+            
             oi.engine.postings = oi.engine.postings.find_workers();
             % assignment{ numel(oi.engine.postings.workers) } = '';
 
