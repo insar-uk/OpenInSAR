@@ -49,6 +49,7 @@ if J==1
 
     % write the input file
     if ~exist(terminalInputLocation,'file')
+        OI.Functions.mkdirs(fileparts(terminalInputLocation))
         fid = fopen(terminalInputLocation,'w');
         fwrite(fid,'');
         fclose(fid);
@@ -102,13 +103,14 @@ while true
         jobstr = postings.jobline;
         if ~isempty(jobstr)
             disp(jobstr)
-
+            firstWait = true;
             postings.report_recieved(J);
             break
         else
-            fprintf(1,'%s - waiting...', datetime("now"));
+            
             postings.report_ready(J);
             if firstWait
+                fprintf(1,'%s - waiting...', datetime("now"));
                 pause(10)
                 firstWait = false;
             else
@@ -122,6 +124,7 @@ while true
         disp('resetting')
         clearvars -except J
         restoredefaultpath
+        addpath('ICL_HPC')
         worker
         return
     end
@@ -157,12 +160,14 @@ while true
                     OI.Functions.struct2xml(errStruct).to_string())
                 clearvars -except J
                 restoredefaultpath
+                addpath('ICL_HPC')
                 worker
             catch ERR2
                 warning('cant handle error at all, restarting')
                 disp(ERR2)
                 clearvars -except J
                 restoredefaultpath
+                addpath('ICL_HPC')
                 worker
                 return
             end
@@ -185,6 +190,7 @@ while true
             disp('resetting')
             clearvars -except J
             restoredefaultpath
+            addpath('ICL_HPC')
             worker
             return
         end

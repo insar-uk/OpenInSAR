@@ -97,7 +97,7 @@ methods
         normz = @(x) x./abs(x);
         mask0s = @(x) OI.Functions.mask0s(x);
         mean_coherence = @(phase2d) mean(abs(sum(normz(phase2d),2)))./size(phase2d,2);
-        data2d = reshape(blockData,[],sz(3));
+        data2d = reshape(normz(blockData),[],sz(3));
         avfilt = @(I,x,y) imfilter((I),fspecial('average',[x,y]));
 
         % APS
@@ -138,29 +138,29 @@ methods
 
         fprintf(1,'Mean coherence after constant aps analysis: %.3f\n',mean_coherence(data_residual))
         
-        % Lets improve the aps by spatial filtering
-        for iteration = 1:3
-            for visitInd = sz(3):-1:1
-                apsBlock(:,:,visitInd) = avfilt(reshape( ...
-                    data_residual(:,thisReferenceVisit) ...
-                    .* conj(data_residual(:,visitInd)), ...
-                    sz(1:2) ) ... % reshape size
-                    ,50,200); % filter size
-            end
-            aps2d = reshape(normz(apsBlock),[],sz(3));
-            data_residual = data_residual.*aps2d;
+        % % Lets improve the aps by spatial filtering
+        % for iteration = 1:3
+        %     for visitInd = sz(3):-1:1
+        %         apsBlock(:,:,visitInd) = avfilt(reshape( ...
+        %             data_residual(:,thisReferenceVisit) ...
+        %             .* conj(data_residual(:,visitInd)), ...
+        %             sz(1:2) ) ... % reshape size
+        %             ,50,200); % filter size
+        %     end
+        %     aps2d = reshape(normz(apsBlock),[],sz(3));
+        %     data_residual = data_residual.*aps2d;
     
-             % Height
-            data_residual = data_residual.*qToPhase(-q);
-            [Cq, q, qi] = OI.Functions.invert_height(data_residual,kFactors); %#ok<*ASGLU>
-            data_residual = data_residual.*qToPhase(q);
+        %      % Height
+        %     data_residual = data_residual.*qToPhase(-q);
+        %     [Cq, q, qi] = OI.Functions.invert_height(data_residual,kFactors); %#ok<*ASGLU>
+        %     data_residual = data_residual.*qToPhase(q);
     
-            % Velocity
-            data_residual = data_residual.*vToPhase(-v);
-            [Cv,v] = OI.Functions.invert_velocity(data_residual,timeSeries);
-            data_residual = data_residual.*vToPhase(v);
-            fprintf(1,'Mean coherence after iter %i: %.3f\n',iteration,mean_coherence(data_residual))
-        end
+        %     % Velocity
+        %     data_residual = data_residual.*vToPhase(-v);
+        %     [Cv,v] = OI.Functions.invert_velocity(data_residual,timeSeries);
+        %     data_residual = data_residual.*vToPhase(v);
+        %     fprintf(1,'Mean coherence after iter %i: %.3f\n',iteration,mean_coherence(data_residual))
+        % end
 
         
         % Save the PSI outputs
@@ -242,7 +242,7 @@ methods
         cat = engine.load( OI.Data.Catalogue() );
         stacks = engine.load( OI.Data.Stacks() );
         segmentInds = stacks.stack( stackInd ).correspondence( segInd,:);
-        safeInds = stacks.stack.segments.safe(segmentInds);
+        safeInds = stacks.stack( stackInd ).segments.safe(segmentInds);
         datetimes = arrayfun(@(x) x.date.datenum, [cat.safes{safeInds}]);
     end
 

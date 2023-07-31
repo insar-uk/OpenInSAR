@@ -78,7 +78,6 @@ methods
             blockData(:,:,visitIndex) = coregData( ...
                 blockInfo.rgDataStart:blockInfo.rgDataEnd, ...
                 blockInfo.azDataStart:blockInfo.azDataEnd).';
-
         end % visits
 
         % Save the block

@@ -24,10 +24,11 @@ nextWorker = 0;
 assignment = {};
 
 thingToDoList = { OI.Data.PsiSummary() }; %1
+% thingToDoList = { OI.Data.BlockingSummary };
 
 for thingToDo = thingToDoList
     oi.ui.log('info','Jobs remaining in queue:\n');
-    oi.engine.queue.overview()
+    oi.engine.queue.overview();
     % oi.engine.load( thingToDo{1} )
     matcher = @(posting, x) numel(posting) >= numel(x) && any(strfind(posting(1:numel(x)), x));
 
@@ -56,20 +57,21 @@ for thingToDo = thingToDoList
                 fclose(fid);
                 % what is it?
                 if matcher( posting, 'READY')
-                    fprintf(1, 'Worker %i is ready\n', JJ);
+                    oi.engine.ui.log('trace','Worker %i is ready\n', JJ);
                     assignment{JJ} = '';
                     nextWorker = JJ; %#ok<NASGU>
                 end
                 % running
                 if matcher( posting, 'RUNNING')
-                    fprintf(1, 'Worker %i : %s\n', JJ,posting);
+                    % fprintf(1, 'Worker %i : %s\n', JJ,posting);
+                    oi.engine.ui.log('debug','Worker %i : %s\n', JJ,posting);
                     jobstr = strsplit(posting, 'Job(');
                     jobstr = ['Job(' jobstr{2}];
                     assignment{JJ} = OI.Job(jobstr);
                 end
                 % finished
                 if matcher( posting, 'FINISHED') || OI.Compatibility.contains(posting,'_FINISHED')
-                    fprintf(1, 'Worker %i : %s\n', JJ,posting);
+                    oi.engine.ui.log('info','Worker %i : %s\n', JJ,posting);
                     ss = strsplit(posting, '_ANSWER=');
                     if numel(ss)>1
                         answer = ss{2};
@@ -104,7 +106,7 @@ for thingToDo = thingToDoList
                 end
                 % error
                 if matcher( posting, 'ERROR')
-                    fprintf(1, 'Worker %i : %s\n', JJ, posting);
+                    oi.engine.ui.log('error','Worker %i : %s\n', JJ, posting);
                     oi.engine.ui.log('error',posting);
                     warning(posting);
                     assignment{JJ} = '';
@@ -225,7 +227,9 @@ for thingToDo = thingToDoList
                 thingToDo{1}.id,thingToDo{1}.generator);
             break
         else 
-            fprintf(1, 'Queue length: %i\n', oi.engine.queue.length());
+            oi.engine.ui.log('info', ...
+                'Queue length: %i\n', oi.engine.queue.length());
+            
         end
     end
 end

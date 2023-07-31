@@ -88,6 +88,7 @@ methods
                 engine.ui.log('info', 'GetOrbits finishing... Saving catalogue with %d orbit files\n', sum(hasOrbitForSafe))
                 catalogue = catalogue.make_filepaths_portable(project);
                 engine.save(catalogue,catalogue);
+                this.outputs{1} = OI.Data.OrbitSummary();
                 this.outputs{1}.configure('fileCount',numel(orbitFiles))
                 engine.save( this.outputs{1} );
                 this.isFinished = true;

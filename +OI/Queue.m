@@ -17,7 +17,6 @@ methods
         % check for duplicate
         for k = 1:length(this.jobArray)
             if this.jobArray{k}.eq(jobObj)
-                disp('not adding duplicate job');
                 return;
             end
         end

@@ -2,7 +2,7 @@ classdef Log < handle
 
 properties
     messageHistory = {};
-    printLevel = 4;
+    printLevel = 3;
     streamId = 1;
     fileId = 0;
 end%properties
@@ -16,7 +16,7 @@ properties (Constant = true)
     DEBUG = 4;
     TRACE = 5;
 
-    DEFAULT_LOG_LEVEL = 4;
+    DEFAULT_LOG_LEVEL = 3;
 
 end%properties
 

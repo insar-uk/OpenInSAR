@@ -143,8 +143,8 @@ methods
     end
 
     function jobs = create_job(obj, engine)
-        engine.ui.log('info', 'create_job method called on obj %s\n', obj.id);
-        engine.ui.log('info', 'Creating job to produce %s\n', strrep(obj.filepath, '\', '\\' ) );
+        engine.ui.log('trace', 'create_job method called on obj %s\n', obj.id);
+        engine.ui.log('debug', 'Creating job to produce %s\n', strrep(obj.filepath, '\', '\\' ) );
         if isprop(obj,'id')
             jobs = {OI.Job('name',obj.generator,'arguments',{'DesiredOutput',obj.id})};
         else
@@ -178,7 +178,7 @@ methods
             % filepath
             if ~exist(filepath, 'file')
                 if isLogging
-                    engine.ui.log('info', 'File %s does not exist, creating job to produce it\n', strrep(filepath,'\','\\'));
+                    engine.ui.log('debug', 'File %s does not exist, creating job to produce it\n', strrep(filepath,'\','\\'));
                 end
                 if any(filepath=='$')
                     if nargin < 2
@@ -255,10 +255,23 @@ methods
                 % here
                 fp = [obj.filepath, '.' obj.fileextension];
                 if ~exist(fileparts(fp),'dir')
-
                     OI.Functions.mkdirs(fp);
                 end
-                save(fp, 'data_','-v7');
+                bigFile = whos('data_').bytes >= 2^31; % Limit of mat v7 file format (Octave doesn't support v7.3)
+                if OI.Compatibility.isOctave
+                    if bigFile
+                        save('-mat-binary', fp, 'data_');
+                    else
+                        save('-mat', fp, 'data_');
+                    end
+                else
+                    if bigFile
+                        save(fp, 'data_','-v7.3');
+                    else
+                        save(fp, 'data_', '-v7');
+                    end
+                end
+ 
                 status = 'saved';
             case {'tif','tiff'}
                 imwrite(data_, obj.filepath);
