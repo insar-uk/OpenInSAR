@@ -69,10 +69,10 @@ classdef Postings
             for ii=1:numel(obj.workers)
                 J=obj.workers(ii);
                 if (J>0) && obj.check_ready(J)
-                    disp(['Worker ' num2str(J) ' is ready.'])
+                    % disp(['Worker ' num2str(J) ' is ready.'])
                     return
                 end
-                disp([ num2str(ii) ' _ Worker ' num2str(J)  ' not ready '])
+                % disp([ num2str(ii) ' _ Worker ' num2str(J)  ' not ready '])
             end
             J=0;
         end

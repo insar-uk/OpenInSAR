@@ -69,7 +69,7 @@ methods
             segments = struct('index',[],'safe',[],'swath',[],'burst',[]);
             % loop through safes, swaths, bursts in this visit.
             % Starting from: earliest safe, closest swath, earliest burst
-            for safeInd = reference.safeInds
+            for safeInd = reference.safeInds(:)'
                 safeMeta = preprocessingInfo.metadata(safeInd);
                 for swathInd = 1:numel(safeMeta.swath)
                     swath = safeMeta.swath( swathInd );

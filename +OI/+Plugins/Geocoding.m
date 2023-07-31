@@ -29,12 +29,12 @@ classdef Geocoding < OI.Plugins.PluginBase
                 return;
             end
             
-            engine.ui.log('info','Finished loading for %s\n',this.id);
+            engine.ui.log('debug','Finished loading for %s\n',this.id);
             if isempty(this.segmentIndex)
                 % check if all the data is in the database
                 allDone = true;
                 for trackInd = 1:numel(stacks.stack)
-                for segmentInd = stacks.stack(1).reference.segments.index
+                for segmentInd = stacks.stack( trackInd ).reference.segments.index
 
                     result = OI.Data.LatLonEleForImage();
                     result.STACK = num2str(trackInd);
@@ -81,9 +81,9 @@ classdef Geocoding < OI.Plugins.PluginBase
             end
 
             % address of the data in the catalogue and metadata
-            safeIndex= stacks.stack.segments.safe( segInd );
-            swathIndex =stacks.stack.segments.swath( segInd );
-            burstIndex = stacks.stack.segments.burst( segInd );
+            safeIndex= stacks.stack(this.trackIndex).segments.safe( segInd );
+            swathIndex =stacks.stack(this.trackIndex).segments.swath( segInd );
+            burstIndex = stacks.stack(this.trackIndex).segments.burst( segInd );
             % get metadata
             swathInfo = ...
                 preprocessingInfo.metadata( safeIndex ).swath( swathIndex );

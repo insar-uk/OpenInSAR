@@ -87,7 +87,8 @@ methods
 
         % Check we haven't done this already
         refSegInd = this.referenceSegmentIndex;
-        segInd = stacks.stack.correspondence(refSegInd, this.visitIndex);
+        stackInd = this.trackIndex;
+        segInd = stacks.stack(stackInd).correspondence(refSegInd, this.visitIndex);
 
         % Get the expected results:
         result = OI.Data.CoregOffsets().configure( ...
@@ -106,7 +107,7 @@ methods
             % also coregistered data
             result2 = OI.Data.CoregisteredSegment().copy_parameters( result );
             % get the safe index
-            safeIndex = stacks.stack.segments.safe( segInd );
+            safeIndex = stacks(stackInd).stack.segments.safe( segInd );
             % get the safe
             safe = cat.safes{safeIndex};
 
@@ -186,19 +187,21 @@ methods
             'This job should have been skipped.'])
 
         % address of the data in the catalogue and metadata
-        safeIndex = stacks.stack.segments.safe( segInd );
-        swathIndex = stacks.stack.segments.swath( segInd );
-        burstIndex = stacks.stack.segments.burst( segInd );
+        safeIndex = stacks.stack(stackInd).segments.safe( segInd );
+        swathIndex = stacks.stack(stackInd).segments.swath( segInd );
+        burstIndex = stacks.stack(stackInd).segments.burst( segInd );
         % get metadata
         swathInfo = ...
             preprocessingInfo.metadata( safeIndex ).swath( swathIndex );
     
         % Get metadat for reference
-        refSafeIndex = stacks.stack.segments.safe( refSegInd );
-        refSwathIndex = stacks.stack.segments.swath( refSegInd );
-        % refBurstIndex = stacks.stack.segments.burst( refSegInd );
+        refSafeIndex = stacks.stack(stackInd).segments.safe( refSegInd );
+        refSwathIndex = stacks.stack(stackInd).segments.swath( refSegInd );
+        refBurstIndex = stacks.stack(stackInd).segments.burst( refSegInd );
         refSwathInfo = ...
             preprocessingInfo.metadata(refSafeIndex).swath(refSwathIndex);
+
+        % Size of reference data array
         [lpbRef,spbRef,~,~] = ...
             OI.Plugins.Geocoding.get_parameters( refSwathInfo );
         [refMeshRange, refMeshAz] = ...
@@ -220,6 +223,11 @@ methods
             OI.Plugins.Geocoding.get_poe_and_timings( ...
                 cat, safeIndex, swathInfo, burstIndex );
 
+        % Orbit for the reference
+        [refOrbit, refLineTimes] = ...
+            OI.Plugins.Geocoding.get_poe_and_timings( ...
+                cat, refSafeIndex, refSwathInfo, refBurstIndex );
+
         % ensure 'virtual' timings for secondary match the size of reference timings
         if (lpbRef ~= lpb)
             engine.ui.log('warning','Lines per burst mismatch between reference and secondary during coregistration of visit %i segment %i\n',...
@@ -231,6 +239,8 @@ methods
             end
                 
         end
+        123
+        haveFoundOffsets = false;
                 
         if ~haveFoundOffsets % if we already have offsets we can skip this
             % we need one more input...
@@ -345,6 +355,7 @@ methods
 
         % resample the segment
         safe = cat.safes{safeIndex};
+        refSafe = cat.safes{refSafeIndex};
         % for each polarisation requested and available
         for pol = {'HH','VH','VV'} % do default last, to align how we check
             % if the plugin has finished
@@ -362,70 +373,47 @@ methods
                 'VISIT_INDEX', num2str(this.visitIndex) ...
             );
 
-            % find correct strip and its filepath
-            for stripInd = 1:numel(safe.strips)
-                strip = safe.strips{stripInd};
-                if strip.swath == swathIndex && ...
-                    strcmpi(strip.polarization,pol{1})
-                    break
-                end
-            end
-            segPath = safe.strips{stripInd}.getFilepath();
+            % load the reference data
+            segPath = safe.get_tiff_path(swathIndex,pol{1});
+            refSegPath = refSafe.get_tiff_path(refSwathIndex,pol{1});
 
             % loady
             data = OI.Data.Tiff.read_cropped(...
                 segPath, 1, [1 lpb]+(burstIndex-1)*lpb, []);
             
             % get ramp
-            rampPhase = OI.Functions.deramp_sentinel1(...
+            [derampPhase, demodulatePhase] = OI.Functions.deramp_demod_sentinel1(...
                 swathInfo, burstIndex, orbit, safe);
+            [refDerampPhase, refDemodulatePhase] = OI.Functions.deramp_demod_sentinel1(...
+                refSwathInfo, refBurstIndex, refOrbit, refSafe);
 
             % resample
             coregData=interp2(meshAz', ...
                 meshRange', ...
-                double(data).*exp(1i.*rampPhase'), ...
+                double(data).*exp(1i.*derampPhase'), ...
                 refMeshAz'+a', ...
                 refMeshRange'+r', ...
                 'cubic', ...
                 nan);
-            resampledRamp = interp2(meshAz', meshRange', rampPhase',...
+            resampledRamp = interp2(meshAz', meshRange', derampPhase',...
                         refMeshAz'+a',refMeshRange'+r','cubic',nan);
+
+            resampledModulationPhase = interp2(meshAz', meshRange', ...
+                demodulatePhase', refMeshAz'+a', refMeshRange'+r', ...
+                'cubic', nan);
+
+            % Load the reference data
+            refData = OI.Data.Tiff.read_cropped( ...
+                refSegPath, 1, [1 lpbRef]+(refBurstIndex-1)*lpbRef, []);
     
             % reramp and range compensate
             coregData = coregData .* exp(-1i.*resampledRamp) .* ...
                 exp( 1i * rangeSampleDistance * r' * 4 * pi / lambda);
-
-            % p = coregData;
-            % s = rdata;
-            % p = normz(p);
-            % p(isnan(p))=0;
-            % s = normz(s);
-            % s(isnan(s))=0;
-            % abs(sum(sum(avfilt(s.*circshift(p,-1,1),20,4))))
-
-            % % resample
-            % coregData=interp2(meshAz', meshRange', ...
-            %     double(data).*exp(1i.*rampPhase'),...
-            %             refMeshAz'+a',refMeshRange'+r','cubic',nan);
-            % resampledRamp = interp2(meshAz', meshRange', rampPhase',...
-            %             refMeshAz'+a',refMeshRange'+r','cubic',nan);
-            % 
-            % % reramp and range compensate
-            % coregData = coregData .* exp(-1i.*resampledRamp) .* ...
-            %     exp( 1i * rangeSampleDistance * r' * 4 * pi / lambda);
-            % p = coregData;
-            % s = rdata;
-            % p = normz(p);
-            % p(isnan(p))=0;
-            % s = normz(s);
-            % s(isnan(s))=0;
-            % abs(sum(sum(avfilt(s.*circshift(p,-1,1),20,4))))
-
+    
+            demodulatedPhaseDifference = resampledModulationPhase - refDemodulatePhase';
+            
             engine.save(coregSegmentInfo, coregData);
-            % engine.save(coregRampInfo, resampledRamp);
-
         end
-%imagesc(angle((coregData.*conj(rdata)).*conj(mean(coregData(:).*conj(rdata(:)),'omitnan')))')
         % we win
         this.isFinished = true;
     end % run

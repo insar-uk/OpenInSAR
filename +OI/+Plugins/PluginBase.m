@@ -43,7 +43,7 @@ methods
     % We also want to check the outputs don't exist, but without queueing
 
         this.isReady = false;
-        engine.ui.log('info', 'Validating %s plugin\n', this.id);
+        engine.ui.log('debug', 'Validating %s plugin\n', this.id);
 
         
         % Check the outputs don't exist
@@ -61,7 +61,7 @@ methods
                 missingOutput = true;
                 break;
             else
-                engine.ui.log('info', 'Already have output %s for %s\n', this.outputs{ii}.id, this.id)
+                engine.ui.log('debug', 'Already have output %s for %s\n', this.outputs{ii}.id, this.id)
             end
         end
         % reset queue
@@ -70,7 +70,7 @@ methods
         % If we have all the outputs, we don't need to do anything
         if ~missingOutput
             this.isFinished = true;
-            engine.ui.log('info', 'Already have outputs from %s\n', this.id)
+            engine.ui.log('debug', 'Already have outputs from %s\n', this.id)
             return
         end
 

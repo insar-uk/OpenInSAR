@@ -99,6 +99,18 @@ methods
             );
     end
 
+    function tiffPath = get_tiff_path(this, swathIndex, polarisation)
+        % find correct strip and its filepath
+        for stripInd = 1:numel(this.strips)
+            strip = this.strips{stripInd};
+            if strip.swath == swathIndex && ...
+                strcmpi(strip.polarization,polarisation)
+                break
+            end
+        end
+        tiffPath = this.strips{stripInd}.getFilepath();
+    end
+
     function annotationPath = get_annotation_path(this, stripIndex)
         if nargin < 2
             stripIndex = 1;

@@ -87,7 +87,7 @@ methods
         end
 
         if this.plugin.isReady
-            this.ui.log('info', 'Running plugin %s, %i jobs remaining\n', this.plugin.id, this.queue.length());
+            this.ui.log('info', 'Running plugin %s, %i jobs currently in queue.\n', this.plugin.id, this.queue.length());
             % time the plugin run
             ticPlugin = tic;
             % actually run the plugin!
@@ -101,7 +101,7 @@ methods
             % push to back of queue
             this.queue.remove_job(job);
             this.queue.add_job(job);
-            this.ui.log('info', 'Plugin %s added to back of queue, not ready\n', this.plugin.id')
+            this.ui.log('debug', 'Plugin %s added to back of queue, not ready\n', this.plugin.id')
         end
     end
 
@@ -109,13 +109,13 @@ methods
     function finish_job(this, job, timeJobTook)
         this.handle_job_timing(job, timeJobTook);
         if ~this.plugin.isFinished
-            this.ui.log('warning', 'Plugin %s finished property is not set\n', this.plugin.id);
+            this.ui.log('debug', 'Plugin %s finished property is false\n', this.plugin.id);
             % check the output files exist
             outputsExist = true;
             for output = this.plugin.outputs
                 outputObj = this.database.find( output{1} );
                 if isempty(outputObj)
-                    this.ui.log('error', 'Output %s not found in database\n', strrep(output{1}.id,'\','\\'));
+                    this.ui.log('debug', 'Output %s not found in database\n', strrep(output{1}.id,'\','\\'));
                     outputsExist = false;
                     break
                 end
@@ -130,10 +130,10 @@ methods
             this.ui.log('info', 'Plugin %s finished, removing job\n', this.plugin.id);
             this.queue.remove_job(job);
         else
-            this.ui.log('info', 'Plugin %s not finished, re-adding the job to queue\n', this.plugin.id);
+            this.ui.log('debug', 'Plugin %s not finished, re-adding the job to queue\n', this.plugin.id);
             this.queue.remove_job(job);
             this.queue.add_job(job);
-            this.ui.log('info', 'Plugin %s added to back of queue\n', this.plugin.id')
+            this.ui.log('debug', 'Plugin %s added to back of queue\n', this.plugin.id')
         end
     end
 
@@ -178,11 +178,13 @@ methods
         this.priorJobTiming(end+1) = timeJobTook;
 
         % print how long the last job took
-        this.ui.log('info', 'Job %s took %f seconds\n', jobThatJustFinished.to_string(), timeJobTook);
+        formattedJobString = strrep(jobThatJustFinished.to_string(),'Job(','');
+        formattedJobString = formattedJobString(1:end-1);
+        this.ui.log('info', 'Job %s took %.2f seconds\n', formattedJobString, timeJobTook);
 
         % print the total time taken
         totalTime = sum(this.priorJobTiming);
-        this.ui.log('info', 'Total time taken %f seconds\n', totalTime);
+        this.ui.log('info', 'Total time taken %.2f seconds\n', totalTime);
 
         % look up remaining jobs in the queue
         remainingJobs = this.queue.jobArray;
@@ -223,12 +225,13 @@ methods
             unitToReport = 'minutes';
         end
         timingMessage = sprintf(timingTemplate,reportTime,unitToReport);
-        this.ui.log('info',timingMessage);
+        % This isn't working for distributed queues, so we'll quiten the output for now.
+        this.ui.log('debug',timingMessage);
         
         if nUnknownJobs %> 0
-            this.ui.log('info', 'Plus %i jobs without timing information available\n', nUnknownJobs);
+            this.ui.log('debug', 'Plus %i jobs without timing information available\n', nUnknownJobs);
         end
-        this.ui.log('info', 'Estimated time of completion %s\n', datetime('now') + totalTime/86400);
+        this.ui.log('debug', 'Estimated time of completion %s\n', datetime('now') + totalTime/86400);
         this.ui.log('debug', 'timing loop took %.3f secs itself.\n',toc(timeForThis));
     end
 
@@ -317,7 +320,7 @@ methods
 
         % Remeber to handle empty data in the calling function !!
         if isempty(data)
-            this.ui.log('warning', 'No data found for %s\n', dataObj.id')
+            this.ui.log('debug', 'No data found for %s\n', dataObj.id')
             % if we dont have a file, and we dont have data, 
             % and we havent added jobs yet then we should add the job to the queue
             if isempty(outstandingJobs) && ~dataObj.hasFile

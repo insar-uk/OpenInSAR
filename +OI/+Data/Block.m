@@ -13,7 +13,7 @@ end%properties
 methods
     function this = Block( ~ )
         this.hasFile = true;
-        this.filepath = '$WORK$/blocks/$id$';
+        this.filepath = '$WORK$/blocks/data/$id$';
         this.fileextension = 'mat';
     end%ctor
 end%methods
