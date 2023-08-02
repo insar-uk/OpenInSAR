@@ -306,6 +306,26 @@ methods
 
     end
 
+    function params = identifying_paramaters(this)
+        params = {};
+
+        % If there are no variables, return
+        if ~any(find(this.id=='$')), return; end
+
+        % Find all variables in the string
+        var_regex = '\$[a-zA-Z0-9_]+\$';
+        vars = regexp(this.id, var_regex, 'match');
+        
+        params = cell(numel(vars),1);
+        % Loop through all variables and remove the $ signs
+        for ii=1:numel(vars)
+            var = vars{ii};
+            vName = var(2:end-1); % remove the $ signs
+            params{ii} = vName;
+        end
+
+    end
+
     % replace variables in the filepath with the actual values
     function str = string_interpolation(this, str, engine)
 

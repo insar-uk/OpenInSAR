@@ -69,7 +69,7 @@ methods
             if isempty(coregData)
                 engine.ui.log('warning', ...
                     'No coreged data available! T%i S%i V%i P%s\n', ...
-                    trackInd, refSegInd, visitInd, this.POLARISATION);
+                    this.STACK, blockInfo.segmentIndex, visitIndex, this.POLARISATION);
                 return;
                 % break; % throw back to the engine, not resampled/coregistered
             end

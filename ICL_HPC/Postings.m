@@ -36,6 +36,7 @@ classdef Postings
             fid=fopen(fp,'w');
             status = fwrite(fid,['JOB=' jobline]);
             fclose(fid);
+            fprintf(1,'Worker %i has been assigned: %s\n',J,jobline);
         end
 
         % Just makes the folder, if necessary
@@ -61,6 +62,7 @@ classdef Postings
                 end
             end
             workerList=unique(isWorker);
+            workerList(workerList==0)=[];
             obj.workers=workerList;
         end
 
@@ -227,9 +229,29 @@ classdef Postings
             fclose(fid);
         end
 
+        function obj = wipe_error(obj,J)
+
+            fid=fopen(obj.get_posting_filepath(J),'r');
+            line=fgetl(fid);
+            fclose(fid);
+
+            % Check if the posting is an error
+            if ~isempty(line) && numel(line) > 6 && strcmp(line(1:6),'ERROR_')
+                fid=fopen(obj.get_posting_filepath(J),'w');
+                fwrite(fid,'');
+                fclose(fid);
+            end
+        end
+
+        function obj = wipe_all_errors(obj)
+            for ii = 1:numel(obj.workers)
+                obj = obj.wipe_error( obj.workers(ii) );
+            end
+        end
+
         function obj = force_reset_all(obj)
             for ii = 1:numel(obj.workers)
-                obj = obj.force_reset(ii);
+                obj = obj.force_reset(  obj.workers(ii)  );
             end
         end
 

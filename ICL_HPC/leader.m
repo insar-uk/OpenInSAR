@@ -18,8 +18,9 @@ oi.engine.connect( projObj );
 
 
 oi.engine.postings = oi.engine.postings.reset_workers();
+oi.engine.postings = oi.engine.postings.wipe_all_errors();
 
-oi.engine.postings.report_ready(0)
+oi.engine.postings.report_ready(0);
 nextWorker = 0;
 assignment = {};
 
@@ -27,8 +28,7 @@ thingToDoList = { OI.Data.PsiSummary() }; %1
 % thingToDoList = { OI.Data.BlockingSummary };
 
 for thingToDo = thingToDoList
-    oi.ui.log('info','Jobs remaining in queue:\n');
-    oi.engine.queue.overview();
+
     % oi.engine.load( thingToDo{1} )
     matcher = @(posting, x) numel(posting) >= numel(x) && any(strfind(posting(1:numel(x)), x));
 
@@ -37,6 +37,7 @@ for thingToDo = thingToDoList
     while true
 
         while nextWorker == 0
+            oi.ui.log('info','Jobs remaining in queue:\n');
             oi.engine.queue.overview();
             
             oi.engine.postings = oi.engine.postings.find_workers();
@@ -66,11 +67,16 @@ for thingToDo = thingToDoList
                     % fprintf(1, 'Worker %i : %s\n', JJ,posting);
                     oi.engine.ui.log('debug','Worker %i : %s\n', JJ,posting);
                     jobstr = strsplit(posting, 'Job(');
-                    jobstr = ['Job(' jobstr{2}];
-                    assignment{JJ} = OI.Job(jobstr);
+                    if numel(jobstr)>1
+                        jobstr = ['Job(' jobstr{2}];
+                        assignment{JJ} = OI.Job(jobstr);
+                    else
+                        assignment{JJ} = '';
+                    end
                 end
                 % finished
                 if matcher( posting, 'FINISHED') || OI.Compatibility.contains(posting,'_FINISHED')
+                    assignment{JJ}='';
                     oi.engine.ui.log('info','Worker %i : %s\n', JJ,posting);
                     ss = strsplit(posting, '_ANSWER=');
                     if numel(ss)>1
@@ -141,7 +147,7 @@ for thingToDo = thingToDoList
         
         if isempty(nextJob)
             % try loading our target
-            oi.engine.load( thingToDo{1} )
+            oi.engine.load( thingToDo{1} );
             nextJob = oi.engine.queue.next_job();
             if isempty(nextJob)
                 oi.engine.ui.log('info',...
@@ -152,9 +158,9 @@ for thingToDo = thingToDoList
 
         while isempty(nextJob.target)
             % we can carry on running jobs that don't have a target
-            oi.engine.run_next_job()
+            oi.engine.run_next_job();
             % try loading our target
-            oi.engine.load( thingToDo{1} )
+            oi.engine.load( thingToDo{1} );
             nextJob = oi.engine.queue.next_job();
             if isempty(nextJob)
                 % 'No more jobs for leader.'

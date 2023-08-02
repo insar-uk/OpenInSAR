@@ -187,7 +187,12 @@ methods
             end
         end
         fprintf(1,'Queue overview as of %s:\n',datestr(now())); %#ok<TNOW1,DATST>
-        disp(names)
+        if this.length() == 0
+            fprintf(1,'Empty.');
+        else
+            disp(names)
+        end
+
     end
 
     function clear(this)

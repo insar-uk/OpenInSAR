@@ -37,6 +37,7 @@ methods
             end% switch
         end% for
 
+       
         % if no specific orbit requested, make a job for each orbit in catalogue
         if (isempty(this.datetime) || isempty(this.platform))
             % check the orbit directory
@@ -95,6 +96,10 @@ methods
             end
 
             return
+        end
+
+         if ~isa(this.datetime,'OI.Data.Datetime')
+            this.datetime=OI.Data.Datetime( this.datetime );
         end
 
         this.outputs{1} = OI.Data.Orbit();
