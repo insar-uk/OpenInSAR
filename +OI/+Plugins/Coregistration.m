@@ -226,7 +226,7 @@ methods
         % Orbit for the reference
         [refOrbit, refLineTimes] = ...
             OI.Plugins.Geocoding.get_poe_and_timings( ...
-                cat, refSafeIndex, refSwathInfo, refBurstIndex );
+                cat, refSafeIndex, refSwathInfo, refBurstIndex ); %#ok<ASGLU>
 
         % ensure 'virtual' timings for secondary match the size of reference timings
         if (lpbRef ~= lpb)
@@ -239,7 +239,7 @@ methods
             end
                 
         end
-        123
+        
         haveFoundOffsets = false;
                 
         if ~haveFoundOffsets % if we already have offsets we can skip this
@@ -375,7 +375,7 @@ methods
 
             % load the reference data
             segPath = safe.get_tiff_path(swathIndex,pol{1});
-            refSegPath = refSafe.get_tiff_path(refSwathIndex,pol{1});
+            refSegPath = refSafe.get_tiff_path(refSwathIndex,pol{1}); %#ok<NASGU>
 
             % loady
             data = OI.Data.Tiff.read_cropped(...
@@ -383,7 +383,7 @@ methods
             
             % get ramp
             [derampPhase, demodulatePhase, azMisregistrationPhase] = OI.Functions.deramp_demod_sentinel1(...
-                swathInfo, burstIndex, orbit, safe, a);
+                swathInfo, burstIndex, orbit, safe, a); %#ok<ASGLU>
             % [refDerampPhase, refDemodulatePhase,] = OI.Functions.deramp_demod_sentinel1(...
             %     refSwathInfo, refBurstIndex, refOrbit, refSafe);
 
@@ -412,8 +412,6 @@ methods
                 exp( 1i * rangeSampleDistance * r' * 4 * pi / lambda) .* ...
                 exp( -1i * resampledAzPhase );
     
-            % demodulatedPhaseDifference = resampledModulationPhase - refDemodulatePhase';
-            
             engine.save(coregSegmentInfo, coregData);
         end
         % we win

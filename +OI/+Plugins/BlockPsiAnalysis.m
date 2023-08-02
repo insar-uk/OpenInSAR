@@ -12,11 +12,6 @@ methods
     function this = BlockPsiAnalysis( varargin )
         this.isArray = true;
         this.isFinished = false;
-        % if strcmpi(getenv('USERNAME'),'stewl')
-            % this.STACK=1;
-            % this.BLOCK=32;
-            % this.run();
-        % end
     end    
 
 
@@ -29,15 +24,6 @@ methods
             % No block map
             return
         end
-        
-
-        % % Set some stuff for debugging
-        % if strcmpi(getenv('USERNAME'),'stewl')
-        %     % For testing
-        %     this.STACK = 1;
-        %     this.BLOCK = 32;
-        %     blockData = load('P:\\stack_1_polarisation_VV_block_32.mat').data_;
-        % end
 
         if isempty(this.BLOCK)
             % Queue up all blocks
