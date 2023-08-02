@@ -47,7 +47,7 @@ methods
 
         stack = stacks.stack( this.STACK );
         thisSegment = blockMap.stacks(this.STACK).blocks( this.BLOCK ).segmentIndex;
-        thisReferenceVisit = stack.reference.segments.visit( thisSegment );
+        thisReferenceVisit = stack.reference.segments.visit( thisSegment ); %#ok<*NASGU>
 
         % Create the block object template
         blockObj = OI.Data.Block().configure( ...
@@ -56,10 +56,7 @@ methods
             'BLOCK', num2str( this.BLOCK ) ...
             ).identify( engine );
 
-                
-        % if ~strcmpi(getenv('USERNAME'),'stewl')
         blockData = engine.load( blockObj );
-    % end
 
         if isempty(blockData)
             % No data for this block
@@ -67,110 +64,114 @@ methods
         end
         sz = size(blockData);
 
-
-       
         % Create data objects
         ampStabObj = OI.Data.BlockResult( blockObj, 'AmplitudeStability' );
         coherenceObj = OI.Data.BlockResult( blockObj, 'Coherence');
         velocityObject = OI.Data.BlockResult( blockObj, 'Velocity' );
         heightErrorObject = OI.Data.BlockResult( blockObj, 'HeightError' );
         
+        if ~heightErrorObject.identify(engine).exist()
+            % Get the time series and baselines
+            baselinesObjectTemplate = OI.Data.BlockBaseline().configure( ...
+                'STACK', num2str(this.STACK), ...
+                'BLOCK', num2str(this.BLOCK) ...
+                ).identify( engine );
+            baselinesObject = engine.load( baselinesObjectTemplate );
+            timeSeries = baselinesObject.timeSeries(:)';
+            kFactors = baselinesObject.k(:)';
 
-        % Get the time series and baselines
-        baselinesObjectTemplate = OI.Data.BlockBaseline().configure( ...
-            'STACK', num2str(this.STACK), ...
-            'BLOCK', num2str(this.BLOCK) ...
-            ).identify( engine );
-        baselinesObject = engine.load( baselinesObjectTemplate );
-        timeSeries = baselinesObject.timeSeries(:)';
-        kFactors = baselinesObject.k(:)';
+            % Get PSC
+            amplitudeStability = OI.Functions.amplitude_stability( abs(blockData) );
+            pscMask = amplitudeStability(:)>3;
+            % Save the amplitude stability
+            engine.save( ampStabObj, amplitudeStability );
 
-        % Get PSC
-        amplitudeStability = OI.Functions.amplitude_stability( abs(blockData) );
-        pscMask = amplitudeStability(:)>3;
-        % Save the amplitude stability
-        engine.save( ampStabObj, amplitudeStability );
+            %% Do the inversion
+            qToPhase = @(q) exp(1i.*q.*kFactors);
+            vToPhase = @(v) exp(1i.*v.*timeSeries);
+            normz = @(x) x./abs(x);
+            mask0s = @(x) OI.Functions.mask0s(x);
+            mean_coherence = @(phase2d) mean(abs(sum(normz(phase2d),2)))./size(phase2d,2);
+            data2d = reshape(normz(blockData),[],sz(3));
+            % avfilt = @(I,x,y) imfilter((I),fspecial('average',[x,y]));
 
-        %% Do the inversion
-        qToPhase = @(q) exp(1i.*q.*kFactors);
-        vToPhase = @(v) exp(1i.*v.*timeSeries);
-        normz = @(x) x./abs(x);
-        mask0s = @(x) OI.Functions.mask0s(x);
-        mean_coherence = @(phase2d) mean(abs(sum(normz(phase2d),2)))./size(phase2d,2);
-        data2d = reshape(normz(blockData),[],sz(3));
-        avfilt = @(I,x,y) imfilter((I),fspecial('average',[x,y]));
+            % APS
+            pscCm = data2d(pscMask,:)'*data2d(pscMask,:);
+            [eVec, eVal] = eig(pscCm);
+            [~, bestPairIndex] = max(diag(eVal));
+            aps = eVec(:,bestPairIndex).';
 
-        % APS
-        pscCm = data2d(pscMask,:)'*data2d(pscMask,:);
-        [eVec, eVal] = eig(pscCm);
-        [~, bestPairIndex] = max(diag(eVal));
-        aps = eVec(:,bestPairIndex).';
+            % height error
+            data_residual = data2d.*aps;
+            [Cq, q, qi] = OI.Functions.invert_height(data_residual,kFactors); %#ok<*ASGLU>
+            
+            % velocity
+            data_residual = normz(data2d.*aps.*qToPhase(q));
+            [Cv,v] = OI.Functions.invert_velocity(data_residual,timeSeries);
 
-        % height error
-        data_residual = data2d.*aps;
-        [Cq, q, qi] = OI.Functions.invert_height(data_residual,kFactors);
+            % q, v, and aps now form our initial model
+            % lets improve each in turn
+            psMask = Cv>.75;
+
+            % APS
+            psResidual = data_residual(psMask,:).*conj(aps);
+            psCm = psResidual'*psResidual;
+            [eVec, eVal] = eig(psCm);
+            [~, bestPairIndex] = max(diag(eVal));
+            aps = eVec(:,bestPairIndex).';
+            data_residual = data2d.*aps.*qToPhase(q).*vToPhase(v);
+
+            % Height
+            data_residual = data_residual.*qToPhase(-q);
+            [Cq, q, qi] = OI.Functions.invert_height(data_residual,kFactors);
+            data_residual = data_residual.*qToPhase(q);
+
+            % Velocity
+            data_residual = data_residual.*vToPhase(-v);
+            [Cv,v] = OI.Functions.invert_velocity(data_residual,timeSeries);
+            data_residual = data_residual.*vToPhase(v);
+
+            fprintf(1,'Mean coherence after constant aps analysis: %.3f\n',mean_coherence(data_residual))
+            
+            % % Lets improve the aps by spatial filtering
+            % for iteration = 1:3
+            %     for visitInd = sz(3):-1:1
+            %         apsBlock(:,:,visitInd) = avfilt(reshape( ...
+            %             data_residual(:,thisReferenceVisit) ...
+            %             .* conj(data_residual(:,visitInd)), ...
+            %             sz(1:2) ) ... % reshape size
+            %             ,50,200); % filter size
+            %     end
+            %     aps2d = reshape(normz(apsBlock),[],sz(3));
+            %     data_residual = data_residual.*aps2d;
         
-        % velocity
-        data_residual = normz(data2d.*aps.*qToPhase(q));
-        [Cv,v] = OI.Functions.invert_velocity(data_residual,timeSeries);
-
-        % q, v, and aps now form our initial model
-        % lets improve each in turn
-        psMask = Cv>.75;
-
-        % APS
-        psResidual = data_residual(psMask,:).*conj(aps);
-        psCm = psResidual'*psResidual;
-        [eVec, eVal] = eig(psCm);
-        [~, bestPairIndex] = max(diag(eVal));
-        aps = eVec(:,bestPairIndex).';
-        data_residual = data2d.*aps.*qToPhase(q).*vToPhase(v);
-
-        % Height
-        data_residual = data_residual.*qToPhase(-q);
-        [Cq, q, qi] = OI.Functions.invert_height(data_residual,kFactors);
-        data_residual = data_residual.*qToPhase(q);
-
-        % Velocity
-        data_residual = data_residual.*vToPhase(-v);
-        [Cv,v] = OI.Functions.invert_velocity(data_residual,timeSeries);
-        data_residual = data_residual.*vToPhase(v);
-
-        fprintf(1,'Mean coherence after constant aps analysis: %.3f\n',mean_coherence(data_residual))
+            %      % Height
+            %     data_residual = data_residual.*qToPhase(-q);
+            %     [Cq, q, qi] = OI.Functions.invert_height(data_residual,kFactors); %#ok<*ASGLU>
+            %     data_residual = data_residual.*qToPhase(q);
         
-        % % Lets improve the aps by spatial filtering
-        % for iteration = 1:3
-        %     for visitInd = sz(3):-1:1
-        %         apsBlock(:,:,visitInd) = avfilt(reshape( ...
-        %             data_residual(:,thisReferenceVisit) ...
-        %             .* conj(data_residual(:,visitInd)), ...
-        %             sz(1:2) ) ... % reshape size
-        %             ,50,200); % filter size
-        %     end
-        %     aps2d = reshape(normz(apsBlock),[],sz(3));
-        %     data_residual = data_residual.*aps2d;
-    
-        %      % Height
-        %     data_residual = data_residual.*qToPhase(-q);
-        %     [Cq, q, qi] = OI.Functions.invert_height(data_residual,kFactors); %#ok<*ASGLU>
-        %     data_residual = data_residual.*qToPhase(q);
-    
-        %     % Velocity
-        %     data_residual = data_residual.*vToPhase(-v);
-        %     [Cv,v] = OI.Functions.invert_velocity(data_residual,timeSeries);
-        %     data_residual = data_residual.*vToPhase(v);
-        %     fprintf(1,'Mean coherence after iter %i: %.3f\n',iteration,mean_coherence(data_residual))
-        % end
+            %     % Velocity
+            %     data_residual = data_residual.*vToPhase(-v);
+            %     [Cv,v] = OI.Functions.invert_velocity(data_residual,timeSeries);
+            %     data_residual = data_residual.*vToPhase(v);
+            %     fprintf(1,'Mean coherence after iter %i: %.3f\n',iteration,mean_coherence(data_residual))
+            % end
 
+            
+            % Save the PSI outputs
+            C = reshape(Cv,sz(1:2));
+            v = reshape(v,sz(1:2));
+            q = reshape(q,sz(1:2));
+            engine.save( coherenceObj, C );
+            engine.save( velocityObject, v );
+            engine.save( heightErrorObject, q );
+        else
+            C = engine.load( coherenceObj );
+            v = engine.load( velocityObject );
+            q = engine.load( heightErrorObject );
+        end
         
-        % Save the PSI outputs
-        C = reshape(Cv,sz(1:2));
-        v = reshape(v,sz(1:2));
-        q = reshape(q,sz(1:2));
-        engine.save( coherenceObj, C );
-        engine.save( velocityObject, v );
-        engine.save( heightErrorObject, q );
-
+        
         % Save a preview of the v, C and q
         blockInfo = blockMap.stacks(this.STACK).blocks(this.BLOCK);
         OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, C, 'Coherence')
@@ -183,12 +184,14 @@ methods
             'BLOCK', num2str(this.BLOCK) ...
         );
         bg = engine.load(blockGeocode);
+        if isempty(bg)
+            return
+        end
 
         % Create a shapefile of the block
         blockName = sprintf('Stack_%i_block_%i',this.STACK,this.BLOCK);
         blockFilePath = fullfile( projObj.WORK, 'shapefiles', this.id, blockName);
         
-
         cohMask = C>.5;
         OI.Functions.ps_shapefile( ...
             blockFilePath, ...
@@ -201,7 +204,6 @@ methods
             C(cohMask));
 
         this.isFinished = true;
-
     end % run
 
     function this = queue_jobs(this, engine, blockMap)
@@ -218,9 +220,13 @@ methods
                     );
                 coherenceObj = OI.Data.BlockResult(blockObj, 'Coherence').identify( engine );
 
+                % Create a shapefile of the block
+                blockName = sprintf('Stack_%i_block_%i',stackIndex,blockIndex);
+                blockFilePath = fullfile( projObj.WORK, 'shapefiles', this.id, blockName);
+
                 % Check if the block is already done
                 priorObj = engine.database.find( coherenceObj );
-                if ~isempty(priorObj)
+                if ~isempty(priorObj) && exist(blockFilePath,'file')
                     % Already done
                     continue
                 end

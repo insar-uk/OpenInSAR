@@ -34,7 +34,7 @@ methods
 
         % force the second track to be opposing look dir if possible
         if numel( trackPriorityInd ) > 1
-            trackPriorityInd = prioritise_opposite_look( ...
+            trackPriorityInd = OI.Plugins.Stacking.prioritise_opposing_look( ...
                 trackPriorityInd, cat, visitsForEachTrack);
         end        
 
@@ -183,10 +183,9 @@ methods
             
             if ~isstruct( this.outputs{1}.stack ) || ... 
                 isempty( fieldnames( this.outputs{1}.stack ) ) 
-                this.outputs{1}.stack = stack;
-            else
-                this.outputs{1}.stack(referenceTrackInd) = stack;
+                this.outputs{1}.stack = stack([],1);
             end
+            this.outputs{1}.stack(referenceTrackInd) = stack;
         end
         engine.save( this.outputs{1} );
 

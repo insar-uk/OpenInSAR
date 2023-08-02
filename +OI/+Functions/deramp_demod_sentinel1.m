@@ -1,4 +1,4 @@
-function [realphi, realdemod] = deramp_demod_sentinel1( swathInfo, burstIndex,  orbit, safe )
+function [realphi, realdemod, lagPhase] = deramp_demod_sentinel1( swathInfo, burstIndex,  orbit, safe, azOff )
     if nargin==0
         disp(1)
         return
@@ -118,8 +118,9 @@ function [realphi, realdemod] = deramp_demod_sentinel1( swathInfo, burstIndex,  
             annotationPath);
     end
     % Ka is relative to tao (fast time) at first sample!
-    % ka = polyval(afrEstimatePoly, tao-s2n(afrEst.t0));
-    ka = polyval(afrEstimatePoly, tao-tao(1));
+    ka = polyval(afrEstimatePoly, tao-s2n(afrEst.t0));
+    %ka = polyval(afrEstimatePoly, tao-tao(1));
+    %ka = polyval(afrEstimatePoly, tao-s2n(afrEst.t0));
     
     %% 6.4: Doppler Centroid Rate in the Focussed TOPS SLC Data (kt)
     % Find the closest estimate to the middle of the burst
@@ -149,18 +150,47 @@ function [realphi, realdemod] = deramp_demod_sentinel1( swathInfo, burstIndex,  
             annotationPath);
     end
     % Doppler centroid is given relative to fast time at first sample!
-%     fnc = polyval(dcEstimatePoly, tao-s2n(dcEst.t0));
+     fnc = polyval(dcEstimatePoly, tao-s2n(dcEst.t0));
     % fnc = polyval(dcEstimatePoly, tao-mean(tao));
+    % fnc = polyval(dcEstimatePoly, 2.*tao-tao(1));
+    %fnc = polyval(dcEstimatePoly, tao-s2n(dcEst.t0));
+    % SNAP uses the following:
+    %fnc = polyval(dcEstimatePoly,(tao*2-s2n(dcEst.t0)));
     fnc = polyval(dcEstimatePoly, tao-tao(1));
 
-    
+    % esa uses:
+    %(srt/2 + 1:spb * rps/c) *  2;
+    %= srt + 1:spb * rsi - dc.t0
+    fnc = polyval(dcEstimatePoly, tao - s2n(dcEst.t0));
+
     %% 6.6: Reference zero-Doppler Azimuth Time etaref
     etaref = -fnc ./ ka;
-
+    etaref = etaref - etaref(round(spb/2));
+    
+    % Snap does this bizarre thing for etaref:
+%     eta = (0:lpb-1)'.*ati;
+%     tmp1=lpb*ati/2;
+%     tmp2=tmp1+fnc(1)/ka(1);
+%     etaref = tmp2-fnc./ka;
+    
     %etaref = etaref-mean(etaref);
     % finally...
     kt=(ka.*ks)./(ka-ks);
 
     % phi phase
     realphi=-pi*kt.*(eta-etaref).^2;
-    realdemod=-2*pi.*fnc.*(eta - etaref);
+    realdemod=-2*pi.*kt.*(eta - etaref);
+    
+    % Check if azimuth offsets were provided
+    % INTERFEROMETRIC PROCESSING OF SLC SENTINEL-1 TOPS DATA
+    % Raphael Grandin, ESA Fringe 2015
+    % https://proceedings.esa.int/files/116.pdf
+    if nargin > 4
+        % adjust for azimuth misregistration
+        etalagPoly = polyfit(1:size(azOff,1),ati.*azOff(:,1),1);
+        etalagPoly(end)=0;
+        etalag = polyval(etalagPoly,1:lpb);
+        lagPhase = 2*pi*kt.*eta.*etalag';
+    else
+        lagPhase = 0;
+    end

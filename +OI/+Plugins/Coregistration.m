@@ -107,7 +107,7 @@ methods
             % also coregistered data
             result2 = OI.Data.CoregisteredSegment().copy_parameters( result );
             % get the safe index
-            safeIndex = stacks(stackInd).stack.segments.safe( segInd );
+            safeIndex = stacks.stack(stackInd).segments.safe( segInd );
             % get the safe
             safe = cat.safes{safeIndex};
 
@@ -382,10 +382,10 @@ methods
                 segPath, 1, [1 lpb]+(burstIndex-1)*lpb, []);
             
             % get ramp
-            [derampPhase, demodulatePhase] = OI.Functions.deramp_demod_sentinel1(...
-                swathInfo, burstIndex, orbit, safe);
-            [refDerampPhase, refDemodulatePhase] = OI.Functions.deramp_demod_sentinel1(...
-                refSwathInfo, refBurstIndex, refOrbit, refSafe);
+            [derampPhase, demodulatePhase, azMisregistrationPhase] = OI.Functions.deramp_demod_sentinel1(...
+                swathInfo, burstIndex, orbit, safe, a);
+            % [refDerampPhase, refDemodulatePhase,] = OI.Functions.deramp_demod_sentinel1(...
+            %     refSwathInfo, refBurstIndex, refOrbit, refSafe);
 
             % resample
             coregData=interp2(meshAz', ...
@@ -397,20 +397,22 @@ methods
                 nan);
             resampledRamp = interp2(meshAz', meshRange', derampPhase',...
                         refMeshAz'+a',refMeshRange'+r','cubic',nan);
+            resampledAzPhase = interp2(meshAz', meshRange', azMisregistrationPhase',...
+                refMeshAz'+a',refMeshRange'+r','cubic',nan);
+            % resampledModulationPhase = interp2(meshAz', meshRange', ...
+            %     demodulatePhase', refMeshAz'+a', refMeshRange'+r', ...
+            %     'cubic', nan);
 
-            resampledModulationPhase = interp2(meshAz', meshRange', ...
-                demodulatePhase', refMeshAz'+a', refMeshRange'+r', ...
-                'cubic', nan);
-
-            % Load the reference data
-            refData = OI.Data.Tiff.read_cropped( ...
-                refSegPath, 1, [1 lpbRef]+(refBurstIndex-1)*lpbRef, []);
+            % % Load the reference data
+            % refData = OI.Data.Tiff.read_cropped( ...
+            %     refSegPath, 1, [1 lpbRef]+(refBurstIndex-1)*lpbRef, []);
     
-            % reramp and range compensate
+            % reramp, range compensate, adjust for misregistration
             coregData = coregData .* exp(-1i.*resampledRamp) .* ...
-                exp( 1i * rangeSampleDistance * r' * 4 * pi / lambda);
+                exp( 1i * rangeSampleDistance * r' * 4 * pi / lambda) .* ...
+                exp( -1i * resampledAzPhase );
     
-            demodulatedPhaseDifference = resampledModulationPhase - refDemodulatePhase';
+            % demodulatedPhaseDifference = resampledModulationPhase - refDemodulatePhase';
             
             engine.save(coregSegmentInfo, coregData);
         end

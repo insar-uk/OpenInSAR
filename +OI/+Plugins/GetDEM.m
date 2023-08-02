@@ -22,6 +22,9 @@ classdef GetDEM < OI.Plugins.PluginBase
             minLon = 180;
 
             for stackInd = 1:numel(stacks.stack)
+                if isempty( stacks.stack(stackInd).segments )
+                    continue
+                end
                 maxLat = max([stacks.stack(stackInd).segments.lat(:); maxLat]);
                 minLat = min([stacks.stack(stackInd).segments.lat(:); minLat]);
                 maxLon = max([stacks.stack(stackInd).segments.lon(:); maxLon]);

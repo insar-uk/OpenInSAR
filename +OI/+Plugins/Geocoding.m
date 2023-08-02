@@ -34,6 +34,9 @@ classdef Geocoding < OI.Plugins.PluginBase
                 % check if all the data is in the database
                 allDone = true;
                 for trackInd = 1:numel(stacks.stack)
+                    if isempty( stacks.stack( trackInd ).reference )
+                        continue;
+                    end
                 for segmentInd = stacks.stack( trackInd ).reference.segments.index
 
                     result = OI.Data.LatLonEleForImage();

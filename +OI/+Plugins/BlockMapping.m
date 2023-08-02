@@ -4,7 +4,7 @@ properties
     inputs = {OI.Data.StitchingInformation()}
     outputs = {OI.Data.BlockMap()}
     id = 'BlockMapping'
-
+    gaaaa = 'gaaaa1'
 end % properties
 
 methods
@@ -204,9 +204,9 @@ methods
             end % segment loop
 
             if stackInd==1
-                blockMap.stacks = struct('blocks',blocksInStack,'map',blockMapArray);
+                blockMap.stacks = struct('blocks',blocksInStack,'map',blockMapArray,'usefulBlockIndices',[],'usefulBlocks',[]);
             else
-                blockMap.stacks(stackInd) = struct('blocks',blocksInStack,'map',blockMapArray);
+                blockMap.stacks(stackInd) = struct('blocks',blocksInStack,'map',blockMapArray,'usefulBlockIndices',[],'usefulBlocks',[]);
             end
 
             % Collect blocks in AOI

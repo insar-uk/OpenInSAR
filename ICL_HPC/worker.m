@@ -150,7 +150,7 @@ while true
                 disp(OI.Functions.struct2xml(errStruct).to_string())
 
                 % write the error to a file
-                ds = strrep(strrep(datestr(now),':',''),' ','_');
+                ds = strrep(strrep(datestr(now),':',''),' ','_'); %#ok<DATST,TNOW1>
                 fid = fopen(fullfile(postings.postingPath,['error' num2str(J) ds '.txt']),'w');
                 fwrite(fid, OI.Functions.struct2xml(errStruct).to_string());
                 fclose(fid);

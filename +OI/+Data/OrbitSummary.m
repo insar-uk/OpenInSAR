@@ -8,8 +8,9 @@ classdef OrbitSummary < OI.Data.DataObj
 
     methods
         function this = OrbitSummary( varargin )
-            this.hasFile = false;
+            this.hasFile = true;
             this.isUniqueName = false;
+            this.filepath = fullfile( this.filepath, '$id$' );
         end
     end % methods
 
