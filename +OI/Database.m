@@ -43,8 +43,18 @@ classdef Database < handle
                 
                 secrets = fileread( projObj.SECRETS_FILEPATH );
                 secrets = strsplit( secrets, sprintf('\n') ); %#ok<SPRINTFN>
+                
+                secrets = secrets(~cellfun(@isempty,secrets)); % Ignore empty lines.
+
                 for i = 1:length(secrets)
                     kv = strsplit( secrets{i}, '=' );
+                    if numel(kv)<2
+                        warning('While loading your project, there was an unexpected line in the secrets file.\nLine %i in secrets file is not a valid key value pair\nFormat should be:\n\texampleUsernameVariable=exampleUsername\nThe line has been ignored.',i)
+                        continue
+                    elseif numel(kv)>2
+                        % '=' in username/password, undo the strsplit
+                        kv{2}=strjoin(kv(2:end),'=');
+                    end
                     this.add( strtrim(kv{2}), strtrim(kv{1}) );
                 end
             else

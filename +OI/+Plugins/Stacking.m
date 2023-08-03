@@ -63,6 +63,8 @@ methods
                 OI.Data.Datetime( visitDatenums{referenceTrackInd}(bestVisit) );
             reference.safeInds = ...
                 visitsForEachTrack{referenceTrackInd}{bestVisit};
+            reference.safeMeta = ...
+                preprocessingInfo.metadata(reference.safeInds(1));
 
             % get all the useful data segments/bursts in this reference.
             segCount = 0;
@@ -179,7 +181,7 @@ methods
             end
             stack.segmentCount = segCount;
             stack.visits = theseVisits;
-            stack.cat = cat;
+            % stack.cat = cat;
             
             if ~isstruct( this.outputs{1}.stack ) || ... 
                 isempty( fieldnames( this.outputs{1}.stack ) ) 

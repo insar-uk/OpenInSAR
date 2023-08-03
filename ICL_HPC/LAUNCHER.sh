@@ -3,7 +3,7 @@ scriptPath=$(realpath $(pwd))
 nCpus=4;
 nJ=${1:-99} # use first arg or default to 99
 nMem=16;
-nHour=1;
+nHour=3;
 nMin=55;
 
 matScript='worker'

@@ -315,6 +315,7 @@ function this = run_first_and_last( this, engine, stacks, cat, preprocessingInfo
     BLOCK_SIZE = projObj.BLOCK_SIZE; % in meters, square area.
 
     allDone = true;
+    jobCount = 0;
     for trackInd = 1:numel(stacks.stack)
     for refSegInd = stacks.stack(trackInd).reference.segments.index
         % get safe ind
@@ -377,10 +378,12 @@ function this = run_first_and_last( this, engine, stacks, cat, preprocessingInfo
                     allDone = false;
                     % requeue the job
                     engine.ui.log('debug','Requeuing %i %i\n',trackInd, refSegInd)
-                    engine.requeue_job( ...
-                                'trackIndex',trackInd, ...
-                                'referenceSegmentIndex', refSegInd, ...
-                                'blocks', thisGroupsBlocks);
+                    jobCount = jobCount+1;
+                    engine.requeue_job_at_index( ...
+                        jobCount, ...
+                        'trackIndex',trackInd, ...
+                        'referenceSegmentIndex', refSegInd, ...
+                        'blocks', thisGroupsBlocks);
                 end
             end % polarisation
         end % group of blocks

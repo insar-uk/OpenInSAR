@@ -70,9 +70,11 @@ methods
                 existing = engine.database.fetch( metadataName );
                 % if no metadata, add a job to generate them:
                 if isempty(existing)
-                    engine.requeue_job('platform', safePlatform, ...
-                        'datetime', safeDatetime.datenum());
                     jobsAdded = jobsAdded + 1;
+                    engine.requeue_job_at_index(jobsAdded, ...
+                        'platform', safePlatform, ...
+                        'datetime', safeDatetime.datenum());
+                    
                 else % add the data to an array, to save later if complete
                     fns = fieldnames(existing);
                     for fn = fns(:)'

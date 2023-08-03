@@ -67,16 +67,23 @@ classdef Postings
         end
 
         % get the next ready worker
-        function J = get_next_worker(obj)
+        function [nextReadyWorker, nextWaitingWorker] = get_next_worker(obj)
+            nextWaitingWorker = 0;
+            nextReadyWorker = 0;
+            alreadyFoundWaitingWorker = false;
             for ii=1:numel(obj.workers)
                 J=obj.workers(ii);
-                if (J>0) && obj.check_ready(J)
-                    % disp(['Worker ' num2str(J) ' is ready.'])
+                [tfReady, tfWaiting]=check_ready(obj,J);
+                if (J>0) && tfReady
+                    nextReadyWorker = J;
                     return
+                end                
+                if tfWaiting && ~alreadyFoundWaitingWorker
+                    nextWaitingWorker=J;
+                    alreadyFoundWaitingWorker = true;
                 end
-                % disp([ num2str(ii) ' _ Worker ' num2str(J)  ' not ready '])
+                % else not ready and not waiting
             end
-            J=0;
         end
         
         function obj=report_ready(obj,J)
@@ -142,8 +149,10 @@ classdef Postings
             fclose(fid);
         end
         
-        function TF=check_ready(obj,J)
+        function [TF, tfWaiting]=check_ready(obj,J)
             TF=false;
+            tfWaiting=false;
+
             myPosting=obj.get_posting_filepath(J);
             if ~exist(myPosting,'file') % if I haven't filed for a job
                 return
@@ -159,8 +168,15 @@ classdef Postings
             
             if strcmp(line,'READY')
                 TF=true;
-                return; % Empty. I asked for a job and havent got one yet.
+                return; % I asked for a job and havent got one yet.
             end
+
+            if numel(line)>8 && strcmpi('FINISHED',line(1:8))
+                TF=false;
+                tfWaiting=true;
+                return; % I've finished my job and am waiting for the next one.
+            end
+            
         end
 
         function TF=check_break(obj,J)

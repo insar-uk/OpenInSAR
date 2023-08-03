@@ -3,7 +3,7 @@ classdef BlockBaseline < OI.Data.DataObj
 properties
     % name = 'AsfQueryResults';
     id = 'stack_$STACK$_block_$BLOCK$_baseline_information';
-    generator = 'BlockingBaselineAnalysis';
+    generator = 'BlockBaselineAnalysis';
     STACK;
     BLOCK;
 
@@ -17,6 +17,10 @@ properties
     blockXYZ;
     blockInfo;
     timeSeries;
+    
+    heading;
+    direction;
+    meanIncidenceAngle;
 
 end%properties
 

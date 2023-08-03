@@ -65,7 +65,12 @@ methods
                 'VISIT_INDEX',num2str(visitIndex) );
             coregDataObj = coregDataObj.identify( engine );
             coregData = engine.load( coregDataObj );
-
+            
+            if ~segIndexInCatalogue(visitIndex)
+                % No data available...
+                continue
+            end
+            
             if isempty(coregData)
                 engine.ui.log('warning', ...
                     'No coreged data available! T%i S%i V%i P%s\n', ...
@@ -83,6 +88,13 @@ methods
         % Save the block
         engine.save( blockObj, blockData );
         this.isFinished = true;
+        
+        if ~isfield(blockInfo,'indexInStack')
+            overallIndex = blockInfo.index;
+            blockInfo.indexInStack = ...
+                find(arrayfun(@(x) x.index == overallIndex, ...
+                    blockMap.stacks( this.STACK ).blocks));
+        end
 
         % Save a preview of the block
         OI.Plugins.Blocking.preview_block(projObj, blockInfo, blockData, this.POLARISATION);
@@ -118,6 +130,7 @@ methods
 
         % Do each stack
         allComplete = true;
+        jobCount=0;
         for stackInd = 1:numel( blockMap.stacks )
             stack = stacks.stack(stackInd);
             stackBlockMap = blockMap.stacks(stackInd);
@@ -143,8 +156,10 @@ methods
                     
                     % If file not found, create a job to generate it
                     if isempty(blockInDatabase)
+                        jobCount = jobCount+1;
                         % Create a job to generate the block
-                        engine.requeue_job( ...
+                        engine.requeue_job_at_index( ...
+                            jobCount, ...
                             'BLOCK', blockInd, ...
                             'STACK', stackInd, ...
                             'POLARISATION', POL{1} );
@@ -176,13 +191,11 @@ methods (Static = true)
         sz(3) = size(blockData,3);
 
         % save a preview of the block
-        baddies = sum(isnan(blockData),3);
+        baddies = squeeze(sum(sum(blockData))) == 0;
 
-
-        amp = sum(log(abs(blockData)),3,'omitnan');
-        amp = amp./(sz(3) - baddies); % roundabout way of doing mean
+        amp = sum(log(abs(blockData(:,:,~baddies))),3,'omitnan');
+        amp = amp./(sz(3) - sum(baddies)); % roundabout way of doing mean
         amp(isnan(amp)) = 0;
-
       
         blockExtent = OI.Data.GeographicArea().configure( ...
             'lat', blockInfo.latCorners, ...
@@ -191,7 +204,7 @@ methods (Static = true)
 
         % preview directory
         previewDir = fullfile(projObj.WORK,'preview','block');
-        blockName = sprintf('Stack_%i_%s_block_%i',blockInfo.stackIndex,POL,blockInfo.index);
+        blockName = sprintf('Stack_%i_%s_block_%i',blockInfo.stackIndex,POL,blockInfo.indexInStack);
 
         previewKmlPath = fullfile( previewDir, [blockName '.kml']);
         previewKmlPath = OI.Functions.abspath( previewKmlPath );

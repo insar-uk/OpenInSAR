@@ -33,6 +33,7 @@ classdef Geocoding < OI.Plugins.PluginBase
             if isempty(this.segmentIndex)
                 % check if all the data is in the database
                 allDone = true;
+                jobCount = 0;
                 for trackInd = 1:numel(stacks.stack)
                     if isempty( stacks.stack( trackInd ).reference )
                         continue;
@@ -53,7 +54,9 @@ classdef Geocoding < OI.Plugins.PluginBase
                         this.outputs{1}.value(end+1,:) = [trackInd, segmentInd];
                         % end
                     else
-                        engine.requeue_job( ...
+                        jobCount = jobCount + 1;
+                        engine.requeue_job_at_index( ...
+                            jobCount, ...
                             'trackIndex',trackInd, ...
                             'segmentIndex', segmentInd);
                     end
