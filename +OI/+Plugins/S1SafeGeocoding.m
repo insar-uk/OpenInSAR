@@ -49,9 +49,12 @@ classdef S1SafeGeocoding < OI.Plugins.PluginBase
                     existing = engine.database.fetch(coordName);
                     if isempty(existing)
                         % create a job with the datetime
-                        engine.requeue_job('platform', targetPlatform, ...
-                            'datetime', targetDatetime.datenum());
                         jobsAdded = jobsAdded + 1;
+                        engine.requeue_job_at_index( ...
+                            jobsAdded, ...
+                            'platform', targetPlatform, ...
+                            'datetime', targetDatetime.datenum());
+                        
                     else
                         % add the data to an array
                         fns = fieldnames(existing);

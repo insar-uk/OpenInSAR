@@ -53,6 +53,7 @@ methods
             % get the catalogue
             catalogue = engine.load( OI.Data.Catalogue() );
 
+            jobCount = 0;
             % for each safe in the catalogue
             for ii=1:numel(catalogue.safes)
                 % get the datetime
@@ -66,8 +67,12 @@ methods
                 orbitFile = OI.Data.Orbit().find(targetPlatform, targetDatetime, orbitFiles);
 
                 if isempty( orbitFile )
+                    jobCount = jobCount+1;
                     % create a job with the date and platform
-                    engine.requeue_job('datetime', targetDatetime.datenum(), 'platform', targetPlatform);
+                    engine.requeue_job_at_index( ...
+                        jobCount, ...
+                        'datetime', targetDatetime.datenum(), ...
+                        'platform', targetPlatform);
                 else
                     % add the orbit file to the catalogue
                     catalogue.safes{ii}.orbitFile = orbitFile;
@@ -77,9 +82,9 @@ methods
             end
 
             % check if any safe is missing an orbit file
-            hasOrbitForSafe = cellfun(@(x) ~isempty(x.orbitFile), catalogue.safes);
+            %hasOrbitForSafe = cellfun(@(x) ~isempty(x.orbitFile), catalogue.safes);
 
-            if ~all(hasOrbitForSafe)
+            if jobCount
                 % requeue this job
                 % engine.requeue_job();
                 this.isFinished = false;
@@ -98,7 +103,7 @@ methods
             return
         end
 
-         if ~isa(this.datetime,'OI.Data.Datetime')
+        if ~isa(this.datetime,'OI.Data.Datetime')
             this.datetime=OI.Data.Datetime( this.datetime );
         end
 

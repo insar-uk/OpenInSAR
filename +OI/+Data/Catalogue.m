@@ -51,6 +51,12 @@ methods
         end
     end
 
+    function tf = is_track_index_ascending(this, trackIndex)
+        % check if the track is ascending or descending
+        exampleSafe = this.safes{this.catalogueIndexByTrack(1,trackIndex)};
+        tf = (exampleSafe.direction(1) == 'A');
+    end
+
     function this = get_track_info(this)
         % get the coverage and track numbers
         for ii=this.nSafes:-1:1

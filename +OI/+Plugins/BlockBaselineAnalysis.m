@@ -1,7 +1,7 @@
 classdef BlockBaselineAnalysis < OI.Plugins.PluginBase
     
 properties
-    inputs = {OI.Data.BlockingSummary()}
+    inputs = {OI.Data.BlockMap()}
     outputs = {OI.Data.BlockBaselineSummary()}
     id = 'BlockBaselineAnalysis'
     STACK = []
@@ -47,6 +47,8 @@ methods
 
         % Get the segment addresses and corresponding safes
         segmentInds = stack.correspondence(referenceSegmentIndex,:);
+        segmentInds(segmentInds==0) = []; % skip missing data
+        
         safeInds = stack.segments.safe(segmentInds);
         safeCellArray=cat.safes(safeInds);
 
@@ -153,7 +155,11 @@ methods
         baselineInfo.orbitXYZ = referenceOrbitXYZ;
         baselineInfo.blockXYZ = blockXYZ;
         baselineInfo.blockInfo = blockInfo;
-
+        
+        baselineInfo.heading = referenceSwathMetadata.heading;
+        baselineInfo.direction = preprocessingInfo.metadata( safeIndex ).pass;
+        baselineInfo.meanIncidenceAngle = acosd(dot(blockXYZ./norm(blockXYZ),-sensingVector));
+        
         baselineInfo.timeSeries = timeSeries;
 
         engine.save( baselineInfo );
@@ -171,6 +177,7 @@ methods
         end
 
         % Do each stack
+        jobCount = 0;
         allComplete = true;
         for stackInd = 1:numel( blockMap.stacks )
             % Loop through the list of useful blocks
@@ -184,8 +191,10 @@ methods
                 
                 % If file not found, create a job to generate it
                 if isempty(blockInDatabase)
+                    jobCount = jobCount+1;
                     % Create a job to generate the block
-                    engine.requeue_job( ...
+                    engine.requeue_job_at_index( ...
+                        jobCount, ...
                         'BLOCK', blockInd, ...
                         'STACK', stackInd ...
                     )

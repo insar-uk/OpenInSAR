@@ -28,7 +28,7 @@ methods
 
     function throw_error_if_no_project_loaded(this)
         if isempty(this.database.fetch('project'))
-            error('Please load a project before doing any work.');
+      error('Please load a project before doing any work.');
         end
     end
 
@@ -166,6 +166,35 @@ methods
         this.queue.add_job(job);
     end
 
+    
+    function requeue_job_at_index(this, index, varargin)
+        
+        job = OI.Job(this.currentJob);
+        % concat any new args
+        newArgs = {};
+        nTotalArgs = 0;
+
+        % octave bug, empty cell array is not empty
+        if numel(job.arguments) && isempty(job.arguments{1})
+        else % add the existing job args
+            for existingIndex = 1:length(job.arguments)
+                nTotalArgs = nTotalArgs + 1;
+                newArgs{nTotalArgs} = ... %#ok<AGROW>
+                    job.arguments{existingIndex}; %#ok<AGROW>
+            end
+        end
+
+        % add the new args
+        for newArgIndex = 1:length(varargin)
+            nTotalArgs = nTotalArgs + 1;
+            newArgs{nTotalArgs} = varargin{newArgIndex}; %#ok<AGROW>
+        end
+        if numel(newArgs) > 1
+            job.target = '1'; % target distribution
+        end
+        job.arguments = newArgs;
+        this.queue.add_job(job, index);
+    end
 
     function handle_job_timing(this, jobThatJustFinished, timeJobTook)
         % add the time to the job history

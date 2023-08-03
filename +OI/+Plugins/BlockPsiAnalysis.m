@@ -1,7 +1,7 @@
 classdef BlockPsiAnalysis < OI.Plugins.PluginBase
     
 properties
-    inputs = {OI.Data.BlockingSummary()}
+    inputs = {OI.Data.BlockBaselineSummary()}
     outputs = {OI.Data.BlockPsiSummary()}
     id = 'BlockPsiAnalysis'
     STACK = []
@@ -35,39 +35,56 @@ methods
         thisSegment = blockMap.stacks(this.STACK).blocks( this.BLOCK ).segmentIndex;
         thisReferenceVisit = stack.reference.segments.visit( thisSegment ); %#ok<*NASGU>
 
+        % Find missing data visits
+        missingData = stack.correspondence(thisSegment, :)' == 0;
+        
         % Create the block object template
         blockObj = OI.Data.Block().configure( ...
             'POLARISATION', 'VV', ...
             'STACK',num2str( this.STACK ), ...
             'BLOCK', num2str( this.BLOCK ) ...
             ).identify( engine );
-
-        blockData = engine.load( blockObj );
-
-        if isempty(blockData)
-            % No data for this block
-            return
-        end
-        sz = size(blockData);
-
+        
         % Create data objects
         ampStabObj = OI.Data.BlockResult( blockObj, 'AmplitudeStability' );
         coherenceObj = OI.Data.BlockResult( blockObj, 'Coherence');
         velocityObject = OI.Data.BlockResult( blockObj, 'Velocity' );
         heightErrorObject = OI.Data.BlockResult( blockObj, 'HeightError' );
         
-        if ~heightErrorObject.identify(engine).exist()
-            % Get the time series and baselines
-            baselinesObjectTemplate = OI.Data.BlockBaseline().configure( ...
-                'STACK', num2str(this.STACK), ...
-                'BLOCK', num2str(this.BLOCK) ...
-                ).identify( engine );
-            baselinesObject = engine.load( baselinesObjectTemplate );
+
+        % Get the time series and baselines
+        baselinesObjectTemplate = OI.Data.BlockBaseline().configure( ...
+            'STACK', num2str(this.STACK), ...
+            'BLOCK', num2str(this.BLOCK) ...
+            ).identify( engine );
+        baselinesObject = engine.load( baselinesObjectTemplate );
+
+        if isempty( baselinesObject )
+            return % needs generating
+        end
+
+        if ~heightErrorObject.identify(engine).exists()
+
+            
+            
             timeSeries = baselinesObject.timeSeries(:)';
             kFactors = baselinesObject.k(:)';
 
+            % Load the block data
+            blockData = engine.load( blockObj );
+            
+            if isempty(blockData)
+                % No data for this block
+                return
+            end
+            sz = size(blockData);
+            baddies = squeeze(sum(sum(blockData))) == 0;
+        
             % Get PSC
-            amplitudeStability = OI.Functions.amplitude_stability( abs(blockData) );
+            amplitudeStability = ...
+                OI.Functions.amplitude_stability( ...
+                    abs(blockData(:,:,~baddies)) ...
+                    );
             pscMask = amplitudeStability(:)>3;
             % Save the amplitude stability
             engine.save( ampStabObj, amplitudeStability );
@@ -79,6 +96,10 @@ methods
             mask0s = @(x) OI.Functions.mask0s(x);
             mean_coherence = @(phase2d) mean(abs(sum(normz(phase2d),2)))./size(phase2d,2);
             data2d = reshape(normz(blockData),[],sz(3));
+
+            % Remove missing data
+            data2d = data2d(:,~missingData);
+
             % avfilt = @(I,x,y) imfilter((I),fspecial('average',[x,y]));
 
             % APS
@@ -160,14 +181,21 @@ methods
         
         % Save a preview of the v, C and q
         blockInfo = blockMap.stacks(this.STACK).blocks(this.BLOCK);
-        OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, C, 'Coherence')
-        OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, v .* mask0s(C>.5), 'Velocity')
-        OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, q .* mask0s(C>.5), 'HeightError')
-
+        if baselinesObject.azimuthVector(3) > 0 % ascending
+            OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, flipud(fliplr(C)), 'Coherence') %#ok<FLUDLR>
+            OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, flipud(fliplr(v .* mask0s(C>.5))), 'Velocity') %#ok<FLUDLR>
+            OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, flipud(fliplr(q .* mask0s(C>.5))), 'HeightError') %#ok<FLUDLR>
+        else % descending
+            OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, fliplr(C), 'Coherence')
+            OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, fliplr(v .* mask0s(C>.5)), 'Velocity')
+            OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, fliplr(q .* mask0s(C>.5)), 'HeightError')
+        end
+        
         % Get block lat/;pm
+        overallBlockIndex = blockMap.stacks(this.STACK).blocks( this.BLOCK ).index;
         blockGeocode = OI.Data.BlockGeocodedCoordinates().configure( ...
             'STACK', num2str(this.STACK), ...
-            'BLOCK', num2str(this.BLOCK) ...
+            'BLOCK', num2str(overallBlockIndex) ...
         );
         bg = engine.load(blockGeocode);
         if isempty(bg)
@@ -194,6 +222,8 @@ methods
 
     function this = queue_jobs(this, engine, blockMap)
         allDone = true;
+        jobCount = 0;
+        projObj = engine.load( OI.Data.ProjectDefinition() );
         % Queue up all blocks
         for stackIndex = 1:numel(blockMap.stacks)
             stackBlocks = blockMap.stacks( stackIndex );
@@ -216,9 +246,10 @@ methods
                     % Already done
                     continue
                 end
-
+                jobCount = jobCount+1;
                 allDone = false;
-                engine.requeue_job( ...
+                engine.requeue_job_at_index( ...
+                    jobCount, ...
                     'BLOCK', blockIndex, ...
                     'STACK', stackIndex);
             end
@@ -281,7 +312,7 @@ methods (Static = true)
         end
 
         blockExtent.save_kml_with_image( ...
-            previewKmlPath, fliplr(dataToPreview), cLims);
+            previewKmlPath, dataToPreview, cLims);
     end
 
     function I = grayscale_to_rgb( grayImage, cmap )

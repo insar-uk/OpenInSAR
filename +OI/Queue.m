@@ -26,7 +26,9 @@ methods
                 warning('Oct/Mat use 1 indexing.')
                 idx = 1;
             end
-            this.jobArray = [this.jobArray(1:idx-1) jobObj this.jobArray(idx:end)];
+            this.jobArray = [this.jobArray(1:idx-1), {jobObj}, ...
+                this.jobArray(idx:end)];
+ 
         else
             this.jobArray{end+1} = jobObj;
         end
