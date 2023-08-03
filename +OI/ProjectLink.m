@@ -55,8 +55,8 @@ methods ( Access = private )
         % userPaths('stewl_windows') = '\\rds.imperial.ac.uk\rds\user\saa116\ephemeral\test_2023_06_21.oi';
         % userPaths('saa116_unix') = '../test_2023_06_21.oi';
 
-        userPaths('11915_windows') = '\\rds.imperial.ac.uk\rds\user\ws121\ephemeral\test_2023_06_21.oi';
-        userPaths('ws121_unix') = '../test_2023_06_21.oi';
+        % userPaths('11915_windows') = '\\rds.imperial.ac.uk\rds\user\ws121\ephemeral\test_2023_06_21.oi';
+        % userPaths('ws121_unix') = '../test_2023_06_21.oi';
 
         % Example usage
         if OI.OperatingSystem.isWindows()
