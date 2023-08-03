@@ -46,7 +46,6 @@ classdef Database < handle
                 
                 secrets = secrets(~cellfun(@isempty,secrets)); % Ignore empty lines.
 
-
                 for i = 1:length(secrets)
                     kv = strsplit( secrets{i}, '=' );
                     if numel(kv)<2

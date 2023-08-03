@@ -311,11 +311,16 @@ methods
         end
      
         % Add any outstanding jobs to the queue
-        for jobInd = 1:length(outstandingJobs)
-            this.ui.log('debug', 'Calling LOAD on %s produced %d extra jobs\n Current job is: %s\n', dataObj.id,numel(outstandingJobs),this.currentJob);
-
+        nNewJobs = numel(outstandingJobs);
+        if nNewJobs
+            this.ui.log('debug', ...
+                ['Calling LOAD on %s produced %d extra jobs\n', ...
+                'Current job is: %s\n'], dataObj.id,nNewJobs,this.currentJob);
+        end
+        for jobInd = 1:nNewJobs
+            % Add the job to the queue, in the order they came in.
             this.ui.log('debug', 'Adding job %s to queue\n', outstandingJobs{jobInd}.to_string())
-            this.queue.add_job( outstandingJobs{jobInd} );
+            this.queue.add_job( outstandingJobs{jobInd}, jobInd );
         end
 
         % Remeber to handle empty data in the calling function !!

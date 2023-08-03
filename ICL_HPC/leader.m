@@ -119,8 +119,8 @@ for thingToDo = thingToDoList
                 end
             end
 
-            nextWorker = oi.engine.postings.get_next_worker(); 
-            if nextWorker == 0
+            [nextWorker, nextWorkerWaiting] = oi.engine.postings.get_next_worker(); 
+            if nextWorker == 0 && nextWorkerWaiting == 0
                 nextJob = oi.engine.queue.next_job();
                 if ~isempty(nextJob) && ~isempty(nextJob.target) && nextJob.target
                     % jobs require assignment, but
