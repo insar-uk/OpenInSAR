@@ -18,7 +18,8 @@ fi
 
 # module avail matlab
 # load matlab onto cluster
-module -s load 'matlab/R2021a' #silent mode suppresses nuisance 'error' about requirement
+module load fix_unwriteable_tmp # preload requirement to avoid warning
+module load matlab/R2021a
 
 # find the script directory, go $HOME (tilde '~') then one up ('..'), then navigate to your ICSar script folder
 cd $runPath
