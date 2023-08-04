@@ -17,9 +17,10 @@ methods
 
 
     function this = run(this, engine, varargin)
-
-        this = this.configure(engine, varargin{1});
-
+        if numel(varargin)
+            this = this.configure(engine, varargin{1});
+        end
+        
         if isempty(this.POLARISATION)
             % Check which polarisations are requested
             this = this.get_polarisations(engine);
@@ -56,7 +57,7 @@ methods
         segIndexInReference = blockInfo.segmentIndex;
         stack = stacks.stack(this.STACK);
         segIndexInCatalogue = stack.correspondence(segIndexInReference,:);
-
+        
         for visitIndex = 1:numel(segIndexInCatalogue)
             coregDataObj = OI.Data.CoregisteredSegment().configure( ...
                 'POLARIZATION', this.POLARISATION, ...
@@ -95,9 +96,12 @@ methods
                 find(arrayfun(@(x) x.index == overallIndex, ...
                     blockMap.stacks( this.STACK ).blocks));
         end
-
+        
+        safeInd = cat.catalogueIndexByTrack(1,this.STACK);
+        direction = cat.safes{safeInd}.direction; % ascending or desc
+        
         % Save a preview of the block
-        OI.Plugins.Blocking.preview_block(projObj, blockInfo, blockData, this.POLARISATION);
+        OI.Plugins.Blocking.preview_block(projObj, blockInfo, blockData, this.POLARISATION, direction);
 
     end % run
 
@@ -185,7 +189,7 @@ methods (Static = true)
         tf = any( all(polInSafe == pol,2) );
     end
 
-    function previewKmlPath = preview_block(projObj, blockInfo, blockData, POL)
+    function previewKmlPath = preview_block(projObj, blockInfo, blockData, POL, direction)
         % get the block extent
         sz = blockInfo.size;
         sz(3) = size(blockData,3);
@@ -196,6 +200,10 @@ methods (Static = true)
         amp = sum(log(abs(blockData(:,:,~baddies))),3,'omitnan');
         amp = amp./(sz(3) - sum(baddies)); % roundabout way of doing mean
         amp(isnan(amp)) = 0;
+        
+        if strcmpi(direction,'ASCENDING')
+            amp = flipud(fliplr(amp));
+        end
       
         blockExtent = OI.Data.GeographicArea().configure( ...
             'lat', blockInfo.latCorners, ...

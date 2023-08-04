@@ -93,52 +93,59 @@ methods
             qToPhase = @(q) exp(1i.*q.*kFactors);
             vToPhase = @(v) exp(1i.*v.*timeSeries);
             normz = @(x) x./abs(x);
-            mask0s = @(x) OI.Functions.mask0s(x);
             mean_coherence = @(phase2d) mean(abs(sum(normz(phase2d),2)))./size(phase2d,2);
-            data2d = reshape(normz(blockData),[],sz(3));
+            blockData = reshape(blockData,[],sz(3));
+            blockData = normz(blockData);
 
             % Remove missing data
-            data2d = data2d(:,~missingData);
+            blockData = blockData(:,~missingData);
 
             % avfilt = @(I,x,y) imfilter((I),fspecial('average',[x,y]));
 
             % APS
-            pscCm = data2d(pscMask,:)'*data2d(pscMask,:);
+            fprintf(1,'Number of PSC: ',sum(pscMask(:)))
+            pscCm = blockData(pscMask,:)'*blockData(pscMask,:);
             [eVec, eVal] = eig(pscCm);
             [~, bestPairIndex] = max(diag(eVal));
-            aps = eVec(:,bestPairIndex).';
+            aps = normz(eVec(:,bestPairIndex).');
 
-            % height error
-            data_residual = data2d.*aps;
-            [Cq, q, qi] = OI.Functions.invert_height(data_residual,kFactors); %#ok<*ASGLU>
+            % Height error: remove aps
+            blockData = blockData.*aps;
+            [Cq, q0, qi] = OI.Functions.invert_height(blockData,kFactors); %#ok<*ASGLU>
             
-            % velocity
-            data_residual = normz(data2d.*aps.*qToPhase(q));
-            [Cv,v] = OI.Functions.invert_velocity(data_residual,timeSeries);
-
+            % Velocity: remove q, aps already removed
+            blockData = blockData.*qToPhase(q0);
+            [Cv,v0] = OI.Functions.invert_velocity(blockData,timeSeries);
+            % remove velocity
+            blockData = blockData.*vToPhase(v0);
             % q, v, and aps now form our initial model
             % lets improve each in turn
             psMask = Cv>.75;
 
-            % APS
-            psResidual = data_residual(psMask,:).*conj(aps);
+            % APS residual
+            psResidual = blockData(psMask,:);
             psCm = psResidual'*psResidual;
             [eVec, eVal] = eig(psCm);
             [~, bestPairIndex] = max(diag(eVal));
-            aps = eVec(:,bestPairIndex).';
-            data_residual = data2d.*aps.*qToPhase(q).*vToPhase(v);
+            apsResidual = normz(eVec(:,bestPairIndex).');
+            blockData = blockData.*apsResidual;
 
-            % Height
-            data_residual = data_residual.*qToPhase(-q);
-            [Cq, q, qi] = OI.Functions.invert_height(data_residual,kFactors);
-            data_residual = data_residual.*qToPhase(q);
+            % Add height back on and reestimate
+            blockData = blockData.*qToPhase(-q0);
+            [Cq, q, qi] = OI.Functions.invert_height(blockData,kFactors);
+            blockData = blockData.*qToPhase(q);
 
-            % Velocity
-            data_residual = data_residual.*vToPhase(-v);
-            [Cv,v] = OI.Functions.invert_velocity(data_residual,timeSeries);
-            data_residual = data_residual.*vToPhase(v);
+            % Add velocity back on and reestimate
+            blockData = blockData.*vToPhase(-v0);
+            [Cv,v] = OI.Functions.invert_velocity(blockData,timeSeries);
 
-            fprintf(1,'Mean coherence after constant aps analysis: %.3f\n',mean_coherence(data_residual))
+            % Add all the errors back on, and save the raw phase of the highly coherent points.
+            blockData = blockData.*qToPhase(-q).*vToPhase(-v0).*conj(aps).*conj(apsResidual);
+            blockData = blockData(Cv>.5,:);
+            psPhaseObject = OI.Data.BlockResult( blockObj, 'InitialPsPhase' );
+            engine.save( psPhaseObject, blockData );
+
+            fprintf(1,'Mean coherence after constant aps analysis: %.3f\n',mean_coherence(blockData))
             
             % % Lets improve the aps by spatial filtering
             % for iteration = 1:3
@@ -180,11 +187,21 @@ methods
         
         
         % Save a preview of the v, C and q
+        mask0s = @(x) OI.Functions.mask0s(x);
         blockInfo = blockMap.stacks(this.STACK).blocks(this.BLOCK);
+
+        % Fix for legacy blockInfo which missed this field
+        if ~isfield(blockInfo,'indexInStack')
+            overallIndex = blockInfo.index;
+            blockInfo.indexInStack = ...
+                find(arrayfun(@(x) x.index == overallIndex, ...
+                    blockMap.stacks( this.STACK ).blocks));
+        end
+
         if baselinesObject.azimuthVector(3) > 0 % ascending
-            OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, flipud(fliplr(C)), 'Coherence') %#ok<FLUDLR>
-            OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, flipud(fliplr(v .* mask0s(C>.5))), 'Velocity') %#ok<FLUDLR>
-            OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, flipud(fliplr(q .* mask0s(C>.5))), 'HeightError') %#ok<FLUDLR>
+            OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, flipud(C), 'Coherence') %#ok<FLUDLR>
+            OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, flipud(v .* mask0s(C>.5)), 'Velocity') %#ok<FLUDLR>
+            OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, flipud(q .* mask0s(C>.5)), 'HeightError') %#ok<FLUDLR>
         else % descending
             OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, fliplr(C), 'Coherence')
             OI.Plugins.BlockPsiAnalysis.preview_block(projObj, blockInfo, fliplr(v .* mask0s(C>.5)), 'Velocity')
@@ -234,14 +251,14 @@ methods
                     'STACK',num2str( stackIndex ), ...
                     'BLOCK', num2str( blockIndex ) ...
                     );
-                coherenceObj = OI.Data.BlockResult(blockObj, 'Coherence').identify( engine );
+                resultObj = OI.Data.BlockResult(blockObj, 'InitialPsPhase').identify( engine );
 
                 % Create a shapefile of the block
                 blockName = sprintf('Stack_%i_block_%i',stackIndex,blockIndex);
                 blockFilePath = fullfile( projObj.WORK, 'shapefiles', this.id, blockName);
 
                 % Check if the block is already done
-                priorObj = engine.database.find( coherenceObj );
+                priorObj = engine.database.find( resultObj );
                 if ~isempty(priorObj) && exist(blockFilePath,'file')
                     % Already done
                     continue
@@ -277,14 +294,19 @@ methods (Static = true)
         % get the block extent
         sz = blockInfo.size;
         dataToPreview = reshape(dataToPreview, sz(1), sz(2), []);
-
+        
+        if nargin < 5
+            cLims = [0 1];
+        end
         
         switch dataCategory
             case 'Coherence'
                 imageColormap = gray(256);
-            % case 'Velocity'
+            case 'Velocity'
+                clims = [-1 1] * 0.01; % typical vals
             %     jet = imageColormap;
-            % case 'HeightError'
+            case 'HeightError'
+                clims = [-1 1] * 80; % typical vals
             %     jet = imageColormap;
             otherwise
                 imageColormap = jet(256);
@@ -301,15 +323,13 @@ methods (Static = true)
 
         % preview directory
         previewDir = fullfile(projObj.WORK,'preview','block', dataCategory);
-        blockName = sprintf('%s_stack_%i_block_%i',dataCategory, blockInfo.stackIndex, blockInfo.index);
+        blockName = sprintf('%s_stack_%i_block_%i',dataCategory, blockInfo.stackIndex, blockInfo.indexInStack);
 
         previewKmlPath = fullfile( previewDir, [blockName '.kml']);
         previewKmlPath = OI.Functions.abspath( previewKmlPath );
         OI.Functions.mkdirs( previewKmlPath );
         % save the preview
-        if nargin < 5
-            cLims = [0 1];
-        end
+
 
         blockExtent.save_kml_with_image( ...
             previewKmlPath, dataToPreview, cLims);
