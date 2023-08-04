@@ -188,10 +188,11 @@ methods
                 names.(jn) = 1;
             end
         end
-        fprintf(1,'Queue overview as of %s:\n',datestr(now())); %#ok<TNOW1,DATST>
+        
         if this.length() == 0
-            fprintf(1,'Empty.');
+            fprintf(1,'Queue is currently empty.\n');
         else
+            fprintf(1,'Queue overview as of %s:\n',datestr(now())); %#ok<TNOW1,DATST>
             disp(names)
         end
 

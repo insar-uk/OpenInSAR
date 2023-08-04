@@ -1,7 +1,10 @@
 
-    function I = grayscale_to_rgb( grayImage, cmap )
-        minValue = double(min(grayImage(:)));
-        maxValue = double(max(grayImage(:)));
+    function I = grayscale_to_rgb( grayImage, cmap, crange )
+        if nargin == 2
+            crange = [min(grayImage(:)), max(grayImage(:))];
+        end
+        minValue = double(crange(1));
+        maxValue = double(crange(2));
         normalized_array = (grayImage - minValue) / (maxValue - minValue);
         
         % Get the colormap and rescale it to match the grayscale image limits

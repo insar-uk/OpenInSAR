@@ -47,6 +47,7 @@ methods
         for stackInd = 1:numel( stitchInfo.stack )
             segmentsInStack = stitchInfo.stack( stackInd ).segments;
             blocksInStack = [];
+            blockCountInStack = 0;
             for segmentInd = 1:numel( segmentsInStack )
                 engine.ui.log('info','Breaking segment %i of %i in stack %i into blocks\n', segmentInd, numel( segmentsInStack ), stackInd);
                 thisSeg = segmentsInStack(segmentInd);
@@ -99,8 +100,10 @@ methods
                     for ri = 1:nBlocksRg
                         ii = (ai-1)*nBlocksRg + ri;
                         blockCount = blockCount + 1;
+                        blockCountInStack = blockCountInStack+1;
 
                         blocks(ii).indexInSegment = ii;
+                        blocks(ii).indexInStack = blockCountInStack;
                         blocks(ii).index = blockCount;
                         blocks(ii).segmentIndex = segmentInd;
                         blocks(ii).stackIndex = stackInd;
@@ -190,7 +193,8 @@ methods
                 mAz=max(mAz,blocksInStack(ii).azOutputEnd);
                 mRg=max(mRg,blocksInStack(ii).rgOutputEnd);
                 end
-                blockMapArray=zeros(mAz,mRg);
+                % Uint16 save memory. Likely to have more than 2^8, unlikely to have more than 2^16.
+                blockMapArray=zeros(mAz,mRg,'uint16');
                 for ii=1:numel(blocksInStack)
                 blockMapArray(blocksInStack(ii).azOutputStart:blocksInStack(ii).azOutputEnd,blocksInStack(ii).rgOutputStart:blocksInStack(ii).rgOutputEnd)=ii;
                 end

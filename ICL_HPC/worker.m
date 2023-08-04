@@ -175,10 +175,15 @@ while true
 
         if oi.engine.plugin.isFinished
             if dbSize < numel(oi.engine.database.data)
-                % convert the database additions to xml
-                resultAsStruct = OI.Functions.obj2struct( oi.engine.database.data{end} );
-                resultAsXmlString = OI.Functions.struct2xml( resultAsStruct ).to_string();
-                answer = resultAsXmlString;
+                lastEntry = oi.engine.database.data{end};
+                if ~lastEntry.hasFile
+                    % convert the database additions to xml
+                    resultAsStruct = OI.Functions.obj2struct(  );
+                    resultAsXmlString = OI.Functions.struct2xml( resultAsStruct ).to_string();
+                    answer = resultAsXmlString;
+                else
+                    answer = '';
+                end
                 postings.report_done(J, answer);
             end
         end
