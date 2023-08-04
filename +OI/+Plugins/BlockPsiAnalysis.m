@@ -50,6 +50,7 @@ methods
         coherenceObj = OI.Data.BlockResult( blockObj, 'Coherence');
         velocityObject = OI.Data.BlockResult( blockObj, 'Velocity' );
         heightErrorObject = OI.Data.BlockResult( blockObj, 'HeightError' );
+        psPhaseObject = OI.Data.BlockResult( blockObj, 'InitialPsPhase' );
         
 
         % Get the time series and baselines
@@ -63,7 +64,7 @@ methods
             return % needs generating
         end
 
-        if ~heightErrorObject.identify(engine).exists()
+        if ~psPhaseObject.identify(engine).exists()
 
             
             
@@ -245,11 +246,18 @@ methods
         for stackIndex = 1:numel(blockMap.stacks)
             stackBlocks = blockMap.stacks( stackIndex );
             for blockIndex = stackBlocks.usefulBlockIndices(:)'
+                blockInfo = stackBlocks.blocks( blockIndex );
+                if ~isfield(blockInfo,'indexInStack')
+                    overallIndex = blockInfo.index;
+                    blockInfo.indexInStack = ...
+                        find(arrayfun(@(x) x.index == overallIndex, ...
+                            blockMap.stacks( stackIndex ).blocks));
+                end
                 
                 % Create the block object template
                 blockObj = OI.Data.Block().configure( ...
                     'STACK',num2str( stackIndex ), ...
-                    'BLOCK', num2str( blockIndex ) ...
+                    'BLOCK', num2str( blockInfo.indexInStack ) ...
                     );
                 resultObj = OI.Data.BlockResult(blockObj, 'InitialPsPhase').identify( engine );
 
@@ -298,7 +306,8 @@ methods (Static = true)
         if nargin < 5
             cLims = [0 1];
         end
-        
+                        imageColormap = jet(256);
+                imageColormap(1,:) = [0 0 0];
         switch dataCategory
             case 'Coherence'
                 imageColormap = gray(256);
@@ -309,11 +318,10 @@ methods (Static = true)
                 clims = [-1 1] * 80; % typical vals
             %     jet = imageColormap;
             otherwise
-                imageColormap = jet(256);
-                imageColormap(1,:) = [0 0 0];
+
         end
 
-        dataToPreview = OI.Functions.grayscale_to_rgb(dataToPreview, imageColormap);
+        dataToPreview = OI.Functions.grayscale_to_rgb(dataToPreview, imageColormap, cLims);
 
       
         blockExtent = OI.Data.GeographicArea().configure( ...
