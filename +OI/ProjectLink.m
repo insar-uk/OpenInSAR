@@ -1,6 +1,6 @@
 classdef ProjectLink
 
-properties 
+properties
     projectPath = ''
     projectLink = 'CurrentProject.xml'
 end
@@ -26,7 +26,7 @@ methods
             'Or provide a path to a project link file\n%s' ...
             ], this.projectLink, this.get_help_text() );
         end
-        this = debugging_projects(this);
+        this = this.debugging_projects();
         if ~isempty(this.projectPath)
             this = this.resolve_relative_path();
         else
@@ -59,10 +59,10 @@ methods ( Access = private )
         userPaths('ws121_unix') = '../test_2023_06_21.oi';
 
         % Example usage
-        if OI.OperatingSystem.isWindows()
+        if OI.OperatingSystem.isWindows
             OS = 'windows';
             user = getenv('USERNAME');
-        elseif OI.OperatingSystem.isUnix()
+        elseif OI.OperatingSystem.isUnix
             OS = 'unix';
             user = getenv('USER');
         end
@@ -116,7 +116,7 @@ methods ( Access = private )
 
     function this = check_project_file_exists(this)
         isProjectFileAvailable = exist(this.projectPath,'file');
-        assert( isProjectFileAvailable, 'Project file not found: %s', this.projectPath )
+        assert( isProjectFileAvailable~=0, sprintf('Project file not found: %s', this.projectPath))
     end % check_project_file_exists
 
     function this = resolve_os_specific_path( this )
@@ -131,7 +131,7 @@ methods ( Access = private )
         end
     end % resolve_os_specific_path
 
-    function this = resolve_unix_path(this)   
+    function this = resolve_unix_path(this)
         % Platform specific path
         try
             this.projectPath = curProjStruct.unix_path;
