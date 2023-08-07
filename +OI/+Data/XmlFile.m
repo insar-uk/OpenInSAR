@@ -230,9 +230,14 @@ methods
     function root = to_struct(this)
 
         eleStruct = this.get_ele_struct();
-        eleStruct = eleStruct.ele;    
+        eleStruct = eleStruct.ele;
         % get the parents using arrayfun
-        parents = arrayfun(@(x) x.parent_, eleStruct);
+        if OI.Compatibility.isOctave
+            parents = [eleStruct.parent_]';
+        else
+            parents = arrayfun(@(x) x.parent_, eleStruct);
+        end
+
         childrenCellArray = cell(numel(eleStruct), 1);
         % loop through the elements, assign kids to parents
         for i = 1:numel(eleStruct)
@@ -248,9 +253,9 @@ methods
         root = OI.Data.XmlFile.to_nodestruct(eleStruct,childrenCellArray,1);
 
         % elements = eleStruct.ele;
-        % 
+        %
         % root = struct();
-        % 
+        %
         % % start with the first element.s
         % % create a struct for it
         % startInd = 1;
@@ -258,31 +263,31 @@ methods
         % parents = arrayfun(@(x) x.parent_,elements);
         % tags = arrayfun(@(x) x.tag_,eleStruct.ele,'UniformOutput',0);
         % depths = arrayfun(@(x) x.depth_,elements);
-        % 
+        %
         % % find any elements that have this as a parent.
         % thisChildren = find(parents == startInd);
-        % 
+        %
         % % while there are unassigned eles
         % unassigned = true(1,numel(elements));
-        % 
+        %
         % while any(unassigned)
         %     % get the max depth of unassigned eles
         %     maxDepth = max(depths(unassigned));
-        % 
+        %
         %     % get the unassigned eles at this depth
         %     theseEles = find(unassigned & depths == maxDepth);
-        % 
+        %
         %     % determine how many individual parents there are
         %     theseParents = parents(theseEles);
         %     uniqueParents = unique(theseParents);
         %     nUniqueParents = numel(uniqueParents);
-        % 
+        %
         %     % for each parent
         %     for ii = 1:nUniqueParents
             %     % get the eles that have this parent
             %     thisParent = uniqueParents(ii);
             %     thisParentEles = theseEles(theseParents == thisParent);
-        % 
+        %
             %     % get the parent tag
             %     thisParentTag = tags{thisParent};
             %     % assign each child of this unique parent
@@ -296,7 +301,7 @@ methods
             %     end
         %     end
         % end
-        % 
+        %
 
 % parents = arrayfun(@(x) x.parent_,eleStruct.ele);
 % tagStr = arrayfun(@(x) x.tag_,eleStruct.ele,'UniformOutput',0);
@@ -305,11 +310,11 @@ methods
 %         % THIS METHOD FAILS BECAUSE OF NESTED NON_SCALAR STRUCTURES:
 %         % fundamentally it tries to build the bottom generation up
 %         % but we build one layer at a time
-%         % and the connections from a bottom layer might be to different 
+%         % and the connections from a bottom layer might be to different
 %         % root elements several layers up.
 %         % so we cant relate 10 greatgrandchildren named sarah to 10
 %         % individual seperate greatgrandparents named Tony because we only
-%         % have access to the layer above, and not the greatgrandparents 
+%         % have access to the layer above, and not the greatgrandparents
 %         % generation
 %         tags = this.get_tags( eleStruct );
 %         occurance = this.get_multiplicity( tags );
@@ -348,7 +353,7 @@ methods
 %             case 'product' % trim S1 xml so we dont have to write product every time
 %                 root = branches.product;
 %             end
-%         end 
+%         end
 
     end
 
@@ -721,14 +726,18 @@ methods (Static = true)
         if (nargin < 3)
             index = 1;
         end
-    
+
         root = struct();
-    
+
         % get the child elements
         childEleInds = childrenCellArray{index};
         childEles = elementStructArray(childEleInds);
         % get the tag_ fields using arrayfun
-        tags = arrayfun(@(x) x.tag_, childEles, 'UniformOutput', false);
+        if OI.Compatibility.isOctave
+            tags = {childEles.tag_};
+        else
+            tags = arrayfun(@(x) x.tag_, childEles, 'UniformOutput', false);
+        end
         % identify any duplicate tags and get a logical mask
         [uniqueTags, ~, tagInds] = unique(tags);
         tagIndsThatAreDupes = find(histc(tagInds, 1:numel(uniqueTags)) > 1);
@@ -737,24 +746,24 @@ methods (Static = true)
         % a 1 in the matrix means that the tag is a duplicate corresponding
         % to the column number
         dupeMatrix = tagInds == tagIndsThatAreDupes(:)';
-    
+
         % is a dupe:
         isDupe = any(dupeMatrix, 2);
         % occurance
         numberOfTimesTagHasBeenUsed = cumsum(dupeMatrix);
         % The occurrence of a tag refers to how many times it has appeared among
         % the child elements of a parent element. When a tag is a duplicate, its
-        % occurrence count is incremented by 1 for each preceding duplicate, 
+        % occurrence count is incremented by 1 for each preceding duplicate,
         % enabling unique indexing of duplicates.
         tagMultiplicity = ones(size(tags));
         tagMultiplicity(isDupe) = numberOfTimesTagHasBeenUsed(isDupe);
-    
+
         for childInd = 1:numel(childEleInds)
             % get the index of the child element
             k = childEleInds(childInd);
             % get the tag occurance
             thisOne = tagMultiplicity(childInd);
-    
+
             % if the element has no children, add the data to the struct
             % if the element is a leaf, add the data to the struct
             if isempty(childrenCellArray{k})
@@ -773,7 +782,7 @@ methods (Static = true)
                     elseif contains(attr,'array')
                         if thisOne == 1
                             root.(elementStructArray(k).tag_) = ...
-                                str2num(elementStructArray(k).value_); 
+                                str2num(elementStructArray(k).value_);
                         else
                             warning('debug this 2')
                             root.(elementStructArray(k).tag_){thisOne} = ...

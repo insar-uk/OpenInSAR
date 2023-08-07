@@ -156,6 +156,25 @@ classdef DEM < OI.Data.DataObj
             end
             tileData = fread(fid, [3601,3601], 'int16=>int16');
             fclose(fid);
+            
+            % Get coordinates from filename
+            extent = OI.Data.DEM.srtm1_tile_extent(filename);
+            latAxis=linspace(extent.south(),extent.north(),3601);
+            lonAxis=linspace(extent.west(),extent.east(),3601);
+            [lon, lat] = meshgrid(latAxis,lonAxis);
+
+            % Calculate geoid undulation (mean sea level) at coordinates
+            geoidAtExtentBoundaries = geoidheight(extent.lat, extent.lon, 'EGM96');
+
+            % Fit a 2d linear polynomial to the geoid undulation at the extent
+            nSamples = numel(geoidAtExtentBoundaries(:));
+            geoidFitCoefficients = [extent.lat(:), extent.lon(:), ones(nSamples,1)] \ geoidAtExtentBoundaries(:);
+
+            % Interpolate the geoid undulation on the grid
+            geoidAtGrid = [lat(:), lon(:), ones(numel(lat),1)] * geoidFitCoefficients;
+
+            % Remove geoid undulation (mean sea level) from elevation data
+            tileData = tileData - int16(geoidAtGrid); % [m] 
         end
     end % methods (Static = true)
 

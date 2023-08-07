@@ -18,6 +18,22 @@ methods
         maxLon = max(this.lon);
     end
 
+    function n = north(this)
+        n = max(this.lat);
+    end
+
+    function s = south(this)
+        s = min(this.lat);
+    end
+
+    function e = east(this)
+        e = max(this.lon);
+    end
+
+    function w = west(this)
+        w = min(this.lon);
+    end
+
     function to_kml(this, filename)
         % Save the polygon as a kml file
 
@@ -131,7 +147,7 @@ methods
         end
     end
 
-    function save_kml_with_image( this, filepath, imgData, cLims )
+    function save_kml_with_image( this, filepath, imgData, cLims, imgSize )
         % kml requires a specific poly order
         % [this, rotation, newOrder] = this.make_counter_clockwise();
         % % if the rotation is not zero, rotate the image
@@ -140,14 +156,23 @@ methods
         % end
 
         % write the image to a file
+        if length(filepath)<4 || ~strcmpi(filepath(end-3:end),'.kml')
+            filepath = [filepath '.kml'];
+        end
+        
         imgPath = strrep(filepath, '.kml', '.jpeg');
         OI.Functions.mkdirs(imgPath);
-        if nargin < 4 % no lims provided, jyst normalise
+        if nargin < 4 || isempty(cLims) % no lims provided, jyst normalise
             
         else
             imgData(imgData<cLims(1)) = cLims(1);
             imgData(imgData>cLims(2)) = cLims(2);
         end
+        
+        if nargin>4 && ~isempty(imgSize)
+            imgData = imresize(imgData,[512,512]);
+        end
+        
         OI.Functions.imwrite(imgData, imgPath, true);
 
         kml = OI.Data.Kml();
