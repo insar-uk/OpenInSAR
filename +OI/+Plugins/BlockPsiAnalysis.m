@@ -298,7 +298,7 @@ end % methods
 
 
 methods (Static = true)
-    function previewKmlPath = preview_block(projObj, blockInfo, dataToPreview, dataCategory, cLims)
+    function previewKmlPath = preview_block(projObj, blockInfo, dataToPreview, dataCategoryzz)
         % get the block extent
         sz = blockInfo.size;
         dataToPreview = reshape(dataToPreview, sz(1), sz(2), []);
@@ -306,8 +306,10 @@ methods (Static = true)
         if nargin < 5
             cLims = [0 1];
         end
-                        imageColormap = jet(256);
-                imageColormap(1,:) = [0 0 0];
+
+        imageColormap = jet(256);
+        imageColormap(1,:) = [0 0 0];
+
         switch dataCategory
             case 'Coherence'
                 imageColormap = gray(256);
@@ -320,9 +322,7 @@ methods (Static = true)
             otherwise
 
         end
-
-        dataToPreview = OI.Functions.grayscale_to_rgb(dataToPreview, imageColormap, cLims);
-
+        dataToPreview = OI.Functions.grayscale_to_rgb(dataToPreview, imageColormap);
       
         blockExtent = OI.Data.GeographicArea().configure( ...
             'lat', blockInfo.latCorners, ...
@@ -336,9 +336,8 @@ methods (Static = true)
         previewKmlPath = fullfile( previewDir, [blockName '.kml']);
         previewKmlPath = OI.Functions.abspath( previewKmlPath );
         OI.Functions.mkdirs( previewKmlPath );
-        % save the preview
 
-
+        % save the preview kml
         blockExtent.save_kml_with_image( ...
             previewKmlPath, dataToPreview, cLims);
     end
