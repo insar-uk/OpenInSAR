@@ -202,7 +202,7 @@ methods (Static = true)
         amp(isnan(amp)) = 0;
         
         if strcmpi(direction,'ASCENDING')
-            amp = flipud(fliplr(amp));
+            amp = flipud(fliplr(amp)); %# ok
         end
       
         blockExtent = OI.Data.GeographicArea().configure( ...

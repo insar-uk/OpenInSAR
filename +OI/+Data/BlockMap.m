@@ -147,7 +147,7 @@ classdef BlockMap < OI.Data.DataObj
                     kmlFilename = ['Block_map_stack_' num2str(si)];
                     kmlPath = fullfile(kmlDir,kmlFilename);
                     kmlPath = OI.Functions.abspath( kmlPath );
-                    kmlPath = [kmlPath '.kml'];
+                    kmlPath = [kmlPath '.kml']; %#ok<AGROW>
 
                     OI.Functions.mkdirs( kmlPath );
 

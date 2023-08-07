@@ -187,33 +187,36 @@ methods
 
                 % Add these blocks to the output
                 blocksInStack = [blocksInStack(:); blocks(:);] ;
-                % bb = [bb(:);blocks(:)];
-                mAz=0;mRg=0;
-                for ii=1:numel(blocksInStack)
-                mAz=max(mAz,blocksInStack(ii).azOutputEnd);
-                mRg=max(mRg,blocksInStack(ii).rgOutputEnd);
-                end
-                % Uint16 save memory. Likely to have more than 2^8, unlikely to have more than 2^16.
-                blockMapArray=zeros(mAz,mRg,'uint16');
-                for ii=1:numel(blocksInStack)
-                blockMapArray(blocksInStack(ii).azOutputStart:blocksInStack(ii).azOutputEnd,blocksInStack(ii).rgOutputStart:blocksInStack(ii).rgOutputEnd)=ii;
-                end
-                % figure(808);clf;
-                % imagesc(blockMapArray)
-                % drawnow()
-                % title(sprintf('Stack %i seg %i',stackInd,segmentInd));
+                
+                % % For map array. No longer needed.
+                % mAz=0;mRg=0;
+                % for ii=1:numel(blocksInStack)
+                % mAz=max(mAz,blocksInStack(ii).azOutputEnd);
+                % mRg=max(mRg,blocksInStack(ii).rgOutputEnd);
+                % end
+
+                % %% Handle this in the BlockMap object instead, save disk space
+                % % Uint16 save memory. Likely to have more than 2^8, unlikely to have more than 2^16.
+                % blockMapArray=zeros(mAz,mRg,'uint16');
+                % for ii=1:numel(blocksInStack)
+                % blockMapArray(blocksInStack(ii).azOutputStart:blocksInStack(ii).azOutputEnd,blocksInStack(ii).rgOutputStart:blocksInStack(ii).rgOutputEnd)=ii;
+                % end                
+                % % figure(808);clf;
+                % % imagesc(blockMapArray)
+                % % drawnow()
+                % % title(sprintf('Stack %i seg %i',stackInd,segmentInd));
                
             end % segment loop
 
             if stackInd==1
-                blockMap.stacks = struct('blocks',blocksInStack,'map',blockMapArray,'usefulBlockIndices',[],'usefulBlocks',[]);
+                blockMap.stacks = struct('blocks',blocksInStack,'map',[],'usefulBlockIndices',[],'usefulBlocks',[]);
             else
-                blockMap.stacks(stackInd) = struct('blocks',blocksInStack,'map',blockMapArray,'usefulBlockIndices',[],'usefulBlocks',[]);
+                blockMap.stacks(stackInd) = struct('blocks',blocksInStack,'map',[],'usefulBlockIndices',[],'usefulBlocks',[]);
             end
 
             % Collect blocks in AOI
             bInA = arrayfun(@(x) x.blockInAOI, blockMap.stacks(stackInd).blocks);
-            bInC = arrayfun(@(x) x.blockInSea, blockMap.stacks(stackInd).blocks);
+            bInC = arrayfun(@(x) xs.blockInSea, blockMap.stacks(stackInd).blocks);
             isUsefulBlock = bInA; %zeros(size(bInA),'logical');
             % If we are masking out areas of sea, do that here
             if projObj.MASK_SEA
