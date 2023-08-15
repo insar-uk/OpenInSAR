@@ -64,6 +64,8 @@ methods
             return % needs generating
         end
 
+        blockInfo = blockMap.stacks(this.STACK).blocks(this.BLOCK);
+
         if ~psPhaseObject.identify(engine).exists()
 
             
@@ -87,6 +89,9 @@ methods
                     abs(blockData(:,:,~baddies)) ...
                     );
             pscMask = amplitudeStability(:)>3;
+
+            
+
             % Save the amplitude stability
             engine.save( ampStabObj, amplitudeStability );
 
@@ -97,6 +102,12 @@ methods
             mean_coherence = @(phase2d) mean(abs(sum(normz(phase2d),2)))./size(phase2d,2);
             blockData = reshape(blockData,[],sz(3));
             blockData = normz(blockData);
+
+            
+            % Candidate Stuff
+            candidateThreshold = 2;
+            candidateMask = amplitudeStability > candidateThreshold;
+            candidatePhase = blockData( candidateMask, :);
 
             % Remove missing data
             blockData = blockData(:,~missingData);
@@ -144,7 +155,7 @@ methods
             blockData = blockData.*qToPhase(-q).*vToPhase(-v0).*conj(aps).*conj(apsResidual);
             blockData = blockData(Cv>.5,:);
             psPhaseObject = OI.Data.BlockResult( blockObj, 'InitialPsPhase' );
-            engine.save( psPhaseObject, blockData );
+            
 
             fprintf(1,'Mean coherence after constant aps analysis: %.3f\n',mean_coherence(blockData))
             
@@ -180,11 +191,47 @@ methods
             engine.save( coherenceObj, C );
             engine.save( velocityObject, v );
             engine.save( heightErrorObject, q );
+
+            % coherence;
+            % scattererPhaseOffset;
+            % velocity;
+            % displacement;
+            % heightError;
+            % amplitudeStability;
+            % block;
+
+            [meshRg,meshAz]=meshgrid(...
+                blockInfo.rgOutputStart:blockInfo.rgOutputEnd, ...
+                blockInfo.azOutputStart:blockInfo.azOutputEnd);
+
+            candidateAz=meshAz(candidateMask);
+            candidateRg=meshRg(candidateMask);
+
+            psPhaseStruct = struct( ...
+                'type', 'initial block', ...
+                'coherence', C, ...
+                'velocity', v, ...
+                'heightError', q, ...
+                'amplitudeStability', amplitudeStability, ...
+                'displacement', [], ...
+                'candidateStabilityThreshold', candidateThreshold, ...
+                'candidateStability', amplitudeStability(candidateMask), ...
+                'candidatePhase', candidatePhase, ...
+                'candidateAz', candidateAz, ...
+                'candidateRg', candidateRg, ...
+                'candidateMask', candidateMask, ...
+                'blockInfo', blockInfo ...
+            );
+
+            engine.save( psPhaseObject, psPhaseStruct );
+
         else
             C = engine.load( coherenceObj );
             v = engine.load( velocityObject );
             q = engine.load( heightErrorObject );
         end
+
+
         
         
         % Save a preview of the v, C and q

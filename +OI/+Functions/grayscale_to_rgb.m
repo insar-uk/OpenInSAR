@@ -3,9 +3,10 @@
         if nargin == 2
             crange = [min(grayImage(:)), max(grayImage(:))];
         end
+        grayImage = double(grayImage);
         minValue = double(crange(1));
         maxValue = double(crange(2));
-        normalized_array = (grayImage - minValue) / (maxValue - minValue);
+        normalized_array = (grayImage - minValue) ./ (maxValue - minValue);
         
         % Get the colormap and rescale it to match the grayscale image limits
         cmapIndex = round(1 + (size(cmap, 1) - 1) * normalized_array);

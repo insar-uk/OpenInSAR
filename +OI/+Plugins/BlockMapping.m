@@ -218,6 +218,7 @@ methods
             bInA = arrayfun(@(x) x.blockInAOI, blockMap.stacks(stackInd).blocks);
             bInC = arrayfun(@(x) xs.blockInSea, blockMap.stacks(stackInd).blocks);
             isUsefulBlock = bInA; %zeros(size(bInA),'logical');
+            
             % If we are masking out areas of sea, do that here
             if projObj.MASK_SEA
                 isUsefulBlock = isUsefulBlock & ~bInC;
@@ -226,11 +227,11 @@ methods
             blockMap.stacks(stackInd).usefulBlocks = ...
                 blockMap.stacks(stackInd).blocks(find(isUsefulBlock));
 
-
         end % stack loop
 
         % Save the block map
         engine.save( blockMap );
+        blockMap.make_map_kml( fullfile(projObj.WORK,'preview') );
 
     end % run
 

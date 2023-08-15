@@ -214,7 +214,9 @@ methods (Static = true)
         previewDir = fullfile(projObj.WORK,'preview','block');
         blockName = sprintf('Stack_%i_%s_block_%i',blockInfo.stackIndex,POL,blockInfo.indexInStack);
 
-        previewKmlPath = fullfile( previewDir, [blockName '.kml']);
+        previewKmlPath = fullfile( previewDir, ...
+            'amplitude', ...
+            [blockName '.kml']);
         previewKmlPath = OI.Functions.abspath( previewKmlPath );
         OI.Functions.mkdirs( previewKmlPath );
         % save the preview
