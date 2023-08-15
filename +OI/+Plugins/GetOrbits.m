@@ -82,8 +82,11 @@ methods
             end
 
             % check if any safe is missing an orbit file
-            %hasOrbitForSafe = cellfun(@(x) ~isempty(x.orbitFile), catalogue.safes);
-
+            try
+                hasOrbitForSafe = cellfun(@(x) ~isempty(x.orbitFile), catalogue.safes);
+            catch
+            end
+            
             if jobCount
                 % requeue this job
                 % engine.requeue_job();
@@ -91,7 +94,11 @@ methods
             else
                 % save the catalogue
                 catalogue.overwrite = true;
-                engine.ui.log('info', 'GetOrbits finishing... Saving catalogue with %d orbit files\n', sum(hasOrbitForSafe))
+                try
+                    engine.ui.log('info', 'GetOrbits finishing... Saving catalogue with %d orbit files\n', sum(hasOrbitForSafe))
+                catch
+                end
+                    
                 catalogue = catalogue.make_filepaths_portable(project);
                 engine.save(catalogue,catalogue);
                 this.outputs{1} = OI.Data.OrbitSummary();
