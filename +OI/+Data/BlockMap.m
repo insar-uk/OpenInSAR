@@ -52,12 +52,12 @@ classdef BlockMap < OI.Data.DataObj
         function [this, blockMapArray] = get_map_for_stack(this, stackInd)
 
             stack = this.stacks(stackInd);
-            [~, maxAz, ~, maxRg] = this.get_limits(stackInd);
+            [~, maxAz, ~, maxRg] = this.get_stack_limits(stackInd);
 
             % Uint16 save memory. Likely to have more than 2^8, unlikely to have more than 2^16.
             blockMapArray=zeros(maxAz,maxRg,'uint16');
 
-            for ii=1:numel(blocksInStack)
+            for ii=1:numel(stack.blocks)
                 block = stack.blocks(ii);
                 blockMapArray( ...
                     block.azOutputStart:block.azOutputEnd, ...
@@ -79,8 +79,9 @@ classdef BlockMap < OI.Data.DataObj
                         [~,stack.map] = this.get_map_for_stack(si);
                     end
 
-                    map = OI.Functions.grayscale_to_rgb(stack.map,jet);
+                    
                     nBlocks = numel(stack.blocks);
+                    map = OI.Functions.grayscale_to_rgb(stack.map,jet,[0 nBlocks]);
                     [blockLatCorners, blockLonCorners, blockAzCorners, blockRgCorners] = deal(zeros(nBlocks,4));
 
                     for bi=1:nBlocks
@@ -121,14 +122,17 @@ classdef BlockMap < OI.Data.DataObj
                     %stackExtent = stackExtent.make_counter_clockwise();
 
                     % Add some digits
+                    borderPixels = 20;
                     for bi=1:nBlocks
                         block = stack.blocks(bi);
-                        bit = map( ...
-                            block.azOutputStart:block.azOutputEnd, ...
-                            block.rgOutputStart:block.rgOutputEnd);
+                        bit = map(block.azOutputStart + borderPixels: ...
+                            block.azOutputEnd - borderPixels, ...
+                            block.rgOutputStart + borderPixels: ...
+                            block.rgOutputEnd - borderPixels,...
+                            :);
                         digit = imresize( ...
                             OI.Functions.digit_to_image( bi , true), ...
-                            size(bit));
+                            size(bit,[1 2]));
 
                         % We need to reorient the characters
                         % Depending on the orientation of the output kml,
@@ -139,12 +143,46 @@ classdef BlockMap < OI.Data.DataObj
                         else
                             digit = flipud(digit);
                         end
-
-                        map(block.azOutputStart:block.azOutputEnd, ...
-                            block.rgOutputStart:block.rgOutputEnd) = digit;
+                        
+                        % Highlight blocks in AOI
+                        if block.blockInAOI
+                            % invert colour masking
+                            digit = min(max(1-digit,0),1); 
+                        end
+                        
+                        map(block.azOutputStart + borderPixels: ...
+                            block.azOutputEnd - borderPixels, ...
+                            block.rgOutputStart + borderPixels: ...
+                            block.rgOutputEnd - borderPixels, ...
+                            :) = bit.*digit;
+                        1;
                    end
 
-                    kmlFilename = ['Block_map_stack_' num2str(si)];
+                                        % Add some digits
+%                     for bi=1:nBlocks
+%                         block = stack.blocks(bi);
+%                         bit = map( ...
+%                             block.azOutputStart:block.azOutputEnd, ...
+%                             block.rgOutputStart:block.rgOutputEnd);
+%                         digit = imresize( ...
+%                             OI.Functions.digit_to_image( bi , true), ...
+%                             size(bit),'nearest');
+% 
+%                         % We need to reorient the characters
+%                         % Depending on the orientation of the output kml,
+%                         % And due to ml/oct arrays being 'upside down' anyway.
+%                         isUpsideDown = stackExtent.lat(end)<stackExtent.lat(1);
+%                         if isUpsideDown
+%                             digit  = fliplr(digit);
+%                         else
+%                             digit = flipud(digit);
+%                         end
+% 
+%                         map(block.azOutputStart:block.azOutputEnd, ...
+%                             block.rgOutputStart:block.rgOutputEnd) = digit;
+%                     end
+                   
+                    kmlFilename = ['Block_mapping_stack_' num2str(si)];
                     kmlPath = fullfile(kmlDir,kmlFilename);
                     kmlPath = OI.Functions.abspath( kmlPath );
                     kmlPath = [kmlPath '.kml']; %#ok<AGROW>
@@ -152,7 +190,7 @@ classdef BlockMap < OI.Data.DataObj
                     OI.Functions.mkdirs( kmlPath );
 
                     stackExtent.save_kml_with_image( ...
-                        kmlPath, flipud(map),'',[512,2048]);
+                        kmlPath, imresize(flipud(map),[1024,4096],'nearest'));
 
                 end
 
