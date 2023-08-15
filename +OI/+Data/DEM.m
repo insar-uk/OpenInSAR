@@ -172,7 +172,8 @@ classdef DEM < OI.Data.DataObj
 
             % Interpolate the geoid undulation on the grid
             geoidAtGrid = [lat(:), lon(:), ones(numel(lat),1)] * geoidFitCoefficients;
-
+            geoidAtGrid = reshape(geoidAtGrid,size(tileData));
+            
             % Remove geoid undulation (mean sea level) from elevation data
             tileData = tileData - int16(geoidAtGrid); % [m] 
         end

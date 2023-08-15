@@ -217,9 +217,7 @@ classdef Postings
             fclose(fid);
 
             if isempty(line)||line(1)==-1
-                %we've hit an error. weird.
-                % wait a min to avoid causing drama.
-                pause(60);
+                % Nothing here. We're ready though.
                 report_ready(obj,J); % write the file
                 return
             end

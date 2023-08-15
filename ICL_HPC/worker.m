@@ -176,9 +176,11 @@ while true
         if oi.engine.plugin.isFinished
             if dbSize < numel(oi.engine.database.data)
                 lastEntry = oi.engine.database.data{end};
-                if ~lastEntry.hasFile
+                
+                if (isa(lastEntry,'OI.Data.DataObj') && ~lastEntry.hasFile) ...
+                        || isstruct(lastEntry)
                     % convert the database additions to xml
-                    resultAsStruct = OI.Functions.obj2struct(  );
+                    resultAsStruct = OI.Functions.obj2struct( lastEntry );
                     resultAsXmlString = OI.Functions.struct2xml( resultAsStruct ).to_string();
                     answer = resultAsXmlString;
                 else

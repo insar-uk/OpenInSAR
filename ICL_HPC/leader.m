@@ -116,6 +116,7 @@ for thingToDo = thingToDoList
                     oi.engine.ui.log('error',posting);
                     warning(posting);
                     assignment{JJ} = '';
+                    return % Throw back so we can debug if in interactive mode
                 end
             end
 

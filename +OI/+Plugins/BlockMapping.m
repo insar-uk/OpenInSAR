@@ -216,7 +216,7 @@ methods
 
             % Collect blocks in AOI
             bInA = arrayfun(@(x) x.blockInAOI, blockMap.stacks(stackInd).blocks);
-            bInC = arrayfun(@(x) xs.blockInSea, blockMap.stacks(stackInd).blocks);
+            bInC = arrayfun(@(x) x.blockInSea, blockMap.stacks(stackInd).blocks);
             isUsefulBlock = bInA; %zeros(size(bInA),'logical');
             
             % If we are masking out areas of sea, do that here

@@ -102,7 +102,12 @@ classdef Geocoding < OI.Plugins.PluginBase
             engine.ui.log('info','Interpolating orbits\n');
             [orbit, lineTimes] = ...
                 OI.Plugins.Geocoding.get_poe_and_timings( ...
-                    cat, safeIndex, swathInfo, burstIndex );            
+                    cat, safeIndex, swathInfo, burstIndex );  
+                
+            if isempty(orbit.t)
+                % No orbit file
+               return
+            end
             tOrbit = orbit.interpolate( repmat(lineTimes,spb,1) );
                 satXYZ = [ ...
                         tOrbit.x(:), ...
