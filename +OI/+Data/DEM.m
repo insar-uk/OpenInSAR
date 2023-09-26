@@ -162,6 +162,9 @@ classdef DEM < OI.Data.DataObj
             latAxis=linspace(extent.south(),extent.north(),3601);
             lonAxis=linspace(extent.west(),extent.east(),3601);
             [lon, lat] = meshgrid(latAxis,lonAxis);
+            
+            geoidAtGrid = OI.Data.DEM.get_geoid_height(extent, lat, lon);
+
 
             % Calculate geoid undulation (mean sea level) at coordinates
             geoidAtExtentBoundaries = geoidheight(extent.lat, extent.lon, 'EGM96');
@@ -177,6 +180,51 @@ classdef DEM < OI.Data.DataObj
             % Remove geoid undulation (mean sea level) from elevation data
             tileData = tileData - int16(geoidAtGrid); % [m] 
         end
+    
+    
+        function geoidAtGrid = get_geoid_height( extent, lat, lon)
+            try 
+                % Calculate geoid undulation (mean sea level) at coordinates
+                geoidAtExtentBoundaries = geoidheight(extent.lat, extent.lon, 'EGM96');
+        
+                % Fit a 2d linear polynomial to the geoid undulation at the extent
+                nSamples = numel(geoidAtExtentBoundaries(:));
+                geoidFitCoefficients = [extent.lat(:), extent.lon(:), ones(nSamples,1)] \ geoidAtExtentBoundaries(:);
+        
+                % Interpolate the geoid undulation on the grid
+                geoidAtGrid = [lat(:), lon(:), ones(numel(lat),1)] * geoidFitCoefficients;
+            catch
+                try
+                    geoidModel = imread('egm96-5.pgm');
+                catch ERR
+                    whereIsEgmPgm = [ ...
+                        'The geoidheight function could not be found.', ...
+                        ' As a fallback we can use the egm96-5.pgm file,', ...
+                        ' but this could not be found in the OpenInSAR ', ...
+                        'directory. You can download it from, e.g.: ', ...
+                        'https://sourceforge.net/projects/geographiclib/', ...
+                        'files/geoids-distrib/egm96-5.zip which I found at', ...
+                        ' https://geographiclib.sourceforge.io/C++/doc/', ...
+                        'geoid.html#geoidinterp'
+                    ];
+                    error([ERR.message,'\n\n%s'],whereIsEgmPgm)
+                end
+                % weirdly this is in steps of 3mm??
+                geoidModel = double(geoidModel)*3/1e3; % metres
+                % And possitively offset by 108
+                geoidModel = geoidModel - 108;
+                % the model array starts at 0 longitude...
+                geoidModel = fftshift(geoidModel,2);
+                
+                gLon = linspace(-180,180,size(geoidModel,2));
+                gLat = linspace(90,-90,size(geoidModel,1));
+    
+                % imagesc(gLon,gLat,geoidModel);set(gca,'Ydir','normal')
+    
+                geoidAtGrid = interp2(gLon,gLat,geoidModel,lon,lat);
+            end
+        end
+    
     end % methods (Static = true)
 
 end % classdef

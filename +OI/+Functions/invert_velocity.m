@@ -1,4 +1,4 @@
-function [C,v]=invert_velocity_q(data,phasePerMeterVsTime,oneSidedLimit,numModels)
+function [C,v]=invert_velocity(data,timeSeries,oneSidedLimit,numModels,wavelength)
 % One sided limit is deformation rate in meters per annum.
 
 if nargin<3
@@ -7,6 +7,12 @@ end
 if nargin<4
     numModels=26;
 end
+if nargin<5
+    wavelength=0.0555;
+end
+timeSeries = timeSeries - timeSeries(:,1); % reference to first sample
+timeSeries = timeSeries./365.25; % Convert to years
+phasePerMeterVsTime = (4*pi/wavelength) .* timeSeries;
 
 % Generate periodograms
 linv=(linspace(-sqrt(oneSidedLimit),sqrt(oneSidedLimit),numModels).^2).';
