@@ -66,6 +66,10 @@ classdef BlockMap < OI.Data.DataObj
             this.stacks(stackInd).map = blockMapArray;
         end
 
+        function [az, rg, size] = get_block_position(stackInd,blockInd)
+
+        end
+
 
         function kmlPath = make_map_kml(this, kmlDir)
             if isempty(this.stacks) && isfield(this.stacks(1),'map')

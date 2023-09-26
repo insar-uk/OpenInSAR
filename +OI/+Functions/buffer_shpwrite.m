@@ -1,4 +1,4 @@
-function buffer_shpwrite(varargin)
+function buffer_shpwrite(S, filename, varargin)
     %SHAPEWRITE Write geographic vector data to shapefile
     %
     %   SHAPEWRITE(S, FILENAME) writes the vector geographic features stored in
@@ -76,8 +76,36 @@ function buffer_shpwrite(varargin)
     
     narginchk(2, Inf);
     
+    validateattributes(S, ...
+    {'struct', 'mappoint', 'geopoint', 'mapshape', 'geoshape'}, ...
+    {'nonempty', 'vector'}, mfilename, 'S', 1)
     
-    [S, basename, dbfspec] = parseInputs(varargin{:});
+    % FILENAME is the second of two required inputs.
+    basename = validateFilename(filename);
+    
+    % Identify and validate the parameter name-value pairs beginning with
+    % the third argument.
+    validParameterNames = {'DbfSpec'};
+    for k = 1:2:numel(varargin)
+        parName = validatestring(varargin{k}, validParameterNames, ...
+            mfilename, sprintf('PARAM%d',(k-1)/2), k); 
+        checkExistence(k, nargin, 'a scalar structure', parName);
+        dbfspec = varargin{k+1};
+    end
+    
+    % If the user provided a DBF spec, validate it.  Otherwise, derive one. 
+    %
+    % Note: The makedbfspec function is called in both branches
+    %       (validateDbfSpec always invokes it), and it validates the geometry
+    %       and the attribute fields of S.
+    %
+    if exist('dbfspec','var')
+        % Validate dbfspec and S and ensure consistency.
+        dbfspec = validateDbfSpec(dbfspec, S);
+    else
+        dbfspec = makedbfspec(S);
+    end
+    
     [shapeType, boundingBox, index] = writeSHP(S,basename);
     writeSHX(shapeType, boundingBox, index, basename);
     if ~isempty(dbfspec)
@@ -659,43 +687,6 @@ function buffer_shpwrite(varargin)
     
     eofMarker = hex2dec('1A');
     fwrite(fid, eofMarker, 'uint8');
-    
-    %--------------------------------------------------------------------------
-    
-    function [S, basename, dbfspec] = parseInputs(varargin)
-    
-    % S is the first of two required inputs.
-    S = varargin{1};
-    validateattributes(S, ...
-        {'struct', 'mappoint', 'geopoint', 'mapshape', 'geoshape'}, ...
-        {'nonempty', 'vector'}, mfilename, 'S', 1)
-    
-    % FILENAME is the second of two required inputs.
-    filename = varargin{2};
-    basename = validateFilename(filename);
-    
-    % Identify and validate the parameter name-value pairs beginning with
-    % the third argument.
-    validParameterNames = {'DbfSpec'};
-    for k = 3:2:nargin
-        parName = validatestring(varargin{k}, validParameterNames, ...
-            mfilename, sprintf('PARAM%d',(k-1)/2), k); 
-        checkExistence(k, nargin, 'a scalar structure', parName);
-        dbfspec = varargin{k+1};
-    end
-    
-    % If the user provided a DBF spec, validate it.  Otherwise, derive one. 
-    %
-    % Note: The makedbfspec function is called in both branches
-    %       (validateDbfSpec always invokes it), and it validates the geometry
-    %       and the attribute fields of S.
-    %
-    if exist('dbfspec','var')
-        % Validate dbfspec and S and ensure consistency.
-        dbfspec = validateDbfSpec(dbfspec, S);
-    else
-        dbfspec = makedbfspec(S);
-    end
     
     %--------------------------------------------------------------------------
     

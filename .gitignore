@@ -40,3 +40,11 @@ temp/
 # .vscode/*
 # .vscodes
 xint
+
+
+# GIS files
+*.shp
+*.shx
+*.dbf
+*.qmd
+*.cpg

@@ -144,7 +144,7 @@ methods
             blockData = blockData.*qToPhase(-q).*vToPhase(-v0).*conj(aps).*conj(apsResidual);
             blockData = blockData(Cv>.5,:);
             psPhaseObject = OI.Data.BlockResult( blockObj, 'InitialPsPhase' );
-            engine.save( psPhaseObject, blockData );
+            
 
             fprintf(1,'Mean coherence after constant aps analysis: %.3f\n',mean_coherence(blockData))
             
@@ -180,11 +180,37 @@ methods
             engine.save( coherenceObj, C );
             engine.save( velocityObject, v );
             engine.save( heightErrorObject, q );
+
+            % coherence;
+            % scattererPhaseOffset;
+            % velocity;
+            % displacement;
+            % heightError;
+            % amplitudeStability;
+            % block;
+    
+            pscThreshold = 2;
+            candidateMask = amplitudeStability > pscThreshold;
+            psPhaseStruct = struct( ...
+                'type', 'initial block', ...
+                'coherence', C, ...
+                'velocity', v, ...
+                'heightError', q, ...
+                'amplitudeStability', amplitudeStability, ...
+                'displacement',[],...
+                'candidateStabilityThreshold', pscThreshold, ...
+                'candidateStability', amplitudeStability(candidateMask), ...
+                'candidatePhase', blockData( candidateMask, :) ...
+                );
+            engine.save( psPhaseObject, psPhaseStruct );
+
         else
             C = engine.load( coherenceObj );
             v = engine.load( velocityObject );
             q = engine.load( heightErrorObject );
         end
+
+
         
         
         % Save a preview of the v, C and q

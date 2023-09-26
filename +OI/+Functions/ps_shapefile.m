@@ -12,6 +12,11 @@ end
 
 nP=numel(latArray);
 nT=size(dataArray,2);
+
+for jj=1:nT
+    datefieldNames{jj} = ['D' imageDates{jj}];
+end
+
 for ii=nP:-1:1
     DataStructure(ii).Geometry='Point';
     DataStructure(ii).Lat=latArray(ii);
@@ -26,7 +31,7 @@ for ii=nP:-1:1
 
     if ~isempty(dataArray)
         for jj=1:nT
-           DataStructure(ii).(['D' imageDates{jj}])=dataArray(ii,jj);
+           DataStructure(ii).(datefieldNames{jj})=dataArray(ii,jj);
         end
     end
 end
