@@ -166,6 +166,17 @@ classdef DEM < OI.Data.DataObj
             geoidAtGrid = OI.Data.DEM.get_geoid_height(extent, lat, lon);
 
 
+            % Calculate geoid undulation (mean sea level) at coordinates
+            geoidAtExtentBoundaries = geoidheight(extent.lat, extent.lon, 'EGM96');
+
+            % Fit a 2d linear polynomial to the geoid undulation at the extent
+            nSamples = numel(geoidAtExtentBoundaries(:));
+            geoidFitCoefficients = [extent.lat(:), extent.lon(:), ones(nSamples,1)] \ geoidAtExtentBoundaries(:);
+
+            % Interpolate the geoid undulation on the grid
+            geoidAtGrid = [lat(:), lon(:), ones(numel(lat),1)] * geoidFitCoefficients;
+            geoidAtGrid = reshape(geoidAtGrid,size(tileData));
+            
             % Remove geoid undulation (mean sea level) from elevation data
             tileData = tileData - int16(geoidAtGrid); % [m] 
         end
