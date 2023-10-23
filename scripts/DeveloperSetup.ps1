@@ -55,10 +55,6 @@ if (-not (Test-Path env:VIRTUAL_ENV)) {
     exit
 }
 
-# Update pip
-Write-Host "Updating pip."
-python -m pip install --upgrade pip
-
 # Install python dependencies
 $pythonRequirements = "./src/python-requirements.txt"
 # Check the requirements file exists
