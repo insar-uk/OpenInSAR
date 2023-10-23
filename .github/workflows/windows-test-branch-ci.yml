@@ -34,8 +34,10 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: venv
-        path: venv
     - name: Activate virtual environment
-      run: .\scripts\ActivateVirtualEnvironment.ps1
+      run: |
+       pwd 
+       dir
+       .\scripts\ActivateVirtualEnvironment.ps1
     - name: Run tests
       run: pytest
