@@ -1,3 +1,8 @@
 # Virtual env
 /venv/*
-
+# vscode
+.vscode/*
+# pytest cache
+.pytest_cache/*
+/test/pytest_cache/*
+test/__pycache__/*
