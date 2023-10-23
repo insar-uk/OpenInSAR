@@ -1,0 +1,25 @@
+<!-- 
+    Use this file to specify the path to the current project definition file.
+
+    The path can be specified in two ways:
+    1) A relative path (with respect to the location of the repository)
+    2) Platform specific paths.
+    A relative path will be prefered, unless it is empty.
+
+    Example for Windows #1:
+    <windows_path>..\MyProject.oi</windows_path>
+    Example for Windows #2:
+    <windows_path>C:\OpenInSAR\ExampleProject.oi</windows_path>
+    Example for Windows #3:
+    <windows_path>\\rds.imperial.ac.uk\rds\user\saa116\ephemeral\dungeness.oi</windows_path>
+    Example for Unix:
+    <windows_path>\\rds.imperial.ac.uk\rds\user\saa116\ephemeral\dungeness.oi</windows_path>
+
+-->
+<current_project>
+    <relative_path>../ExampleProject.oi</relative_path>
+    <windows_path>THIS IS A PLACEHOLDER IN CurrentProject.xml. INSERT A VALID PATH TO A '.oi'
+        PROJECT CONFIGURATION</windows_path>
+    <unix_path>THIS IS A PLACEHOLDER IN CurrentProject.xml. INSERT A VALID PATH TO A '.oi' PROJECT
+        CONFIGURATION</unix_path>
+</current_project>
