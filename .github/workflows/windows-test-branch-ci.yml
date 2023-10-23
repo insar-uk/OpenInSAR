@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - test
+      - main
 
 jobs:
   build:
@@ -13,9 +14,19 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.10
+
     - name: Install dependencies
       run: .\scripts\DeveloperSetup.ps1
 
+  run-tests:
+    runs-on: windows-latest
+    needs: build
+
+    steps:
     - name: Run tests
       run: |
         .\scripts\ActivateVirtualEnvironment.ps1
