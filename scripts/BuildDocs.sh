@@ -2,7 +2,7 @@
 
 # Get current working directory
 startDir=$(pwd)
-
+ls
 # Set the location to this file's directory
 here="$(dirname "$(readlink -f "$0")")"
 cd "$here/../doc" || exit
@@ -19,7 +19,10 @@ sphinx-apidoc -o source/ ..
 sphinx-build -M html source build
 
 # Copy the HTML files to the output directory
+if [ ! -d ../output/doc ]; then
+    mkdir ../output/doc
+fi
 cp -r build/html/* ../output/doc/
-
+ls
 # Reset the location
 cd "$startDir" || exit
