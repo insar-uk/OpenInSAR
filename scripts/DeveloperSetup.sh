@@ -34,7 +34,7 @@ pwd
 ls $pythonVirtualEnvPath
 
 # Activate python virtual environment
-pythonVirtualEnvScript="$pythonVirtualEnvPath/Scripts/activate"
+pythonVirtualEnvScript="$pythonVirtualEnvPath/bin/activate"
 if [ -f $pythonVirtualEnvScript ]; then
     echo "Activating Python virtual environment."
     source $pythonVirtualEnvScript

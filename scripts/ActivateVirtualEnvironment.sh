@@ -1,2 +1,2 @@
 # Activate the virtual environment
-./venv/Scripts/activate
+./venv/bin/activate
