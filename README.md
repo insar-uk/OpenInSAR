@@ -5,15 +5,15 @@ This software will undergo extensive refactoring and development over the course
 
 This current version was developed through a PhD project at Imperial College London. The accompanying thesis will be available [here when finalised](https://spiral.imperial.ac.uk/simple-search?location=%2F&query=Transient+Scattering&rpp=1&sort_by=score&order=desc&filter_field_1=author&filter_type_1=equals&filter_value_1=Agar).
 
-main:
+**main** branch status:
 [![](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/ubuntu-test-on-pull.yml/badge.svg)](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/)
 [![](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/windows-test-on-pull.yml/badge.svg)](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/)
 
-test:
+**test** branch status:
 [![](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/ubuntu-test-on-pull.yml/badge.svg?branch=test)](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/)
 [![](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/windows-test-on-pull.yml/badge.svg?branch=test)](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/)
 
-dev:
+**dev** branch status:
 [![](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/ubuntu-test-on-pull.yml/badge.svg?branch=dev)](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/)
 [![](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/windows-test-on-pull.yml/badge.svg?branch=dev)](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/)
 
