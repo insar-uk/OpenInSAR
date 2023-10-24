@@ -1,8 +1,17 @@
 # Virtual env
-/venv/*
+venv/
+
 # vscode
 .vscode/*
+
+# pycache
+__pycache__/
+test/__pycache__/
+
 # pytest cache
-.pytest_cache/*
-/test/pytest_cache/*
-test/__pycache__/*
+.pytest_cache/
+/test/pytest_cache/
+
+# documentation build files
+doc/build/
+
