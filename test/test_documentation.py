@@ -13,6 +13,7 @@ def test_documentation_build_script_exists():
         script_file = os.path.join(SCRIPT_DIR, "BuildDocs.sh")
         assert os.path.isfile(script_file), "BuildDocs.sh not found"
 
+
 def test_build_documentation():
     """
     Check the documentation builds without errors
@@ -29,10 +30,10 @@ def test_build_documentation():
 
     if os.name == 'nt':
         script_file = os.path.join(scripts_dir, "BuildDocs.ps1")
-        output = subprocess.check_output(["powershell", script_file], cwd=scripts_dir)
+        output = subprocess.check_output(["powershell", script_file], cwd=scripts_dir, stderr=subprocess.STDOUT)
     else:
         script_file = os.path.join(scripts_dir, "BuildDocs.sh")
-        output = subprocess.check_output(script_file, cwd=scripts_dir, shell=True)
+        output = subprocess.check_output(script_file, cwd=scripts_dir, shell=True, stderr=subprocess.STDOUT)
 
     # Check for good vibes message from Sphinx
     assert "build succeeded" in output.decode("utf-8").lower(), "Sphinx build failed"
@@ -40,6 +41,7 @@ def test_build_documentation():
     assert os.path.isdir(DOCS_DIR), "Sphinx build failed to create output directory"
     # Check the index.html file exists
     assert os.path.isfile(os.path.join(DOCS_DIR, "index.html")), "Sphinx build failed to create index.html file"
+
 
 def test_static_assets():
     """Test the static assets are properly copied to the output directory"""

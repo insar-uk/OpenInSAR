@@ -8,6 +8,7 @@ def get_repo_absolute_path() -> str:
     root = os.path.dirname(os.path.dirname(this_file))
     return root
 
+
 def app_dir():
     repo_root = get_repo_absolute_path()
     return os.path.join(repo_root, "output", "app")

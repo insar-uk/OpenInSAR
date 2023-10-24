@@ -19,12 +19,12 @@ def test_webapp_build_script_exists():
 def test_nodejs_installed():
     """Check NodeJS is installed"""
     try:
-        output = subprocess.check_output(["node", "--version"], shell=True)
+        output = subprocess.check_output(["node", "--version"], shell=True, stderr=subprocess.STDOUT)
         assert output is not None and len(output) > 0
     except FileNotFoundError or AssertionError:
         raise AssertionError("NodeJS not installed")
     try:
-        output = subprocess.check_output(["npm", "--version"], shell=True)
+        output = subprocess.check_output(["npm", "--version"], shell=True, stderr=subprocess.STDOUT)
         assert output is not None and len(output) > 0
     except FileNotFoundError:
         raise AssertionError("npm not installed")
@@ -42,7 +42,7 @@ def test_webapp():
         output = subprocess.check_output(["powershell", script_file], cwd=SCRIPT_DIR, stderr=subprocess.STDOUT)
     else:
         script_file = os.path.join(SCRIPT_DIR, "BuildWebApp.sh")
-        output = subprocess.check_output(script_file, cwd=SCRIPT_DIR, shell=True)
+        output = subprocess.check_output(script_file, cwd=SCRIPT_DIR, shell=True, stderr=subprocess.STDOUT)
 
     # Check for good vibes message from npm
     assert "error:" not in output.decode("utf-8").lower(), "npm build failed"
