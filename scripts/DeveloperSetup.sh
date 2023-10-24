@@ -28,11 +28,6 @@ else
     python -m venv $pythonVirtualEnv
 fi
 
-ls
-pwd
-
-ls $pythonVirtualEnvPath
-
 # Activate python virtual environment
 pythonVirtualEnvScript="$pythonVirtualEnvPath/bin/activate"
 if [ -f $pythonVirtualEnvScript ]; then
