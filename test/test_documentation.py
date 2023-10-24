@@ -2,12 +2,11 @@ import subprocess
 import os
 from .TestUtilities import get_repo_absolute_path
 
+
 def test_build_documentation():
     """
     Check the documentation builds without errors
     """
-
-
     repo_root = get_repo_absolute_path()
     # Reset the docs directory
     docs_dir = os.path.join(repo_root, "output", "doc")
@@ -33,7 +32,6 @@ def test_build_documentation():
     assert os.path.isdir(docs_dir), "Sphinx build failed to create output directory"
     # Check the index.html file exists
     assert os.path.isfile(os.path.join(docs_dir, "index.html")), "Sphinx build failed to create index.html file"
-
 
 
 def test_static_assets():
