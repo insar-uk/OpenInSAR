@@ -1,4 +1,4 @@
-name: Run Tests on Pull Request (Windows)
+name: Windows CI
 
 on:
   pull_request:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   build_and_test:
+    name: Build and test
     runs-on: windows-latest
     steps:
     - name: Checkout code

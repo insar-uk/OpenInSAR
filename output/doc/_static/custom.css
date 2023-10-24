@@ -1,0 +1,4 @@
+/* Hide the header in the sidebar in favour of the logo */
+div.sphinxsidebar h1 {
+    display: none;
+}
