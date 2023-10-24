@@ -18,18 +18,16 @@ def test_webapp_build_script_exists():
     assert os.access(script_file, os.X_OK), "BuildWebApp script is not executable"
 
 
-# def test_nodejs_installed():
-#     """Check NodeJS is installed"""
-#     try:
-#         output = subprocess.check_output(["node", "--version"], shell=True, stderr=subprocess.STDOUT)
-#         assert output is not None and len(output) > 0
-#     except FileNotFoundError or AssertionError:
-#         raise AssertionError("NodeJS not installed")
-#     try:
-#         output = subprocess.check_output(["npm", "--version"], shell=True, stderr=subprocess.STDOUT)
-#         assert output is not None and len(output) > 0
-#     except FileNotFoundError:
-#         raise AssertionError("npm not installed")
+def test_nodejs_installed():
+    """Check NodeJS is installed"""
+    try:
+        output = subprocess.check_output(["node", "--version"], shell=True)
+    except FileNotFoundError or AssertionError:
+        raise AssertionError("NodeJS not installed")
+    try:
+        output = subprocess.check_output(["npm", "--version"], shell=True)
+    except FileNotFoundError:
+        raise AssertionError("npm not installed")
 
 
 def test_webapp():
@@ -46,10 +44,9 @@ def test_webapp():
         script_file = os.path.join(SCRIPT_DIR, "BuildWebApp.sh")
         output = subprocess.check_output(script_file, cwd=SCRIPT_DIR, shell=True, stderr=subprocess.STDOUT)
 
-    # Check for good vibes message from npm
-
     # Check the output directory exists
     assert os.path.isdir(APP_DIR), "npm build failed to create output directory"
+    # Check for good vibes message from npm
     assert "error:" not in output.decode("utf-8").lower(), "npm build failed"
     # Check the index.html file exists
     assert os.path.isfile(os.path.join(APP_DIR, "index.html")), "npm build failed to create index.html file"
