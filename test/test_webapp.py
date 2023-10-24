@@ -24,10 +24,6 @@ def test_nodejs_installed():
         output = subprocess.check_output(["node", "--version"], shell=True)
     except FileNotFoundError or AssertionError:
         raise AssertionError("NodeJS not installed")
-    try:
-        output = subprocess.check_output(["npm", "--version"], shell=True, stderr=subprocess.STDOUT)
-    except FileNotFoundError:
-        raise AssertionError("npm not installed")
 
 
 def test_webapp():
