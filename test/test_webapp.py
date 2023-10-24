@@ -25,7 +25,7 @@ def test_nodejs_installed():
     except FileNotFoundError or AssertionError:
         raise AssertionError("NodeJS not installed")
     try:
-        output = subprocess.check_output(["npm", "--version"], shell=True)
+        output = subprocess.check_output(["npm", "--version"], shell=True, stderr=subprocess.STDOUT)
     except FileNotFoundError:
         raise AssertionError("npm not installed")
 
@@ -36,6 +36,8 @@ def test_webapp():
     if os.path.isdir(APP_DIR):
         import shutil
         shutil.rmtree(APP_DIR)
+    # Check its gone
+    assert not os.path.isdir(APP_DIR), "Failed to remove app directory"
 
     if os.name == 'nt':
         script_file = os.path.join(SCRIPT_DIR, "BuildWebApp.ps1")
