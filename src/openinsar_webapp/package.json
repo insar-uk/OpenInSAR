@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "@vitejs/plugin-vue": "^4.3.4",
+    "@vue/test-utils": "^2.4.1",
+    "ol": "^8.1.0",
+    "three": "^0.157.0",
+    "tiff": "^5.0.3",
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.7.1",
+    "concurrently": "^8.2.1",
+    "jsdom": "^22.1.0",
+    "vite": "^4.4.9",
+    "vite-plugin-singlefile": "^0.13.5",
+    "vitest": "^0.34.4"
+  },
+  "scripts": {
+    "dev": "vite",
+    "phponly": "php -S localhost:8080 -t ..\\public_html\\",
+    "build": "vite build --emptyOutDir",
+    "test": "vitest"
+  }
+}

@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution":"node", 
+        "baseUrl": "../",
+        "paths": {
+          "@/*": ["*"]
+        },
+        "types": ["@types/node"]
+      },
+      "include": ["./**/*"],
+      "exclude": ["node_modules", "dist"],
+      "allowJs": true
+}
+  
