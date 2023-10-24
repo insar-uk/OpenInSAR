@@ -1,4 +1,4 @@
-name: Run Tests on Pull Request (Windows)
+name: Windows Tests
 
 on:
   pull_request:
