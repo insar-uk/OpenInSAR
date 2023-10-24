@@ -1,4 +1,4 @@
-name: Ubuntu Tests
+name: Ubuntu CI
 
 on:
   pull_request:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   build_and_test:
+    name: Build and test
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code

@@ -2,7 +2,7 @@
 
 # Get current working directory
 startDir=$(pwd)
-ls
+
 # Set the location to this file's directory
 here="$(dirname "$(readlink -f "$0")")"
 cd "$here/../doc" || exit
@@ -23,6 +23,6 @@ if [ ! -d ../output/doc ]; then
     mkdir ../output/doc
 fi
 cp -r build/html/* ../output/doc/
-ls
+
 # Reset the location
 cd "$startDir" || exit
