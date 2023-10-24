@@ -54,3 +54,6 @@ else
     echo "Python requirements file not found. It was expected to be found at: $pythonRequirements."
     exit 1
 fi
+
+# Grant execute permissions to scripts
+chmod +x ./scripts/*.sh
