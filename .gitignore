@@ -15,3 +15,6 @@ test/__pycache__/
 # documentation build files
 doc/build/
 
+# Web app build files
+src/openinsar_webapp/node_modules/
+src/openinsar_webapp/package-lock.json

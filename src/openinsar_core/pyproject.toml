@@ -1,0 +1,33 @@
+[project]
+name = "OpenInSAR"
+version = "0.1"
+authors = [
+  { name="Stewart Agar", email="s.agar16@imperial.ac.uk" },
+]
+description = "InSAR processing and analysis tools"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "websockets",
+    "pytest"
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src","tests"]
+
+
+[project.urls]
+"Homepage" = "https://github.com/insar-uk/OpenInSAR"
+"Bug Tracker" = "https://github.com/insar-uk/OpenInSAR/issues"
