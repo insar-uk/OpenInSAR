@@ -18,3 +18,6 @@ doc/build/
 # Web app build files
 src/openinsar_webapp/node_modules/
 src/openinsar_webapp/package-lock.json
+
+# temp files
+scratch/
