@@ -7,7 +7,7 @@
         "paths": {
           "@/*": ["*"]
         },
-        "types": ["@types/node"]
+        "types": ["@types/node","@types/d3"]
       },
       "include": ["./**/*"],
       "exclude": ["node_modules", "dist"],

@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from "vue-router";
+import NavBar from "./components/NavBar.vue";
 </script>
 
 <template>
   <div id="app">
+    <header class="banner">
+      <nav-bar />
+    </header>
     <main class="content">
-      <div>Hello World</div>
       <router-view />
     </main>
    

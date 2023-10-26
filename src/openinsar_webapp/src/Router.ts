@@ -7,7 +7,12 @@ const BASE_URL = 'app';
 
 // Define your routes
 const routes: Array<RouteRecordRaw> = [
-
+  // Add route for todo list
+  {
+    path: `/todo`,
+    name: 'Home',
+    component: () => import('./components/Todo.vue'),
+  },
 
 
 ];

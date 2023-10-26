@@ -7,7 +7,7 @@ This current version was developed through a PhD project at Imperial College Lon
 
 ## Get started
 
-To get started, please refer to the documentation [here](https://insar-uk.github.io/OpenInSAR/output/doc/). The rest of this README describes the repository structure.
+To get started, please refer to the documentation [here](/output/doc/index.html). The rest of this README describes the repository structure.
 
 ## Repository structure
 ``` Bash
