@@ -13,8 +13,6 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Home',
     component: () => import('./components/Todo.vue'),
   },
-
-
 ];
 
 // Create the router instance
