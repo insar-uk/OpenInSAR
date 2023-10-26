@@ -20,7 +20,8 @@ def lock_resource(request: pytest.FixtureRequest):
         lock.acquire()
 
     def release_lock():
-        lock.release()
+        if lock.locked():
+            lock.release()
 
     request.addfinalizer(release_lock)
     acquire_lock()
