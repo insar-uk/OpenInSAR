@@ -1,8 +1,23 @@
 # Virtual env
-/venv/*
+venv/
+
 # vscode
 .vscode/*
+
+# pycache
+__pycache__/
+test/__pycache__/
+
 # pytest cache
-.pytest_cache/*
-/test/pytest_cache/*
-test/__pycache__/*
+.pytest_cache/
+/test/pytest_cache/
+
+# documentation build files
+doc/build/
+
+# Web app build files
+src/openinsar_webapp/node_modules/
+src/openinsar_webapp/package-lock.json
+
+# temp files
+scratch/

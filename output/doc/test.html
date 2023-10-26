@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>test package &#8212; OpenInSAR 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <link rel="stylesheet" type="text/css" href="_static/static/custom.css" />
+    <script src="_static/documentation_options.js?v=2709fde1"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/custom.js?v=46891756"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="openinsar_core package" href="openinsar_core.html" />
+    <link rel="prev" title="OpenInSAR" href="modules.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="test-package">
+<h1>test package<a class="headerlink" href="#test-package" title="Link to this heading">¶</a></h1>
+<section id="module-test">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-test" title="Link to this heading">¶</a></h2>
+<p>This directory contains pytest tests for the project. These are written in Python, but might test other programs and functionality via e.g. system calls.</p>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-test.TestUtilities">
+<span id="test-testutilities-module"></span><h2>test.TestUtilities module<a class="headerlink" href="#module-test.TestUtilities" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="test.TestUtilities.app_dir">
+<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">app_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.TestUtilities.app_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.TestUtilities.docs_dir">
+<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">docs_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.TestUtilities.docs_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.TestUtilities.get_repo_absolute_path">
+<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">get_repo_absolute_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#test.TestUtilities.get_repo_absolute_path" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.TestUtilities.lock_resource">
+<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">lock_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FixtureRequest</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.TestUtilities.lock_resource" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.TestUtilities.script_dir">
+<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">script_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.TestUtilities.script_dir" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-test.test_documentation">
+<span id="test-test-documentation-module"></span><h2>test.test_documentation module<a class="headerlink" href="#module-test.test_documentation" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_documentation.test_build_documentation">
+<span class="sig-prename descclassname"><span class="pre">test.test_documentation.</span></span><span class="sig-name descname"><span class="pre">test_build_documentation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_documentation.test_build_documentation" title="Link to this definition">¶</a></dt>
+<dd><p>Check the documentation builds without errors</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_documentation.test_documentation_build_script_exists">
+<span class="sig-prename descclassname"><span class="pre">test.test_documentation.</span></span><span class="sig-name descname"><span class="pre">test_documentation_build_script_exists</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_documentation.test_documentation_build_script_exists" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_documentation.test_static_assets">
+<span class="sig-prename descclassname"><span class="pre">test.test_documentation.</span></span><span class="sig-name descname"><span class="pre">test_static_assets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_documentation.test_static_assets" title="Link to this definition">¶</a></dt>
+<dd><p>Test the static assets are properly copied to the output directory</p>
+</dd></dl>
+
+</section>
+<section id="module-test.test_webapp">
+<span id="test-test-webapp-module"></span><h2>test.test_webapp module<a class="headerlink" href="#module-test.test_webapp" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_webapp.test_nodejs_installed">
+<span class="sig-prename descclassname"><span class="pre">test.test_webapp.</span></span><span class="sig-name descname"><span class="pre">test_nodejs_installed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_webapp.test_nodejs_installed" title="Link to this definition">¶</a></dt>
+<dd><p>Check NodeJS is installed</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_webapp.test_webapp">
+<span class="sig-prename descclassname"><span class="pre">test.test_webapp.</span></span><span class="sig-name descname"><span class="pre">test_webapp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_webapp.test_webapp" title="Link to this definition">¶</a></dt>
+<dd><p>Check the web app builds without errors</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_webapp.test_webapp_build_script_exists">
+<span class="sig-prename descclassname"><span class="pre">test.test_webapp.</span></span><span class="sig-name descname"><span class="pre">test_webapp_build_script_exists</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_webapp.test_webapp_build_script_exists" title="Link to this definition">¶</a></dt>
+<dd><p>Check the build script exists</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="index.html">OpenInSAR</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">OpenInSAR</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">test package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="openinsar_core.html">openinsar_core package</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">OpenInSAR</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">OpenInSAR</a></li>
+      <li>Next: <a href="openinsar_core.html" title="next chapter">openinsar_core package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Stewart Agar.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/test.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
