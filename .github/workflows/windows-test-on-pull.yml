@@ -5,7 +5,7 @@ on:
     branches:
       - test
       - main
-
+      
 jobs:
   build_and_test:
     name: Build and test
