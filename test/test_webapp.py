@@ -21,7 +21,7 @@ def test_webapp_build_script_exists():
 def test_nodejs_installed():
     """Check NodeJS is installed"""
     try:
-        output = subprocess.check_output(["node", "--version"], shell=True)
+        subprocess.check_output(["node", "--version"], shell=True)
     except FileNotFoundError or AssertionError:
         raise AssertionError("NodeJS not installed")
 

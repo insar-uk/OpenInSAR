@@ -1,6 +1,10 @@
-OI_DEMO
-=======
+OpenInSAR
+=========
+
+Ipsum lorem.
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
+   test
+   openinsar_core

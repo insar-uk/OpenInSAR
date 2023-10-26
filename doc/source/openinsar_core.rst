@@ -1,10 +1,10 @@
-OI\_DEMO.src package
-====================
+openinsar\_core package
+=======================
 
 Module contents
 ---------------
 
-.. automodule:: OI_DEMO.src
+.. automodule:: openinsar_core
    :members:
    :undoc-members:
    :show-inheritance:

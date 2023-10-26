@@ -1,6 +1,15 @@
 test package
 ============
 
+Module contents
+---------------
+
+.. automodule:: test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
 Submodules
 ----------
 
@@ -12,18 +21,19 @@ test.TestUtilities module
    :undoc-members:
    :show-inheritance:
 
-test.test\_a\_test module
--------------------------
+test.test\_documentation module
+-------------------------------
 
-.. automodule:: test.test_a_test
+.. automodule:: test.test_documentation
    :members:
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+test.test\_webapp module
+------------------------
 
-.. automodule:: test
+.. automodule:: test.test_webapp
    :members:
    :undoc-members:
    :show-inheritance:
+

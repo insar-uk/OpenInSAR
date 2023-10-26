@@ -1,4 +1,32 @@
 import os
+import pytest
+import threading
+
+LOCKING_RESOURCES: dict[str, threading.Lock] = {}
+
+
+@pytest.fixture
+def lock_resource(request: pytest.FixtureRequest):
+    assert request.param is not None, "The name of the resource to lock must be provided"
+    assert isinstance(request.param, str), "The name of the resource to lock must be a string"
+    resource_name = request.param
+
+    if resource_name not in LOCKING_RESOURCES:
+        LOCKING_RESOURCES[resource_name] = threading.Lock()
+
+    lock = LOCKING_RESOURCES[resource_name]
+
+    def acquire_lock():
+        lock.acquire()
+
+    def release_lock():
+        if lock.locked():
+            lock.release()
+
+    request.addfinalizer(release_lock)
+    acquire_lock()
+    yield
+    release_lock()
 
 
 def get_repo_absolute_path() -> str:
