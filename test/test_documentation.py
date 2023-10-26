@@ -37,6 +37,8 @@ def test_build_documentation():
 
     # Check for good vibes message from Sphinx
     assert "build succeeded" in output.decode("utf-8").lower(), "Sphinx build failed"
+    # Check for bad vibes message from Sphinx
+    assert "error:" not in output.decode("utf-8").lower(), "Error in Sphinx build"
     # Check the output directory exists
     assert os.path.isdir(DOCS_DIR), "Sphinx build failed to create output directory"
     # Check the index.html file exists
