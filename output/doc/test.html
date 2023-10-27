@@ -8,11 +8,12 @@
     <title>test package &#8212; OpenInSAR 0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
-    <link rel="stylesheet" type="text/css" href="_static/static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=4e01bb69" />
     <script src="_static/documentation_options.js?v=2709fde1"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/custom.js?v=46891756"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="openinsar_core package" href="openinsar_core.html" />
@@ -73,6 +74,11 @@
 <section id="module-test.test_documentation">
 <span id="test-test-documentation-module"></span><h2>test.test_documentation module<a class="headerlink" href="#module-test.test_documentation" title="Link to this heading">¶</a></h2>
 <dl class="py function">
+<dt class="sig sig-object py" id="test.test_documentation.check_sphinx_apidoc">
+<span class="sig-prename descclassname"><span class="pre">test.test_documentation.</span></span><span class="sig-name descname"><span class="pre">check_sphinx_apidoc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.test_documentation.check_sphinx_apidoc" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="test.test_documentation.test_build_documentation">
 <span class="sig-prename descclassname"><span class="pre">test.test_documentation.</span></span><span class="sig-name descname"><span class="pre">test_build_documentation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_documentation.test_build_documentation" title="Link to this definition">¶</a></dt>
 <dd><p>Check the documentation builds without errors</p>
@@ -84,9 +90,28 @@
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="test.test_documentation.test_sphinx_apidoc">
+<span class="sig-prename descclassname"><span class="pre">test.test_documentation.</span></span><span class="sig-name descname"><span class="pre">test_sphinx_apidoc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">check_sphinx_apidoc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.test_documentation.test_sphinx_apidoc" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="test.test_documentation.test_static_assets">
 <span class="sig-prename descclassname"><span class="pre">test.test_documentation.</span></span><span class="sig-name descname"><span class="pre">test_static_assets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_documentation.test_static_assets" title="Link to this definition">¶</a></dt>
 <dd><p>Test the static assets are properly copied to the output directory</p>
+</dd></dl>
+
+</section>
+<section id="module-test.test_local_servers">
+<span id="test-test-local-servers-module"></span><h2>test.test_local_servers module<a class="headerlink" href="#module-test.test_local_servers" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_local_servers.test_https_server">
+<span class="sig-prename descclassname"><span class="pre">test.test_local_servers.</span></span><span class="sig-name descname"><span class="pre">test_https_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lock_resource</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.test_local_servers.test_https_server" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_local_servers.test_serve_a_directory">
+<span class="sig-prename descclassname"><span class="pre">test.test_local_servers.</span></span><span class="sig-name descname"><span class="pre">test_serve_a_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lock_resource</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.test_local_servers.test_serve_a_directory" title="Link to this definition">¶</a></dt>
+<dd><p>Get this directory, try to serve it, see if we can see this file.</p>
 </dd></dl>
 
 </section>
@@ -114,6 +139,26 @@
 <dt class="sig sig-object py" id="test.test_webapp.test_webapp_build_script_exists">
 <span class="sig-prename descclassname"><span class="pre">test.test_webapp.</span></span><span class="sig-name descname"><span class="pre">test_webapp_build_script_exists</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_webapp.test_webapp_build_script_exists" title="Link to this definition">¶</a></dt>
 <dd><p>Check the build script exists</p>
+</dd></dl>
+
+</section>
+<section id="module-test.test_websocket_server">
+<span id="test-test-websocket-server-module"></span><h2>test.test_websocket_server module<a class="headerlink" href="#module-test.test_websocket_server" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_websocket_server.client_send_recieve">
+<span class="sig-prename descclassname"><span class="pre">test.test_websocket_server.</span></span><span class="sig-name descname"><span class="pre">client_send_recieve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message_to_send</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'localhost'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_wss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#test.test_websocket_server.client_send_recieve" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_websocket_server.test_websocket_echo">
+<span class="sig-prename descclassname"><span class="pre">test.test_websocket_server.</span></span><span class="sig-name descname"><span class="pre">test_websocket_echo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lock_resource</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.test_websocket_server.test_websocket_echo" title="Link to this definition">¶</a></dt>
+<dd><p>Test echoing a message back from the server</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_websocket_server.test_websocket_server">
+<span class="sig-prename descclassname"><span class="pre">test.test_websocket_server.</span></span><span class="sig-name descname"><span class="pre">test_websocket_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lock_resource</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.test_websocket_server.test_websocket_server" title="Link to this definition">¶</a></dt>
+<dd><p>Test setting up the websocket server and receiving a message</p>
 </dd></dl>
 
 </section>

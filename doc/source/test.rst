@@ -9,7 +9,6 @@ Module contents
    :undoc-members:
    :show-inheritance:
 
-
 Submodules
 ----------
 
@@ -29,6 +28,14 @@ test.test\_documentation module
    :undoc-members:
    :show-inheritance:
 
+test.test\_local\_servers module
+--------------------------------
+
+.. automodule:: test.test_local_servers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 test.test\_webapp module
 ------------------------
 
@@ -36,4 +43,13 @@ test.test\_webapp module
    :members:
    :undoc-members:
    :show-inheritance:
+
+test.test\_websocket\_server module
+-----------------------------------
+
+.. automodule:: test.test_websocket_server
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
