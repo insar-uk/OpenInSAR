@@ -1,16 +1,11 @@
 {
-    "compilerOptions": {
-        "target": "esnext",
-        "module": "esnext",
-        "moduleResolution":"node", 
-        "baseUrl": "../",
-        "paths": {
-          "@/*": ["*"]
-        },
-        "types": ["@types/node","@types/d3"]
-      },
-      "include": ["./**/*"],
-      "exclude": ["node_modules", "dist"],
-      "allowJs": true
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    }
+  ]
 }
-  

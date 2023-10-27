@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router";
-import NavBar from "./components/NavBar.vue";
+import { RouterView } from 'vue-router'
+import NavBar from './components/NavBar.vue'
 </script>
 
 <template>
@@ -11,9 +11,10 @@ import NavBar from "./components/NavBar.vue";
     <main class="content">
       <router-view />
     </main>
-   
+    <RouterLink to="/about">About</RouterLink>
+    <RouterLink to="/todo">Todo</RouterLink>
+    <RouterLink to="/todo/user1">Todo User 1</RouterLink>
   </div>
-  
 </template>
 
 <style>
