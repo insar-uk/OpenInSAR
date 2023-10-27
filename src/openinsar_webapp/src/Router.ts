@@ -34,7 +34,12 @@ const routes = [
   // matches /o/3549
   { path: '/o/:orderId', component: Todo },
   // matches /p/books
-  { path: '/p/:productName', component: Todo }
+  { path: '/p/:productName', component: Todo },
+  // Add catch-all route
+  {
+    path: '/:catchAll(.*)',
+    component: NotFound
+  }
 ]
 
 // Create the router instance

@@ -1,6 +1,9 @@
-from .TestUtilities import APP_DIR, ROOT_DIR, SCRIPT_DIR
+import pytest
+from test.TestUtilities import APP_DIR, ROOT_DIR, SCRIPT_DIR, lock_resource
 import os
 import subprocess
+
+assert lock_resource is not None, "Shutup the linter"
 
 
 def test_webapp_build_script_exists():
@@ -26,7 +29,7 @@ def test_nodejs_installed():
         raise AssertionError("NodeJS not installed")
 
 
-def test_webapp():
+def test_webapp_build():
     """ Check the web app builds without errors """
     # Reset the app directory
     if os.path.isdir(APP_DIR):
@@ -48,3 +51,37 @@ def test_webapp():
     assert "error:" not in output.decode("utf-8").lower(), "npm build failed"
     # Check the index.html file exists
     assert os.path.isfile(os.path.join(APP_DIR, "index.html")), "npm build failed to create index.html file"
+
+
+@pytest.mark.parametrize("lock_resource", ["port8002"], indirect=True)
+def test_single_page_application(lock_resource):
+    """The web app should respond properly to HTTP requests."""
+    from src.openinsar_core.SinglePageAppServer import SinglePageApplicationHandler
+    from src.openinsar_core.ThreadedHttpServer import ThreadedHttpServer
+    import requests
+
+    # Launch the server
+    spas = ThreadedHttpServer("localhost", port=8002, handler=SinglePageApplicationHandler)
+    spas.launch(directory=APP_DIR)
+
+    # Check the index.html file exists
+    assert os.path.isfile(os.path.join(APP_DIR, "index.html")), "npm build failed to create index.html file"
+
+    # Request the index.html file
+    response = requests.get("http://localhost:8002")
+
+    # Check the response is good
+    assert response.status_code == 200, "Failed to get index.html"
+    # Check the response is HTML
+    assert "text/html" in response.headers["Content-Type"], "Response was not HTML"
+    # Check the response is the index.html file
+    assert "I am index.html" in response.text, "Response was not index.html"
+
+    # Now check an invalid path
+    response = requests.get("http://localhost:8002/my/invalid/path")
+    # Check the response is good
+    assert response.status_code == 200, "Failed to get index.html"
+    # Check the response is HTML
+    assert "text/html" in response.headers["Content-Type"], "Response was not HTML"
+    # Check the response is the index.html file
+    assert "I am index.html" in response.text, "Response was not index.html"

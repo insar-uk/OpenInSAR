@@ -9,7 +9,7 @@ import NavBar from './components/NavBar.vue'
       <nav-bar />
     </header>
     <main class="content">
-      <RouterView />
+      <router-view />
     </main>
     <RouterLink to="/about">About</RouterLink>
     <RouterLink to="/todo">Todo</RouterLink>
