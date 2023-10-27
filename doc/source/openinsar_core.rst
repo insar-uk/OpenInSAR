@@ -43,11 +43,3 @@ openinsar\_core.main module
    :members:
    :undoc-members:
    :show-inheritance:
-
-openinsar\_core.mynewfile module
---------------------------------
-
-.. automodule:: openinsar_core.mynewfile
-   :members:
-   :undoc-members:
-   :show-inheritance:
