@@ -9,10 +9,6 @@ This current version was developed through a PhD project at Imperial College Lon
 [![](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/ubuntu-test-on-pull.yml/badge.svg)](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/)
 [![](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/windows-test-on-pull.yml/badge.svg)](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/)
 
-**test** branch status:
-[![](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/ubuntu-test-on-pull.yml/badge.svg?branch=test)](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/)
-[![](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/windows-test-on-pull.yml/badge.svg?branch=test)](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/)
-
 **dev** branch status:
 [![](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/ubuntu-test-on-pull.yml/badge.svg?branch=dev)](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/)
 [![](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/windows-test-on-pull.yml/badge.svg?branch=dev)](https://github.com/OpenInSAR-ICL/OpenInSAR/actions/workflows/)
