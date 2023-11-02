@@ -53,7 +53,7 @@ def test_webapp_build():
     assert os.path.isfile(os.path.join(APP_DIR, "index.html")), "npm build failed to create index.html file"
 
 
-@pytest.mark.parametrize("lock_resource", ["port8002"], indirect=True)
+@pytest.mark.parametrize("lock_resource", ["port8002"], indirect=True, ids=["Use port 8002"])  # Mutex for the port
 def test_single_page_application(lock_resource):
     """The web app should respond properly to HTTP requests."""
     from src.openinsar_core.SinglePageAppServer import SinglePageApplicationHandler

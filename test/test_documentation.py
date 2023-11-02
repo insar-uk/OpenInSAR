@@ -5,6 +5,7 @@ import pytest
 
 
 def test_documentation_build_script_exists():
+    """Looks for the documentation build script, script/BuildDocs.ps1 or script/BuildDocs.sh"""
     assert os.path.isdir(ROOT_DIR), "Failed to find repository root directory"
     assert os.path.isdir(SCRIPT_DIR), "Failed to find scripts directory"
     if os.name == "nt":
@@ -17,6 +18,7 @@ def test_documentation_build_script_exists():
 
 @pytest.fixture
 def check_sphinx_apidoc(tmp_path):
+    """See (func: test_sphinx_apidoc)"""
     def _check_sphinx_apidoc(module_name, expected_content):
         # Define paths
         module_path = tmp_path / f"{module_name}.py"
@@ -71,6 +73,7 @@ def check_sphinx_apidoc(tmp_path):
 
 # Usage of the fixture
 def test_sphinx_apidoc(check_sphinx_apidoc):
+    """Creates a new Python module and runs sphinx-apidoc on it. Checks the output file contains the expected content."""
     module_name = "sample_module"  # Replace with your module name
     expected_content = "Sample Docstring"  # Replace with your expected content
     check_sphinx_apidoc(module_name, expected_content)

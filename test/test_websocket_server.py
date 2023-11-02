@@ -7,6 +7,7 @@ assert lock_resource is not None  # Just to shut up the linters who think its un
 
 
 def client_send_recieve(message_to_send: str, port: int, address: str = "localhost", is_wss: bool = False) -> str:
+    """Create a client, send a message, receive a message, close the client, return the message."""
     # Create a websocket client
     protocol = "wss" if is_wss else "ws"
     server_uri = f"{protocol}://{address}:{port}"
@@ -22,7 +23,8 @@ def client_send_recieve(message_to_send: str, port: int, address: str = "localho
     conn.close()
     return result
 
-@pytest.mark.parametrize("lock_resource", ["port8765"], indirect=True)
+
+@pytest.mark.parametrize("lock_resource", ["port8765"], indirect=True, ids=["Use port 8765"])  # Mutex for the port
 def test_websocket_server(lock_resource):
     """Test setting up the websocket server and receiving a message"""
     ws_server = ThreadedWebsocketServer(port=8765)
@@ -34,7 +36,7 @@ def test_websocket_server(lock_resource):
     ws_server.stop()
 
 
-@pytest.mark.parametrize("lock_resource", ["port8766"], indirect=True)
+@pytest.mark.parametrize("lock_resource", ["port8766"], indirect=True, ids=["Use port 8766"])  # Mutex for the port
 def test_websocket_echo(lock_resource):
     """Test echoing a message back from the server"""
     ws_server = ThreadedWebsocketServer(port=8766)
