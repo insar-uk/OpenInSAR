@@ -1,10 +1,10 @@
-OpenInSAR
-=========
+OpenInSAR Modules
+=================
 
-Ipsum lorem.
+Here is an index of modules in the OpenInSAR package.
 
 .. toctree::
    :maxdepth: 2
 
-   test
    openinsar_core
+   test

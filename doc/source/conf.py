@@ -42,7 +42,8 @@ exclude_patterns = ['build', 'Thumbs.db', '.DS_Store']
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),  # Python standard library
     'websockets': ('https://websockets.readthedocs.io/en/stable/', None),  # Websockets
-    'numpy': ('https://numpy.org/doc/stable/', None)  # Numpy
+    'numpy': ('https://numpy.org/doc/stable/', None),  # Numpy
+    'pytest': ('https://docs.pytest.org/en/stable/', None)  # Pytest
 }
 
 # -- Options for HTML output -------------------------------------------------

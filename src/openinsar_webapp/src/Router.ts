@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Todo from './components/Todo.vue'
 import NotFound from './components/NotFound.vue'
 import Home from './components/HomePage.vue'
+import HtmlLoader from './components/HtmlLoader.vue'
 
 // Define your routes
 const routes = [
@@ -26,15 +27,15 @@ const routes = [
     name: 'NotFoundA',
     component: NotFound
   },
+  { 
+    path: '/html/:htmlFile',
+    component: HtmlLoader
+  },
   {
     path: '/*',
     name: 'NotFoundB',
     component: NotFound
   },
-  // matches /o/3549
-  { path: '/o/:orderId', component: Todo },
-  // matches /p/books
-  { path: '/p/:productName', component: Todo },
   // Add catch-all route
   {
     path: '/:catchAll(.*)',

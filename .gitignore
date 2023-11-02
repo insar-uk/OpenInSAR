@@ -21,3 +21,5 @@ src/openinsar_webapp/package-lock.json
 
 # temp files
 scratch/
+src/openinsar_webapp/public/dev*
+output/app/dev*

@@ -43,3 +43,11 @@ openinsar\_core.main module
    :members:
    :undoc-members:
    :show-inheritance:
+
+openinsar\_core.xml\_utils module
+---------------------------------
+
+.. automodule:: openinsar_core.xml_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

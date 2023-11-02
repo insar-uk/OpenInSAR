@@ -16,7 +16,8 @@
     <link rel="icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="test package" href="test.html" />
+    <link rel="next" title="test package" href="test.html" />
+    <link rel="prev" title="OpenInSAR Modules" href="modules.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -57,7 +58,7 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="openinsar_core.SinglePageAppServer.SinglePageApplicationHandler.spa_index">
-<span class="sig-name descname"><span class="pre">spa_index</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'index.html'</span></em><a class="headerlink" href="#openinsar_core.SinglePageAppServer.SinglePageApplicationHandler.spa_index" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">spa_index</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/'</span></em><a class="headerlink" href="#openinsar_core.SinglePageAppServer.SinglePageApplicationHandler.spa_index" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -143,6 +144,84 @@
 <span id="openinsar-core-main-module"></span><h2>openinsar_core.main module<a class="headerlink" href="#module-openinsar_core.main" title="Link to this heading">¶</a></h2>
 <p>main.py</p>
 </section>
+<section id="module-openinsar_core.xml_utils">
+<span id="openinsar-core-xml-utils-module"></span><h2>openinsar_core.xml_utils module<a class="headerlink" href="#module-openinsar_core.xml_utils" title="Link to this heading">¶</a></h2>
+<p>Utilities for working with XML files.</p>
+<p>OpenInSAR uses XML files for a variety of purposes. As such this bespoke XML interface is useful.
+In general, however, <a class="reference internal" href="#openinsar_core.xml_utils.XmlObject" title="openinsar_core.xml_utils.XmlObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">XmlObject</span></code></a> is basically a wrapper around the ElementTree library.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="openinsar_core.xml_utils.XmlObject">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openinsar_core.xml_utils.</span></span><span class="sig-name descname"><span class="pre">XmlObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xml_string:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xml:</span> <span class="pre">~xml.etree.ElementTree.Element</span> <span class="pre">=</span> <span class="pre">&lt;Element</span> <span class="pre">'root'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openinsar_core.xml_utils.XmlObject" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A class that represents an XML object and provides methods to manipulate it.</p>
+<p>While this mainly uses the ElementTree library, this class allows us to adapt much more efficiently if something should change in that library.</p>
+<p>Attributes:
+- file: str | None: The path to the XML file to be parsed.
+- xml_string: str | None: The XML string to be parsed.
+- xml: ET.Element: The XML object to be used directly.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="openinsar_core.xml_utils.XmlObject.attrib">
+<span class="sig-name descname"><span class="pre">attrib</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></span><a class="headerlink" href="#openinsar_core.xml_utils.XmlObject.attrib" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the attributes of the root element.</p>
+<p>Returns:
+- dict: The attributes of the root element.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openinsar_core.xml_utils.XmlObject.children">
+<span class="sig-name descname"><span class="pre">children</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.12)"><span class="pre">Self</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#openinsar_core.xml_utils.XmlObject.children" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a list of XmlObject instances representing the children of the root element.</p>
+<p>Returns:
+- list[Self]: A list of XmlObject instances representing the children of the root element.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openinsar_core.xml_utils.XmlObject.find">
+<span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.12)"><span class="pre">Self</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#openinsar_core.xml_utils.XmlObject.find" title="Link to this definition">¶</a></dt>
+<dd><p>Finds all child elements with the given name.</p>
+<p>Args:
+- name: str: The name of the child elements.</p>
+<p>Returns:
+- list[Self]: A list of XmlObject instances representing the child elements.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openinsar_core.xml_utils.XmlObject.find_first">
+<span class="sig-name descname"><span class="pre">find_first</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.12)"><span class="pre">Self</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#openinsar_core.xml_utils.XmlObject.find_first" title="Link to this definition">¶</a></dt>
+<dd><p>Finds the first child element with the given name.</p>
+<p>Args:
+- name: str: The name of the child element.</p>
+<p>Returns:
+- Self | None: An XmlObject instance representing the child element, or None if it does not exist.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openinsar_core.xml_utils.XmlObject.tag">
+<span class="sig-name descname"><span class="pre">tag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#openinsar_core.xml_utils.XmlObject.tag" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the tag of the root element.</p>
+<p>Returns:
+- str: The tag of the root element.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openinsar_core.xml_utils.XmlObject.text">
+<span class="sig-name descname"><span class="pre">text</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#openinsar_core.xml_utils.XmlObject.text" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the text of the root element.</p>
+<p>Returns:
+- str | None: The text of the root element, or None if it does not exist.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openinsar_core.xml_utils.XmlObject.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></span><a class="headerlink" href="#openinsar_core.xml_utils.XmlObject.to_json" title="Link to this definition">¶</a></dt>
+<dd><p>Converts the XML object to a JSON object.</p>
+<p>Returns:
+- dict: The JSON object representing the XML object.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 </section>
 
 
@@ -167,9 +246,9 @@
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">OpenInSAR</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="test.html">test package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">OpenInSAR Modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">openinsar_core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test.html">test package</a></li>
 </ul>
 </li>
 </ul>
@@ -178,8 +257,9 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-  <li><a href="modules.html">OpenInSAR</a><ul>
-      <li>Previous: <a href="test.html" title="previous chapter">test package</a></li>
+  <li><a href="modules.html">OpenInSAR Modules</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">OpenInSAR Modules</a></li>
+      <li>Next: <a href="test.html" title="next chapter">test package</a></li>
   </ul></li>
   </ul></li>
 </ul>

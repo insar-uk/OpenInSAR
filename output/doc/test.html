@@ -16,8 +16,7 @@
     <link rel="icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="openinsar_core package" href="openinsar_core.html" />
-    <link rel="prev" title="OpenInSAR" href="modules.html" />
+    <link rel="prev" title="openinsar_core package" href="openinsar_core.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -45,29 +44,65 @@
 </section>
 <section id="module-test.TestUtilities">
 <span id="test-testutilities-module"></span><h2>test.TestUtilities module<a class="headerlink" href="#module-test.TestUtilities" title="Link to this heading">¶</a></h2>
+<p>TestUtilities.py</p>
+<p>A collection of constants and functions which are used by multiple tests.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="test.TestUtilities.ROOT_DIR">
+<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">ROOT_DIR</span></span><a class="headerlink" href="#test.TestUtilities.ROOT_DIR" title="Link to this definition">¶</a></dt>
+<dd><p>The absolute path to the root of the repository.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="test.TestUtilities.SCRIPT_DIR">
+<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">SCRIPT_DIR</span></span><a class="headerlink" href="#test.TestUtilities.SCRIPT_DIR" title="Link to this definition">¶</a></dt>
+<dd><p>The absolute path to the scripts directory.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="test.TestUtilities.APP_DIR">
+<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">APP_DIR</span></span><a class="headerlink" href="#test.TestUtilities.APP_DIR" title="Link to this definition">¶</a></dt>
+<dd><p>The absolute path to the output/app directory.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="test.TestUtilities.DOCS_DIR">
+<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">DOCS_DIR</span></span><a class="headerlink" href="#test.TestUtilities.DOCS_DIR" title="Link to this definition">¶</a></dt>
+<dd><p>The absolute path to the output/doc directory.</p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="test.TestUtilities.app_dir">
-<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">app_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.TestUtilities.app_dir" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">app_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#test.TestUtilities.app_dir" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="test.TestUtilities.docs_dir">
-<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">docs_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.TestUtilities.docs_dir" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">docs_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#test.TestUtilities.docs_dir" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="test.TestUtilities.get_repo_absolute_path">
 <span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">get_repo_absolute_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#test.TestUtilities.get_repo_absolute_path" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get the absolute path to the root of the repository.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="test.TestUtilities.lock_resource">
-<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">lock_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FixtureRequest</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.TestUtilities.lock_resource" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">lock_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytest.org/en/stable/reference/reference.html#pytest.FixtureRequest" title="(in pytest v0.1.dev81+g2390610)"><span class="pre">FixtureRequest</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.TestUtilities.lock_resource" title="Link to this definition">¶</a></dt>
+<dd><p>A fixture that provides a lock for a shared resource.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>request: <a class="reference external" href="https://docs.pytest.org/en/stable/reference/reference.html#pytest.FixtureRequest" title="(in pytest v0.1.dev81+g2390610)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pytest.FixtureRequest</span></code></a>
+The pytest request object. Contains request.param, which is the name of the resource to lock.</p>
+</dd>
+<dt>Raises:</dt><dd><p>AssertionError:
+If the name of the resource to lock is not provided or is not a string.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="test.TestUtilities.script_dir">
-<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">script_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.TestUtilities.script_dir" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">test.TestUtilities.</span></span><span class="sig-name descname"><span class="pre">script_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#test.TestUtilities.script_dir" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -76,7 +111,8 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="test.test_documentation.check_sphinx_apidoc">
 <span class="sig-prename descclassname"><span class="pre">test.test_documentation.</span></span><span class="sig-name descname"><span class="pre">check_sphinx_apidoc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.test_documentation.check_sphinx_apidoc" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>See (func: test_sphinx_apidoc)</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="test.test_documentation.test_build_documentation">
@@ -87,12 +123,14 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="test.test_documentation.test_documentation_build_script_exists">
 <span class="sig-prename descclassname"><span class="pre">test.test_documentation.</span></span><span class="sig-name descname"><span class="pre">test_documentation_build_script_exists</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_documentation.test_documentation_build_script_exists" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Looks for the documentation build script, script/BuildDocs.ps1 or script/BuildDocs.sh</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="test.test_documentation.test_sphinx_apidoc">
 <span class="sig-prename descclassname"><span class="pre">test.test_documentation.</span></span><span class="sig-name descname"><span class="pre">test_sphinx_apidoc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">check_sphinx_apidoc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.test_documentation.test_sphinx_apidoc" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Creates a new Python module and runs sphinx-apidoc on it. Checks the output file contains the expected content.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="test.test_documentation.test_static_assets">
@@ -106,12 +144,28 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="test.test_local_servers.test_https_server">
 <span class="sig-prename descclassname"><span class="pre">test.test_local_servers.</span></span><span class="sig-name descname"><span class="pre">test_https_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lock_resource</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.test_local_servers.test_https_server" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Launch a http server and get a successful response.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="test.test_local_servers.test_serve_a_directory">
 <span class="sig-prename descclassname"><span class="pre">test.test_local_servers.</span></span><span class="sig-name descname"><span class="pre">test_serve_a_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lock_resource</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.test_local_servers.test_serve_a_directory" title="Link to this definition">¶</a></dt>
 <dd><p>Get this directory, try to serve it, see if we can see this file.</p>
+</dd></dl>
+
+</section>
+<section id="module-test.test_octave_connection">
+<span id="test-test-octave-connection-module"></span><h2>test.test_octave_connection module<a class="headerlink" href="#module-test.test_octave_connection" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_octave_connection.found_octave">
+<span class="sig-prename descclassname"><span class="pre">test.test_octave_connection.</span></span><span class="sig-name descname"><span class="pre">found_octave</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_octave_connection.found_octave" title="Link to this definition">¶</a></dt>
+<dd><p>Check if octave is installed</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_octave_connection.test_command_octave">
+<span class="sig-prename descclassname"><span class="pre">test.test_octave_connection.</span></span><span class="sig-name descname"><span class="pre">test_command_octave</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_octave_connection.test_command_octave" title="Link to this definition">¶</a></dt>
+<dd><p>Call Octave script from python. Skips if octave-cli is not available on the command line.</p>
 </dd></dl>
 
 </section>
@@ -147,7 +201,8 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="test.test_websocket_server.client_send_recieve">
 <span class="sig-prename descclassname"><span class="pre">test.test_websocket_server.</span></span><span class="sig-name descname"><span class="pre">client_send_recieve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message_to_send</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'localhost'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_wss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#test.test_websocket_server.client_send_recieve" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create a client, send a message, receive a message, close the client, return the message.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="test.test_websocket_server.test_websocket_echo">
@@ -159,6 +214,64 @@
 <dt class="sig sig-object py" id="test.test_websocket_server.test_websocket_server">
 <span class="sig-prename descclassname"><span class="pre">test.test_websocket_server.</span></span><span class="sig-name descname"><span class="pre">test_websocket_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lock_resource</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.test_websocket_server.test_websocket_server" title="Link to this definition">¶</a></dt>
 <dd><p>Test setting up the websocket server and receiving a message</p>
+</dd></dl>
+
+</section>
+<section id="module-test.test_xml_handling">
+<span id="test-test-xml-handling-module"></span><h2>test.test_xml_handling module<a class="headerlink" href="#module-test.test_xml_handling" title="Link to this heading">¶</a></h2>
+<p>OpenInSAR uses XML files for a variety of purposes. As such a bespoke XML interface is provided. This module tests the XML interface.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="test.test_xml_handling.XmlToJsonTestCase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">test.test_xml_handling.</span></span><span class="sig-name descname"><span class="pre">XmlToJsonTestCase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xml_string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_json</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.test_xml_handling.XmlToJsonTestCase" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_xml_handling.test_get_node">
+<span class="sig-prename descclassname"><span class="pre">test.test_xml_handling.</span></span><span class="sig-name descname"><span class="pre">test_get_node</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_xml_handling.test_get_node" title="Link to this definition">¶</a></dt>
+<dd><p>Test getting a node from an XML object.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_xml_handling.test_xml_find_all">
+<span class="sig-prename descclassname"><span class="pre">test.test_xml_handling.</span></span><span class="sig-name descname"><span class="pre">test_xml_find_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_xml_handling.test_xml_find_all" title="Link to this definition">¶</a></dt>
+<dd><p>Return a list of all elements with a given tag.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_xml_handling.test_xml_find_first">
+<span class="sig-prename descclassname"><span class="pre">test.test_xml_handling.</span></span><span class="sig-name descname"><span class="pre">test_xml_find_first</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_xml_handling.test_xml_find_first" title="Link to this definition">¶</a></dt>
+<dd><p>Find the first element with a given tag. Not proceeding elements with the same tag.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_xml_handling.test_xml_from_element">
+<span class="sig-prename descclassname"><span class="pre">test.test_xml_handling.</span></span><span class="sig-name descname"><span class="pre">test_xml_from_element</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_xml_handling.test_xml_from_element" title="Link to this definition">¶</a></dt>
+<dd><p>Test creating an XML object from a python ElementTree object.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_xml_handling.test_xml_from_string">
+<span class="sig-prename descclassname"><span class="pre">test.test_xml_handling.</span></span><span class="sig-name descname"><span class="pre">test_xml_from_string</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_xml_handling.test_xml_from_string" title="Link to this definition">¶</a></dt>
+<dd><p>Test creating an XML object from a string.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_xml_handling.test_xml_get_attribute">
+<span class="sig-prename descclassname"><span class="pre">test.test_xml_handling.</span></span><span class="sig-name descname"><span class="pre">test_xml_get_attribute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#test.test_xml_handling.test_xml_get_attribute" title="Link to this definition">¶</a></dt>
+<dd><p>Test getting an attribute from an XML object.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_xml_handling.test_xml_open_file">
+<span class="sig-prename descclassname"><span class="pre">test.test_xml_handling.</span></span><span class="sig-name descname"><span class="pre">test_xml_open_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.test_xml_handling.test_xml_open_file" title="Link to this definition">¶</a></dt>
+<dd><p>Test opening an XML file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test.test_xml_handling.test_xml_to_json_converter">
+<span class="sig-prename descclassname"><span class="pre">test.test_xml_handling.</span></span><span class="sig-name descname"><span class="pre">test_xml_to_json_converter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x2j_test_case</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#test.test_xml_handling.XmlToJsonTestCase" title="test.test_xml_handling.XmlToJsonTestCase"><span class="pre">XmlToJsonTestCase</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#test.test_xml_handling.test_xml_to_json_converter" title="Link to this definition">¶</a></dt>
+<dd><p>Test converting XML to JSON. See <a class="reference external" href="https://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html">https://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html</a></p>
 </dd></dl>
 
 </section>
@@ -186,9 +299,9 @@
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">OpenInSAR</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">test package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">OpenInSAR Modules</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="openinsar_core.html">openinsar_core package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">test package</a></li>
 </ul>
 </li>
 </ul>
@@ -197,9 +310,8 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-  <li><a href="modules.html">OpenInSAR</a><ul>
-      <li>Previous: <a href="modules.html" title="previous chapter">OpenInSAR</a></li>
-      <li>Next: <a href="openinsar_core.html" title="next chapter">openinsar_core package</a></li>
+  <li><a href="modules.html">OpenInSAR Modules</a><ul>
+      <li>Previous: <a href="openinsar_core.html" title="previous chapter">openinsar_core package</a></li>
   </ul></li>
   </ul></li>
 </ul>

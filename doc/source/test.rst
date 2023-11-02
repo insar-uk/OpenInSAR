@@ -36,6 +36,14 @@ test.test\_local\_servers module
    :undoc-members:
    :show-inheritance:
 
+test.test\_octave\_connection module
+------------------------------------
+
+.. automodule:: test.test_octave_connection
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 test.test\_webapp module
 ------------------------
 
@@ -52,4 +60,10 @@ test.test\_websocket\_server module
    :undoc-members:
    :show-inheritance:
 
+test.test\_xml\_handling module
+-------------------------------
 
+.. automodule:: test.test_xml_handling
+   :members:
+   :undoc-members:
+   :show-inheritance:
